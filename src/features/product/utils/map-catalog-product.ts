@@ -3,7 +3,7 @@ import type {
   PublicCatalogProductItem,
 } from "@/features/product/types/catalog.types";
 import type { ProductBoxItem } from "@/features/product/types/product-box.types";
-import { buildProductSlug } from "@/utils/product-slug";
+import { buildProductSlug, resolveProductSlug } from "@/utils/product-slug";
 import { resolveStoreMediaUrl } from "@/utils/resolve-store-media-url";
 
 const PLACEHOLDER_PRODUCT_IMAGE_URL = "/placeholder-product.svg";
@@ -18,7 +18,11 @@ export function mapPublicProductToProductBoxItem(
 ): ProductBoxItem {
   return {
     id: product.id,
-    slug: product.slug,
+    slug: resolveProductSlug({
+      id: product.id,
+      name: product.name,
+      slug: product.slug,
+    }),
     name: product.name,
     imageUrl: resolveStoreMediaUrl(product.imageUrl) || PLACEHOLDER_PRODUCT_IMAGE_URL,
     galleryImageUrls:

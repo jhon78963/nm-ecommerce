@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { notFound, permanentRedirect } from "next/navigation";
 
-import { ProductDetailView } from "@/features/product/components/ProductDetailView";
+import { ProductDetailPage } from "@/features/product/components/ProductDetailPage";
 import { getProductBySlug } from "@/features/product/services/catalog.service";
 import { getProductHref } from "@/lib/routes";
+import { resolveProductSlug } from "@/utils/product-slug";
 
 interface ProductPageProps {
   params: Promise<{ slug: string }>;
@@ -33,9 +34,11 @@ export default async function ProductPage({ params }: ProductPageProps) {
     notFound();
   }
 
-  if (slug !== product.slug) {
-    permanentRedirect(getProductHref(product.slug));
+  const canonicalSlug = resolveProductSlug(product);
+
+  if (slug !== canonicalSlug) {
+    permanentRedirect(getProductHref(canonicalSlug));
   }
 
-  return <ProductDetailView product={product} />;
+  return <ProductDetailPage product={product} />;
 }
