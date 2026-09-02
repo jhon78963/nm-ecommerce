@@ -16,6 +16,9 @@ import { cn } from "@/lib/utils";
 
 import "./product-box.css";
 
+const actionButtonClass =
+  "flex h-[clamp(26px,2.2vw,32px)] w-[clamp(26px,2.2vw,32px)] cursor-pointer items-center justify-center rounded-full border-none bg-white p-0 text-theme no-underline shadow-[0_5px_12px_rgba(155,155,155,0.05)] [&_svg]:h-[clamp(14px,1.1vw,17px)] [&_svg]:w-[clamp(14px,1.1vw,17px)]";
+
 interface ProductBoxProps {
   product: ProductBoxItem;
 }
@@ -39,7 +42,7 @@ function ProductRating({ rating }: { rating: number | null }) {
   const value = rating ?? 0;
 
   return (
-    <div className="product-box__stars">
+    <div className="flex items-center gap-0.5">
       {Array.from({ length: 5 }, (_, index) => {
         const filled = value >= index + 1;
 
@@ -64,7 +67,7 @@ function WishlistIcon({ product }: { product: ProductBoxItem }) {
     <a
       href="#"
       title="Add to Wishlist"
-      className={cn("product-box__action product-box__action--wishlist", active && "text-theme")}
+      className={actionButtonClass}
       onClick={(event) => {
         event.preventDefault();
         toggleItem(wishlistProduct);
@@ -83,51 +86,49 @@ export function ProductBox({ product }: ProductBoxProps) {
     event.preventDefault();
   };
 
+  const hoverActionClass = cn(
+    actionButtonClass,
+    "opacity-0 transition-opacity duration-300 group-hover:opacity-100 max-md:opacity-100",
+  );
+
   return (
-    <div className={cn("product-box", isOutOfStock && "product-box--sold-out")}>
-      <div className="product-box__media">
+    <div className="group relative border border-[#f1f1f1] p-[clamp(7px,0.8vw,12px)] transition-all duration-500 ease-in-out">
+      <div className="relative z-0 overflow-hidden bg-[#f8f8f8]">
         {product.discount > 0 ? (
-          <div className="product-box__ribbon">
+          <div className="absolute top-2.5 left-2.5 z-[1] grid aspect-square w-fit place-content-center p-2.5 text-[clamp(10px,0.9vw,14px)] font-bold text-white">
             <span className="product-box__ribbon-shape" aria-hidden />
             {product.discount}%
           </div>
         ) : null}
 
-        <div className="product-box__zoom">
+        <div className="group/zoom overflow-hidden">
           <Link href={href}>
             <Image
               src={product.imageUrl}
               alt={product.name}
               width={400}
               height={400}
-              className="product-box__image"
+              className={cn(
+                "block aspect-square w-full object-contain transition-transform duration-500 ease-in-out group-hover/zoom:scale-110",
+                isOutOfStock && "pointer-events-none grayscale",
+              )}
             />
           </Link>
         </div>
 
-        <div className="product-box__cart-info">
+        <div className="absolute top-2.5 right-2.5 flex flex-col gap-2 max-md:top-2 max-md:right-2 max-md:gap-1">
           <WishlistIcon product={product} />
 
-          <ul className="product-box__hover-action">
+          <ul className="m-0 flex list-none flex-col gap-2 p-0 max-md:gap-1 [&>li:empty]:hidden group-hover:[&>li:nth-child(3)_a]:animate-[product-box-fade-in-down_700ms_ease-in-out] group-hover:[&>li:nth-child(4)_a]:animate-[product-box-fade-in-down_1s_ease-in-out]">
             <li />
             <li />
             <li>
-              <a
-                href="#"
-                title="Quick View"
-                className="product-box__action product-box__action--hover"
-                onClick={preventDefault}
-              >
+              <a href="#" title="Quick View" className={hoverActionClass} onClick={preventDefault}>
                 <Search />
               </a>
             </li>
             <li>
-              <a
-                href="#"
-                title="Compare"
-                className="product-box__action product-box__action--hover"
-                onClick={preventDefault}
-              >
+              <a href="#" title="Compare" className={hoverActionClass} onClick={preventDefault}>
                 <RefreshCw />
               </a>
             </li>
@@ -135,22 +136,28 @@ export function ProductBox({ product }: ProductBoxProps) {
         </div>
       </div>
 
-      <div className="product-box__body">
-        <Link href={href} className="product-box__title">
+      <div className="mt-[15px]">
+        <Link
+          href={href}
+          className="mb-1.5 block truncate text-[clamp(16px,1.1vw,18px)] leading-none font-medium text-[#222] capitalize no-underline transition-colors duration-500 hover:text-theme"
+        >
           {product.name}
         </Link>
 
-        <div className="product-box__rating-row">
+        <div className="mb-1.5 flex items-center gap-1">
           <ProductRating rating={product.ratingCount} />
-          <span>({product.reviewsCount})</span>
+          <span className="text-[clamp(13px,0.9vw,14px)] text-[#777]">({product.reviewsCount})</span>
         </div>
 
-        <h4 className="product-box__price">
+        <h4 className="m-0 flex flex-wrap items-center gap-2 text-[clamp(15px,1vw,18px)] font-medium text-[#222] [&_del]:text-[#999]">
           {formatProductBoxPrice(product.salePrice)}
           {product.discount > 0 ? <del>{formatProductBoxPrice(product.price)}</del> : null}
         </h4>
 
-        <button type="button" className="product-box__cart-btn">
+        <button
+          type="button"
+          className="mt-2.5 block w-full cursor-pointer border-none bg-[#f6f6f6] p-[clamp(5px,0.6vw,10px)] text-center text-[clamp(14px,1vw,16px)] font-medium text-[#888] transition-all duration-300 hover:bg-theme hover:text-white max-md:mt-2"
+        >
           Add To Cart
         </button>
       </div>
