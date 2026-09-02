@@ -6,6 +6,7 @@ import { Minus, Pencil, Plus, ShoppingCart, Trash2, Truck, X } from "lucide-reac
 
 import { useCart } from "@/features/cart/context/CartProvider";
 import { formatPrice } from "@/features/cart/utils/format-price";
+import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 
 export function CartOffcanvas() {
@@ -220,14 +221,14 @@ export function CartOffcanvas() {
               <li>
                 <div className="buttons flex gap-3.5">
                   <Link
-                    href="/carrito"
+                    href={ROUTES.cart}
                     onClick={closeCart}
                     className="view-cart w-full border border-theme bg-theme px-4 py-3 text-center text-sm font-semibold capitalize text-white transition-colors hover:bg-white hover:text-theme"
                   >
                     Ver carrito
                   </Link>
                   <Link
-                    href="/checkout"
+                    href={ROUTES.checkout}
                     onClick={closeCart}
                     className="checkout w-full border border-theme bg-theme px-4 py-3 text-center text-sm font-semibold capitalize text-white transition-colors hover:bg-white hover:text-theme"
                   >

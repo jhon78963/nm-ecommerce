@@ -1,6 +1,11 @@
 /** Rutas públicas del storefront en español. */
 export const ROUTES = {
   collection: (slug: string) => `/${slug}`,
+  cart: "/carrito",
+  checkout: "/checkout",
+  orderTracking: "/pedido/seguimiento",
+  orderDetails: "/pedido/detalle",
+  orderConfirmation: "/pedido/confirmacion",
   favorites: "/favoritos",
   search: "/buscar",
   product: (slugOrId: string | number) => `/producto/${slugOrId}`,

@@ -6,6 +6,7 @@ import { Heart, Home, Search, ShoppingBag, User } from "lucide-react";
 
 import { useCart } from "@/features/cart/context/CartProvider";
 import { useWishlist } from "@/features/wishlist/context/WishlistProvider";
+import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 
 interface MobileNavItem {
@@ -20,7 +21,7 @@ interface MobileNavItem {
 const NAV_ITEMS: MobileNavItem[] = [
   { id: "home", label: "Inicio", href: "/", icon: Home },
   { id: "search", label: "Buscar", href: "/buscar", icon: Search },
-  { id: "cart", label: "Carrito", href: "/carrito", icon: ShoppingBag, isCart: true },
+  { id: "cart", label: "Carrito", href: ROUTES.cart, icon: ShoppingBag, isCart: true },
   { id: "wishlist", label: "Favoritos", href: "/favoritos", icon: Heart, isWishlist: true },
   { id: "user", label: "Cuenta", href: "/micuenta/miperfil", icon: User },
 ];

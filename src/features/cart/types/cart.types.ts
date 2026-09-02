@@ -1,6 +1,7 @@
 export interface CartLineItem {
   id: string;
   productId: string;
+  slug?: string;
   name: string;
   imageUrl?: string;
   quantity: number;
@@ -16,6 +17,7 @@ export interface CartState {
 }
 
 export interface CartContextValue extends CartState {
+  isHydrated: boolean;
   itemCount: number;
   subtotal: number;
   openCart: () => void;

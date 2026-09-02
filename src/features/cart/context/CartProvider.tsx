@@ -11,22 +11,32 @@ import {
 } from "react";
 
 import type { CartContextValue, CartLineItem } from "@/features/cart/types/cart.types";
+import { readCartFromStorage, writeCartToStorage } from "@/features/cart/utils/cart-storage";
 
 const CartContext = createContext<CartContextValue | null>(null);
 
 interface CartProviderProps {
   children: ReactNode;
-  initialItems?: CartLineItem[];
   freeShippingThreshold?: number;
 }
 
 export function CartProvider({
   children,
-  initialItems = [],
   freeShippingThreshold = 200,
 }: CartProviderProps) {
-  const [items, setItems] = useState<CartLineItem[]>(initialItems);
+  const [items, setItems] = useState<CartLineItem[]>([]);
   const [isOpen, setIsOpen] = useState(false);
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  useEffect(() => {
+    setItems(readCartFromStorage());
+    setIsHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isHydrated) return;
+    writeCartToStorage(items);
+  }, [items, isHydrated]);
 
   const subtotal = useMemo(
     () => items.reduce((sum, item) => sum + item.price * item.quantity, 0),
@@ -89,6 +99,7 @@ export function CartProvider({
     () => ({
       items,
       isOpen,
+      isHydrated,
       freeShippingThreshold,
       itemCount: items.length,
       subtotal,
@@ -103,6 +114,7 @@ export function CartProvider({
     [
       items,
       isOpen,
+      isHydrated,
       freeShippingThreshold,
       subtotal,
       openCart,
