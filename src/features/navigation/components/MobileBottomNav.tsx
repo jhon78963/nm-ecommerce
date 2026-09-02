@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { Heart, Home, Search, ShoppingBag, User } from "lucide-react";
 
 import { useCart } from "@/features/cart/context/CartProvider";
+import { useWishlist } from "@/features/wishlist/context/WishlistProvider";
 import { cn } from "@/lib/utils";
 
 interface MobileNavItem {
@@ -13,19 +14,21 @@ interface MobileNavItem {
   href: string;
   icon: typeof Home;
   isCart?: boolean;
+  isWishlist?: boolean;
 }
 
 const NAV_ITEMS: MobileNavItem[] = [
   { id: "home", label: "Inicio", href: "/", icon: Home },
   { id: "search", label: "Buscar", href: "/buscar", icon: Search },
   { id: "cart", label: "Carrito", href: "/carrito", icon: ShoppingBag, isCart: true },
-  { id: "wishlist", label: "Favoritos", href: "/micuenta/favoritos", icon: Heart },
+  { id: "wishlist", label: "Favoritos", href: "/favoritos", icon: Heart, isWishlist: true },
   { id: "user", label: "Cuenta", href: "/micuenta/miperfil", icon: User },
 ];
 
 export function MobileBottomNav() {
   const pathname = usePathname();
   const { itemCount, openCart } = useCart();
+  const { itemCount: wishlistCount } = useWishlist();
 
   return (
     <nav
@@ -59,6 +62,34 @@ export function MobileBottomNav() {
                     </span>
                   ) : null}
                 </button>
+              </li>
+            );
+          }
+
+          if (item.isWishlist) {
+            return (
+              <li key={item.id} className="relative w-full text-center">
+                <Link
+                  href={item.href}
+                  className={cn(
+                    "relative inline-flex w-full flex-col items-center gap-0.5 text-[#6a6a6a]",
+                    isActive && "font-semibold text-[#222]",
+                  )}
+                >
+                  {isActive ? (
+                    <span
+                      className="absolute -bottom-3.5 left-1/2 size-2.5 -translate-x-1/2 rotate-45 rounded-full bg-theme"
+                      aria-hidden
+                    />
+                  ) : null}
+                  <Icon className="mx-auto size-5" />
+                  <span className="text-xs">{item.label}</span>
+                  {wishlistCount > 0 ? (
+                    <span className="absolute right-[calc(50%-18px)] top-0 flex size-4 items-center justify-center rounded-full bg-theme text-[10px] font-semibold text-white">
+                      {wishlistCount > 9 ? "9+" : wishlistCount}
+                    </span>
+                  ) : null}
+                </Link>
               </li>
             );
           }

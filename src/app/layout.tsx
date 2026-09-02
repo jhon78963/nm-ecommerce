@@ -6,6 +6,7 @@ import { AuthProvider } from "@/features/auth/context/AuthProvider";
 import { CartProvider } from "@/features/cart/context/CartProvider";
 import { ExitTagline } from "@/features/seo/components/ExitTagline";
 import { getDefaultDocumentTitle, SITE_META } from "@/features/seo/constants/site-meta";
+import { WishlistProvider } from "@/features/wishlist/context/WishlistProvider";
 
 import "./globals.css";
 
@@ -24,14 +25,16 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="es" className={`${montserrat.variable} h-full antialiased`}>
-      <body className="flex min-h-full flex-col font-sans">
+    <html lang="es" className={`${montserrat.variable} h-full bg-white antialiased`}>
+      <body className="flex min-h-full flex-col bg-white font-sans text-[#222]">
         <ExitTagline />
         <AuthProvider>
-          <CartProvider>
-            <Header />
-            <main className="flex flex-1 flex-col">{children}</main>
-          </CartProvider>
+          <WishlistProvider>
+            <CartProvider>
+              <Header />
+              <main className="flex flex-1 flex-col">{children}</main>
+            </CartProvider>
+          </WishlistProvider>
         </AuthProvider>
       </body>
     </html>

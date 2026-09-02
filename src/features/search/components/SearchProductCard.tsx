@@ -3,6 +3,7 @@ import Image from "next/image";
 
 import type { SearchProduct } from "@/features/search/types/search.types";
 import { formatProductPrice, getProductHref } from "@/features/search/utils/product";
+import { WishlistToggleButton } from "@/features/wishlist/components/WishlistToggleButton";
 import { cn } from "@/lib/utils";
 
 interface SearchProductCardProps {
@@ -28,6 +29,10 @@ export function SearchProductCard({ product, onNavigate }: SearchProductCardProp
             />
           </div>
         </Link>
+
+        <div className="absolute right-2 top-2 opacity-0 transition-opacity group-hover:opacity-100">
+          <WishlistToggleButton product={product} />
+        </div>
 
         <ul className="absolute left-2 top-2 flex flex-col gap-1">
           {product.isOnSale ? (

@@ -1,8 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import Link from "next/link";
-import { Heart, Menu } from "lucide-react";
+import { Menu } from "lucide-react";
 
 import { CartOffcanvas } from "@/features/cart/components/CartOffcanvas";
 import { CartTrigger } from "@/features/cart/components/CartTrigger";
@@ -12,6 +11,7 @@ import { HeaderTopBar } from "@/features/navigation/components/HeaderTopBar";
 import { HeaderUserMenu } from "@/features/navigation/components/HeaderUserMenu";
 import { MainNavigation } from "@/features/navigation/components/MainNavigation";
 import { MobileBottomNav } from "@/features/navigation/components/MobileBottomNav";
+import { WishlistTrigger } from "@/features/wishlist/components/WishlistTrigger";
 import type { HeaderLogoProps, TopBarConfig } from "@/features/navigation/types/navigation.types";
 import { cn } from "@/lib/utils";
 
@@ -115,13 +115,7 @@ export function StickyHeader({
                     </li>
 
                     <li className={cn(iconNavItemClass, "hidden min-[579px]:flex")}>
-                      <Link
-                        href="/micuenta/favoritos"
-                        className="inline-flex items-center text-[#6a6a6a] transition-colors hover:text-theme"
-                        aria-label="Lista de favoritos"
-                      >
-                        <Heart className="size-[clamp(21px,1.6vw,25px)] stroke-[1.5]" />
-                      </Link>
+                      <WishlistTrigger />
                     </li>
 
                     <li className={iconNavItemClass}>
