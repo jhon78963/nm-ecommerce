@@ -20,14 +20,3 @@ export interface HeaderNavigationConfig {
   navItems: NavMenuItem[];
   sticky?: boolean;
 }
-
-export interface LanguageOption {
-  code: string;
-  label: string;
-  flag: string;
-}
-
-export interface CurrencyOption {
-  code: string;
-  symbol: string;
-}

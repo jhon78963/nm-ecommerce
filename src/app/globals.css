@@ -32,3 +32,70 @@ button:not(:disabled),
 button:disabled {
   cursor: not-allowed;
 }
+
+/* Auth modal — slide-in panels (multikart-front parity) */
+@keyframes auth-slide-left {
+  from {
+    transform: translate(50%);
+  }
+
+  to {
+    transform: translate(0);
+  }
+}
+
+@keyframes auth-slide-right {
+  from {
+    transform: translate(-50%);
+    border-radius: 8px;
+  }
+
+  to {
+    transform: translate(0);
+    border-radius: 0;
+  }
+}
+
+.auth-modal .auth-modal-panel {
+  transform: scale(0);
+  transform-origin: bottom center;
+  transition: transform 0.3s ease-in-out;
+}
+
+.auth-modal.auth-modal--show .auth-modal-panel {
+  transform: scale(1);
+  transform-origin: center;
+}
+
+.auth-modal .modal-content {
+  transition: all 0.5s ease;
+}
+
+.auth-modal .modal-content .right-content {
+  transform: translate(50%);
+  transition: transform 0.5s ease;
+}
+
+.auth-modal .modal-content .left-img {
+  z-index: -1;
+  transform: translate(-50%);
+  transition: transform 0.5s ease;
+}
+
+.auth-modal .modal-content.open .right-content {
+  animation: auth-slide-left 0.45s ease-out forwards;
+  animation-delay: 0.5s;
+}
+
+.auth-modal .modal-content.open .left-img {
+  animation: auth-slide-right 0.45s ease-out forwards;
+  animation-delay: 0.5s;
+}
+
+@media (max-width: 1023px) {
+  .auth-modal .modal-content .right-content,
+  .auth-modal .modal-content.open .right-content {
+    animation: none;
+    transform: none;
+  }
+}
