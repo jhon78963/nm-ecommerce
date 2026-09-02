@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { ShoppingBag, X } from "lucide-react";
+import { X } from "lucide-react";
+
+import { ProductCartButton } from "@/features/product/components/cart-button/ProductCartButton";
 
 import { formatProductPrice, getProductHref } from "@/features/search/utils/product";
 import type { SearchProduct } from "@/features/search/types/search.types";
@@ -59,11 +61,7 @@ export function WishlistRow({ product }: WishlistRowProps) {
                 >
                   <X className="size-4" />
                 </button>
-                {isInStock ? (
-                  <Link href={href} className="icon" aria-label={`Ver ${product.name}`}>
-                    <ShoppingBag className="size-4" />
-                  </Link>
-                ) : null}
+                {isInStock ? <ProductCartButton product={product} /> : null}
               </h2>
             </div>
           </div>
@@ -90,11 +88,7 @@ export function WishlistRow({ product }: WishlistRowProps) {
           >
             <X className="size-4" />
           </button>
-          {isInStock ? (
-            <Link href={href} className="icon" aria-label={`Ver ${product.name}`}>
-              <ShoppingBag className="size-4" />
-            </Link>
-          ) : null}
+          {isInStock ? <ProductCartButton product={product} /> : null}
         </div>
       </td>
     </tr>

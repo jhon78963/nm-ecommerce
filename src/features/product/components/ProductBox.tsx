@@ -1,11 +1,13 @@
 "use client";
 
 import type { MouseEvent } from "react";
-import { Heart, RefreshCw, Search, Star } from "lucide-react";
+import { Heart, RefreshCw, Star } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
 import { PRODUCT_COPY } from "@/features/product/constants/product-copy";
+import { CartButton } from "@/features/product/components/cart-button/CartButton";
+import { ProductQuickViewButton } from "@/features/product/components/quick-view/ProductQuickViewButton";
 import type { ProductBoxItem } from "@/features/product/types/product-box.types";
 import {
   formatProductBoxPrice,
@@ -132,9 +134,7 @@ export function ProductBox({ product, fullHeight = false, featured = false }: Pr
             <li />
             <li />
             <li>
-              <a href="#" title={PRODUCT_COPY.quickView} className={hoverActionClass} onClick={preventDefault}>
-                <Search />
-              </a>
+              <ProductQuickViewButton product={product} className={hoverActionClass} />
             </li>
             <li>
               <a href="#" title={PRODUCT_COPY.compare} className={hoverActionClass} onClick={preventDefault}>
@@ -173,18 +173,12 @@ export function ProductBox({ product, fullHeight = false, featured = false }: Pr
           {product.discount > 0 ? <del>{formatProductBoxPrice(product.price)}</del> : null}
         </h4>
 
-        <button
-          type="button"
-          className={cn(
-            "product-box__cta mt-2.5 block w-full cursor-pointer border-none bg-[#f6f6f6] text-center font-medium text-[#888] transition-all duration-300 hover:bg-theme hover:text-white max-md:mt-2",
-            featured
-              ? "p-[clamp(8px,0.75vw,12px)] text-[clamp(15px,1.05vw,17px)]"
-              : "p-[clamp(5px,0.6vw,10px)] text-[clamp(14px,1vw,16px)]",
-            fullHeight && "mt-auto",
-          )}
-        >
-          {PRODUCT_COPY.addToCart}
-        </button>
+        <CartButton
+          product={product}
+          enableModal
+          featured={featured}
+          pushToBottom={fullHeight}
+        />
       </div>
     </div>
   );

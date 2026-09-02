@@ -1,0 +1,15 @@
+export const QUICK_VIEW_COPY = {
+  mrp: "PVP",
+  inclusiveText: "Impuestos incluidos",
+  off: "dto.",
+  reviews: "reseñas",
+  addToCart: "Agregar al carrito",
+  buyNow: "Comprar ahora",
+  outOfStock: "Agotado",
+  addToWishlist: "Agregar a favoritos",
+  addToCompare: "Comparar",
+  deliveryDetails: "Detalles de envío",
+  estimatedDelivery: "Entrega estimada en 3-5 días hábiles",
+  returnPolicy: "Devoluciones fáciles dentro de 30 días",
+  sale: "Oferta",
+} as const;

@@ -39,6 +39,30 @@ export function CartProvider({
 
   const clearCart = useCallback(() => setItems([]), []);
 
+  const addItem = useCallback((item: Omit<CartLineItem, "id"> & { id?: string }) => {
+    setItems((current) => {
+      const existing = current.find(
+        (line) => line.productId === item.productId && line.variationId === item.variationId,
+      );
+
+      if (existing) {
+        return current.map((line) =>
+          line.id === existing.id
+            ? { ...line, quantity: line.quantity + item.quantity }
+            : line,
+        );
+      }
+
+      return [
+        ...current,
+        {
+          ...item,
+          id: item.id ?? `${item.productId}-${item.variationId ?? "default"}-${Date.now()}`,
+        },
+      ];
+    });
+  }, []);
+
   const removeItem = useCallback((id: string) => {
     setItems((current) => current.filter((item) => item.id !== id));
   }, []);
@@ -72,6 +96,7 @@ export function CartProvider({
       closeCart,
       toggleCart,
       clearCart,
+      addItem,
       removeItem,
       updateQuantity,
     }),
@@ -84,6 +109,7 @@ export function CartProvider({
       closeCart,
       toggleCart,
       clearCart,
+      addItem,
       removeItem,
       updateQuantity,
     ],

@@ -5,6 +5,7 @@ import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
 import { AuthProvider } from "@/features/auth/context/AuthProvider";
 import { CartProvider } from "@/features/cart/context/CartProvider";
+import { QuickViewProvider } from "@/features/product/context/QuickViewProvider";
 import { ExitTagline } from "@/features/seo/components/ExitTagline";
 import { getDefaultDocumentTitle, SITE_META } from "@/features/seo/constants/site-meta";
 import { WishlistProvider } from "@/features/wishlist/context/WishlistProvider";
@@ -32,9 +33,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <AuthProvider>
           <WishlistProvider>
             <CartProvider>
-              <Header />
-              <main className="flex flex-1 flex-col">{children}</main>
-              <Footer />
+              <QuickViewProvider>
+                <Header />
+                <main className="flex flex-1 flex-col">{children}</main>
+                <Footer />
+              </QuickViewProvider>
             </CartProvider>
           </WishlistProvider>
         </AuthProvider>

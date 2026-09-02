@@ -22,6 +22,7 @@ export interface CartContextValue extends CartState {
   closeCart: () => void;
   toggleCart: (open: boolean) => void;
   clearCart: () => void;
+  addItem: (item: Omit<CartLineItem, "id"> & { id?: string }) => void;
   removeItem: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
 }

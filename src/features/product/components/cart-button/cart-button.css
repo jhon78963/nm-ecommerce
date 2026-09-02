@@ -1,0 +1,198 @@
+/* Cart button — multikart-front cart-button / add-cart-btn / addtocart_btn parity */
+
+.add-cart-btn {
+  width: 100%;
+  display: block;
+  padding: calc(5px + (10 - 5) * ((100vw - 320px) / (1920 - 320)))
+    calc(5px + (10 - 5) * ((100vw - 320px) / (1920 - 320)));
+  text-align: center;
+  border: none;
+  color: #888;
+  font-size: calc(14px + (16 - 14) * ((100vw - 320px) / (1920 - 320)));
+  font-weight: 500;
+  margin-top: 10px;
+  background-color: #f6f6f6;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.add-cart-btn:hover:not(:disabled) {
+  background-color: var(--theme-color);
+  color: #fff;
+}
+
+.add-cart-btn.active {
+  background-color: var(--theme-color);
+  color: #fff;
+}
+
+.add-cart-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.add-cart-btn--featured {
+  padding: calc(8px + (12 - 8) * ((100vw - 320px) / (1920 - 320)))
+    calc(8px + (12 - 8) * ((100vw - 320px) / (1920 - 320)));
+  font-size: calc(15px + (17 - 15) * ((100vw - 320px) / (1920 - 320)));
+}
+
+.add-cart-btn--auto-top {
+  margin-top: auto;
+}
+
+@media (max-width: 767px) {
+  .add-cart-btn {
+    margin-top: 8px;
+  }
+}
+
+.addtocart_btn {
+  width: max-content;
+  margin: 0 auto;
+  position: relative;
+  width: 100%;
+}
+
+.addtocart_btn .add-button {
+  background-color: transparent;
+  text-align: center;
+  font-size: 16px;
+  width: 100%;
+  padding: 9px 49px;
+  transition: all 0.5s ease;
+  cursor: pointer;
+  border: 1px solid var(--theme-color);
+  margin-top: 15px;
+  color: var(--theme-color);
+  position: relative;
+  font-weight: 500;
+}
+
+.addtocart_btn .add-button::before {
+  transition: 0.5s all ease;
+  position: absolute;
+  inset: 0;
+  left: 50%;
+  right: 50%;
+  opacity: 0;
+  content: "";
+  background-color: var(--theme-color);
+  z-index: -1;
+}
+
+.addtocart_btn .add-button:hover:not(:disabled),
+.addtocart_btn .add-button:focus:not(:disabled) {
+  background-color: var(--theme-color) !important;
+  color: #fff !important;
+}
+
+.addtocart_btn .add-button:hover:not(:disabled)::before,
+.addtocart_btn .add-button:focus:not(:disabled)::before {
+  transition: 0.5s all ease;
+  left: 0;
+  right: 0;
+  opacity: 1;
+}
+
+.addtocart_btn .add-button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.addtocart_btn .qty-box {
+  position: absolute;
+  bottom: 0;
+  display: none;
+  width: 100%;
+}
+
+.addtocart_btn .qty-box.open {
+  display: block;
+}
+
+.addtocart_btn .qty-box .input-group {
+  padding: 4px;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  border-radius: 0;
+  border: 1px solid var(--theme-color);
+  background-color: #fff;
+}
+
+.addtocart_btn .qty-box .input-group .form-control {
+  width: 100%;
+  border: none;
+  background-color: transparent;
+  padding-block: 0;
+  text-align: center;
+  font-weight: 600;
+  color: #222;
+}
+
+.addtocart_btn .qty-box .input-group button {
+  height: 100%;
+  padding: 8px;
+  border: 1px solid #eee;
+  background-color: #f8f8f8;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #222;
+}
+
+.cart-button-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(26px + (32 - 26) * ((100vw - 320px) / (1920 - 320)));
+  height: calc(26px + (32 - 26) * ((100vw - 320px) / (1920 - 320)));
+  border: none;
+  border-radius: 100%;
+  background-color: #fff;
+  color: var(--theme-color);
+  box-shadow: 0 5px 12px rgba(155, 155, 155, 0.05);
+  cursor: pointer;
+  padding: 0;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.cart-button-icon svg {
+  width: calc(14px + (17 - 14) * ((100vw - 320px) / (1920 - 320)));
+  height: calc(14px + (17 - 14) * ((100vw - 320px) / (1920 - 320)));
+}
+
+.cart-button-icon.active {
+  background-color: var(--theme-color);
+  color: #fff;
+}
+
+.product-cart-button.cart {
+  font-size: calc(18px + (20 - 18) * ((100vw - 320px) / (1920 - 320)));
+  border: 1px solid #eee;
+  width: calc(28px + (32 - 28) * ((100vw - 320px) / (1920 - 320)));
+  height: calc(28px + (32 - 28) * ((100vw - 320px) / (1920 - 320)));
+  border-radius: 0;
+  background-color: #f8f8f8;
+  color: #777;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.product-cart-button.cart:hover {
+  color: var(--theme-color);
+}
+
+.product-cart-button.cart svg {
+  width: calc(16px + (18 - 16) * ((100vw - 320px) / (1920 - 320)));
+  height: calc(16px + (18 - 16) * ((100vw - 320px) / (1920 - 320)));
+}
