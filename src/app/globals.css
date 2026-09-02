@@ -99,3 +99,103 @@ button:disabled {
     transform: none;
   }
 }
+
+/* Home banners — marketplace-1 parity */
+.banner-padding {
+  padding-top: clamp(20px, 1.2vw, 24px);
+}
+
+.banner-section .banner-contain {
+  display: block;
+  overflow: hidden;
+}
+
+.banner-section .banner-bg-size {
+  padding-top: 50%;
+}
+
+.banner-section .banner-contain .banner-bg-size {
+  transition: transform 0.5s ease;
+}
+
+.banner-section .banner-contain:hover .banner-bg-size {
+  transform: scale(1.05);
+}
+
+/* Home hero slider — marketplace-1 parity */
+.layout-7 .home-slider {
+  overflow: hidden;
+}
+
+.layout-7 .home-slider .home,
+.layout-7 .home-slider .home-slide {
+  position: relative;
+  height: 60vh;
+  min-height: 280px;
+}
+
+.layout-7 .home-slider .home-slide-link {
+  position: relative;
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+
+.layout-7 .home-slider .home-slider-carousel {
+  overflow: hidden;
+}
+
+.layout-7 .home-slider .home-slider-track {
+  height: 60vh;
+  min-height: 280px;
+}
+
+.home-slider-nav {
+  position: absolute;
+  top: 50%;
+  z-index: 1;
+  display: flex;
+  height: 20px;
+  width: 20px;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 9999px;
+  background-color: rgba(255, 255, 255, 0.5);
+  color: #000;
+  opacity: 0;
+  transform: translateY(-50%) scale(1);
+  transition: all 0.5s ease-in-out;
+}
+
+.home-slider-carousel:hover .home-slider-nav {
+  opacity: 1;
+  transform: translateY(-50%) scale(1.8);
+}
+
+.home-slider-nav-prev {
+  left: clamp(14px, 2.5vw, 50px);
+}
+
+.home-slider-nav-next {
+  right: clamp(14px, 2.5vw, 50px);
+}
+
+@media (max-width: 767px) {
+  .layout-7 .home-slider .home,
+  .layout-7 .home-slider .home-slide,
+  .layout-7 .home-slider .home-slider-track {
+    height: 40vh;
+    min-height: 220px;
+  }
+
+  .home-slider-carousel:hover .home-slider-nav {
+    transform: translateY(-50%) scale(1.5);
+  }
+}
+
+@media (max-width: 480px) {
+  .home-slider-carousel:hover .home-slider-nav {
+    transform: translateY(-50%) scale(1.2);
+  }
+}
