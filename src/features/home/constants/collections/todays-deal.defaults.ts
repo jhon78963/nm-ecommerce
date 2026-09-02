@@ -3,6 +3,7 @@ import type { ProductCollectionConfig } from "@/features/home/types/collection.t
 
 /** marketplace_one.json → content.product_list_1 */
 export const DEFAULT_TODAYS_DEAL_COLLECTION: ProductCollectionConfig = {
+  id: "todays-deal",
   tag: "special offer",
   title: "today's deal",
   status: true,

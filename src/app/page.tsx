@@ -7,16 +7,18 @@ import { HomeServicesSection } from "@/features/home/components/services/HomeSer
 import { HomeSocialMediaSection } from "@/features/home/components/social-media/HomeSocialMediaSection";
 import { getHomeBanners } from "@/features/home/services/banner.service";
 import { getHomeCategoryProductSection } from "@/features/home/services/category-product.service";
+import { getHomeCollections } from "@/features/home/services/collections.service";
 import { getHomeHeroSlides } from "@/features/home/services/hero.service";
 import { getHomeOfferBanner } from "@/features/home/services/offer-banner.service";
 import { getHomeServices } from "@/features/home/services/home-services.service";
 import { getHomeSocialMedia } from "@/features/home/services/home-social-media.service";
 
 export default async function Home() {
-  const [slides, banners, offerBanner, categoryProductSection, services, socialMedia] =
+  const [slides, banners, collections, offerBanner, categoryProductSection, services, socialMedia] =
     await Promise.all([
       getHomeHeroSlides(),
       getHomeBanners(),
+      getHomeCollections(),
       getHomeOfferBanner(),
       getHomeCategoryProductSection(),
       getHomeServices(),
@@ -27,7 +29,13 @@ export default async function Home() {
     <div className="flex flex-1 flex-col bg-white">
       <HomeHeroSection slides={slides} />
       <HomeBannerSection banners={banners} />
-      <ProductCollectionSection />
+      {collections.map((collection) => (
+        <ProductCollectionSection
+          key={collection.id}
+          config={collection}
+          products={collection.products}
+        />
+      ))}
       <HomeOfferBannerSection banner={offerBanner} />
       <HomeCategoryProductSection section={categoryProductSection} />
       <HomeServicesSection services={services} />
