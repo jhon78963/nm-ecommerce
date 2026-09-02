@@ -1,4 +1,5 @@
 import type { StoreFooterConfig } from "@/features/footer/types/footer.types";
+import { SUPPORT_EMAIL } from "@/features/institutional/constants/support-contact";
 
 export const FOOTER_REVALIDATE_SECONDS = 300;
 
@@ -10,8 +11,8 @@ export const FALLBACK_FOOTER_CONFIG: StoreFooterConfig = {
   aboutText:
     "Descubre las últimas tendencias y disfruta de una experiencia de compra única con nuestras colecciones exclusivas.",
   address: "Puesto C-74, Mercado Mayorista, Trujillo, Perú",
-  supportNumber: "+51 984802248",
-  supportEmail: "novedadesmaritex@gmail.com",
+  supportNumber: "+51 901259663",
+  supportEmail: SUPPORT_EMAIL,
   socialMediaEnabled: true,
   facebookUrl: "https://facebook.com/",
   twitterUrl: "https://twitter.com/",
@@ -19,8 +20,10 @@ export const FALLBACK_FOOTER_CONFIG: StoreFooterConfig = {
   pinterestUrl: "https://pinterest.com/",
   tiktokUrl: "https://www.tiktok.com/",
   categories: [
-    { id: "nosotros-1", name: "Acerca de nosotros", href: "/acerca-de-nosotros" },
-    { id: "nosotros-2", name: "Ventas al por mayor", href: "/ventas-al-por-mayor" },
+    { id: "nosotros-1", name: "Nuestra Empresa", href: "/nuestra-empresa" },
+    { id: "nosotros-2", name: "Nuestras Tiendas", href: "/tiendas" },
+    { id: "nosotros-3", name: "Preguntas Frecuentes", href: "/preguntas-frecuentes" },
+    { id: "nosotros-4", name: "Contactanos", href: "/contactanos" },
   ],
   usefulLinks: [
     { id: "info-1", name: "Términos y condiciones", href: "/terminos-y-condiciones" },
@@ -32,10 +35,10 @@ export const FALLBACK_FOOTER_CONFIG: StoreFooterConfig = {
     {
       id: "help-1",
       name: "Políticas de garantía y devoluciones",
-      href: "/politicas-de-garantia-y-devoluciones",
+      href: "/garantia-y-devoluciones",
     },
-    { id: "help-2", name: "Tarifas y zonas de reparto", href: "/tarifas-y-zonas-de-reparto" },
-    { id: "help-3", name: "Mi cuenta", href: "/micuenta/miperfil" },
+    { id: "help-2", name: "Tarifas y zonas de reparto", href: "/tarifas-y-zonas" },
+    { id: "help-3", name: "Ventas al por mayor", href: "/ventas-al-por-mayor" },
   ],
   copyrightEnabled: true,
   copyrightContent: "2026 NovedadesMaritex © Todos los derechos reservados.",

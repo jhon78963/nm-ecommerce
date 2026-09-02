@@ -1,6 +1,7 @@
 import { Mail, MapPin } from "lucide-react";
 
 import type { StoreFooterConfig } from "@/features/footer/types/footer.types";
+import { SUPPORT_EMAIL } from "@/features/institutional/constants/support-contact";
 
 function WhatsAppIcon({ className }: { className?: string }) {
   return (
@@ -13,10 +14,9 @@ function WhatsAppIcon({ className }: { className?: string }) {
 interface FooterContactProps {
   address: StoreFooterConfig["address"];
   supportNumber: StoreFooterConfig["supportNumber"];
-  supportEmail: StoreFooterConfig["supportEmail"];
 }
 
-export function FooterContact({ address, supportNumber, supportEmail }: FooterContactProps) {
+export function FooterContact({ address, supportNumber }: FooterContactProps) {
   return (
     <ul className="contact-list">
       {address ? (
@@ -31,12 +31,10 @@ export function FooterContact({ address, supportNumber, supportEmail }: FooterCo
           Whatsapp: {supportNumber}
         </li>
       ) : null}
-      {supportEmail ? (
-        <li>
-          <Mail className="contact-list__icon" aria-hidden="true" />
-          Escribenos a: {supportEmail}
-        </li>
-      ) : null}
+      <li>
+        <Mail className="contact-list__icon" aria-hidden="true" />
+        <a href={`mailto:${SUPPORT_EMAIL}`}>Escribenos a: {SUPPORT_EMAIL}</a>
+      </li>
     </ul>
   );
 }

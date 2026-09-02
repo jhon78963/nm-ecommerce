@@ -9,6 +9,11 @@ import { FooterNewsletter } from "@/features/footer/components/widgets/FooterNew
 import { FooterPaymentOptions } from "@/features/footer/components/widgets/FooterPaymentOptions";
 import { FooterSocialLinks } from "@/features/footer/components/widgets/FooterSocialLinks";
 import { getStoreFooterConfig } from "@/features/footer/services/footer.service";
+import {
+  HARDCODED_FOOTER_CENTRO_AYUDA_LINKS,
+  HARDCODED_FOOTER_INFORMACION_LINKS,
+  HARDCODED_FOOTER_NOSOTROS_LINKS,
+} from "@/features/institutional/constants/footer-links";
 
 import "./footer.css";
 
@@ -32,19 +37,19 @@ export async function Footer() {
 
             <div className="footer-col footer-col--categories">
               <FooterAccordionSection title="NOSOTROS">
-                <FooterCategories categories={config.categories} />
+                <FooterCategories categories={HARDCODED_FOOTER_NOSOTROS_LINKS} />
               </FooterAccordionSection>
             </div>
 
             <div className="footer-col footer-col--useful">
               <FooterAccordionSection title="INFORMACIÓN">
-                <FooterLinks links={config.usefulLinks} />
+                <FooterLinks links={HARDCODED_FOOTER_INFORMACION_LINKS} />
               </FooterAccordionSection>
             </div>
 
             <div className="footer-col footer-col--help">
               <FooterAccordionSection title="CENTRO DE AYUDA">
-                <FooterLinks links={config.helpCenterLinks} />
+                <FooterLinks links={HARDCODED_FOOTER_CENTRO_AYUDA_LINKS} />
               </FooterAccordionSection>
             </div>
 
@@ -53,7 +58,6 @@ export async function Footer() {
                 <FooterContact
                   address={config.address}
                   supportNumber={config.supportNumber}
-                  supportEmail={config.supportEmail}
                 />
               </FooterAccordionSection>
             </div>
