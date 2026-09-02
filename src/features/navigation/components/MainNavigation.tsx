@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 interface MainNavigationProps {
   isOpen: boolean;
   onClose: () => void;
+  items?: NavMenuItem[];
 }
 
 function NavLink({ item, onNavigate }: { item: NavMenuItem; onNavigate?: () => void }) {
@@ -32,12 +33,12 @@ function NavLink({ item, onNavigate }: { item: NavMenuItem; onNavigate?: () => v
   );
 }
 
-export function MainNavigation({ isOpen, onClose }: MainNavigationProps) {
+export function MainNavigation({ isOpen, onClose, items = MAIN_NAV_ITEMS }: MainNavigationProps) {
   return (
     <>
       <nav className="hidden xl:block" aria-label="Navegación principal">
         <ul className="flex items-center">
-          {MAIN_NAV_ITEMS.map((item) => (
+          {items.map((item) => (
             <li key={item.id} className="relative">
               <NavLink item={item} />
             </li>
@@ -75,7 +76,7 @@ export function MainNavigation({ isOpen, onClose }: MainNavigationProps) {
         </div>
 
         <ul className="flex-1 overflow-y-auto px-4 py-2">
-          {MAIN_NAV_ITEMS.map((item) => (
+          {items.map((item) => (
             <li key={item.id} className="border-b border-[#eee] last:border-0">
               <div className="flex items-center justify-between">
                 <NavLink item={item} onNavigate={onClose} />

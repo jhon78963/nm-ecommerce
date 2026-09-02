@@ -13,7 +13,12 @@ export interface HeaderLogoProps {
 export interface TopBarConfig {
   enabled?: boolean;
   siteName?: string;
-  supportNumber?: string;
+  supportNumber?: string | null;
+}
+
+export interface HeaderNavigationConfig {
+  navItems: NavMenuItem[];
+  sticky?: boolean;
 }
 
 export interface LanguageOption {

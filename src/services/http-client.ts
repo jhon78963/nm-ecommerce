@@ -4,6 +4,7 @@ interface RequestOptions {
   params?: Record<string, string | number | boolean | undefined>;
   cache?: RequestCache;
   token?: string;
+  revalidate?: number | false;
 }
 
 function getHeaders(token?: string): HeadersInit {
@@ -46,10 +47,13 @@ function buildUrl(path: string, params?: RequestOptions["params"]) {
 }
 
 export async function apiGet<T>(path: string, options: RequestOptions = {}): Promise<T> {
-  const response = await fetch(buildUrl(path, options.params), {
+  const { revalidate, cache, ...rest } = options;
+
+  const response = await fetch(buildUrl(path, rest.params), {
     method: "GET",
-    headers: getHeaders(options.token),
-    cache: options.cache ?? "no-store",
+    headers: getHeaders(rest.token),
+    cache: cache ?? (revalidate !== undefined ? "force-cache" : "no-store"),
+    ...(revalidate !== undefined ? { next: { revalidate } } : {}),
   });
 
   if (!response.ok) {

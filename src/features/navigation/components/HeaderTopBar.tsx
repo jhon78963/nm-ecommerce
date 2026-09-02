@@ -9,8 +9,11 @@ interface HeaderTopBarProps extends TopBarConfig {}
 
 export function HeaderTopBar({
   siteName = DEFAULT_TOP_BAR.siteName,
-  supportNumber = DEFAULT_TOP_BAR.supportNumber,
+  supportNumber,
 }: HeaderTopBarProps) {
+  const resolvedSupportNumber =
+    supportNumber === undefined ? DEFAULT_TOP_BAR.supportNumber : supportNumber;
+
   return (
     <div className="bg-[#333333]">
       <div className="mx-auto flex w-full max-w-[1400px] flex-wrap items-center justify-between gap-2 px-4">
@@ -18,10 +21,12 @@ export function HeaderTopBar({
           <li className="hidden pr-6 text-sm text-[#d9d9d9] min-[1400px]:block">
             Bienvenido a {siteName}
           </li>
-          <li className="flex items-center text-sm text-[#d9d9d9]">
-            <MessageCircle className="mr-1.5 size-4 text-theme" aria-hidden />
-            Llámanos: {supportNumber}
-          </li>
+          {resolvedSupportNumber ? (
+            <li className="flex items-center text-sm text-[#d9d9d9]">
+              <MessageCircle className="mr-1.5 size-4 text-theme" aria-hidden />
+              Llámanos: {resolvedSupportNumber}
+            </li>
+          ) : null}
         </ul>
 
         <ul className="flex items-center py-2.5">

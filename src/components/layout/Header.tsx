@@ -1,26 +1,18 @@
 import { StickyHeader } from "@/features/navigation/components/StickyHeader";
-import type { HeaderLogoProps, TopBarConfig } from "@/features/navigation/types/navigation.types";
+import { getStoreHeaderConfig } from "@/features/navigation/services/header.service";
 
-export interface HeaderProps extends HeaderLogoProps, TopBarConfig {
-  sticky?: boolean;
-}
+export async function Header() {
+  const config = await getStoreHeaderConfig();
 
-export function Header({
-  logoUrl,
-  brandName,
-  enabled: topBarEnabled = true,
-  siteName,
-  supportNumber,
-  sticky = true,
-}: HeaderProps) {
   return (
     <StickyHeader
-      logoUrl={logoUrl}
-      brandName={brandName}
-      enabled={topBarEnabled}
-      siteName={siteName}
-      supportNumber={supportNumber}
-      sticky={sticky}
+      logoUrl={config.logoUrl}
+      brandName={config.brandName}
+      enabled={config.topBarEnabled}
+      siteName={config.siteName}
+      supportNumber={config.supportNumber}
+      sticky={config.sticky}
+      navItems={config.navItems}
     />
   );
 }

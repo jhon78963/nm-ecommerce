@@ -12,11 +12,16 @@ import { HeaderUserMenu } from "@/features/navigation/components/HeaderUserMenu"
 import { MainNavigation } from "@/features/navigation/components/MainNavigation";
 import { MobileBottomNav } from "@/features/navigation/components/MobileBottomNav";
 import { WishlistTrigger } from "@/features/wishlist/components/WishlistTrigger";
-import type { HeaderLogoProps, TopBarConfig } from "@/features/navigation/types/navigation.types";
+import type {
+  HeaderLogoProps,
+  HeaderNavigationConfig,
+  NavMenuItem,
+  TopBarConfig,
+} from "@/features/navigation/types/navigation.types";
 import { cn } from "@/lib/utils";
 
-interface StickyHeaderProps extends HeaderLogoProps, TopBarConfig {
-  sticky?: boolean;
+interface StickyHeaderProps extends HeaderLogoProps, TopBarConfig, HeaderNavigationConfig {
+  navItems: NavMenuItem[];
 }
 
 export function StickyHeader({
@@ -26,6 +31,7 @@ export function StickyHeader({
   siteName,
   supportNumber,
   sticky = true,
+  navItems,
 }: StickyHeaderProps) {
   const [isSticky, setIsSticky] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -101,7 +107,7 @@ export function StickyHeader({
               </div>
 
               <div className="menu-right flex items-center">
-                <MainNavigation isOpen={isMenuOpen} onClose={closeMenu} />
+                <MainNavigation isOpen={isMenuOpen} onClose={closeMenu} items={navItems} />
 
                 <div className="icon-nav inline-flex items-center">
                   <ul className="flex items-center">
