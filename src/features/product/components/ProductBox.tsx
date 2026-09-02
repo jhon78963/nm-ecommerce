@@ -22,6 +22,7 @@ const actionButtonClass =
 
 interface ProductBoxProps {
   product: ProductBoxItem;
+  fullHeight?: boolean;
 }
 
 function toWishlistProduct(product: ProductBoxItem): SearchProduct {
@@ -79,7 +80,7 @@ function WishlistIcon({ product }: { product: ProductBoxItem }) {
   );
 }
 
-export function ProductBox({ product }: ProductBoxProps) {
+export function ProductBox({ product, fullHeight = false }: ProductBoxProps) {
   const href = getProductBoxHref(product);
   const isOutOfStock = product.stockStatus === "out_of_stock";
 
@@ -93,7 +94,12 @@ export function ProductBox({ product }: ProductBoxProps) {
   );
 
   return (
-    <div className="group relative border border-[#f1f1f1] p-[clamp(7px,0.8vw,12px)] transition-all duration-500 ease-in-out">
+    <div
+      className={cn(
+        "group relative border border-[#f1f1f1] p-[clamp(7px,0.8vw,12px)] transition-all duration-500 ease-in-out",
+        fullHeight && "flex h-full flex-col",
+      )}
+    >
       <div className="relative z-0 overflow-hidden bg-[#f8f8f8]">
         {product.discount > 0 ? (
           <div className="absolute top-2.5 left-2.5 z-[1] grid aspect-square w-fit place-content-center p-2.5 text-[clamp(10px,0.9vw,14px)] font-bold text-white">
@@ -137,7 +143,7 @@ export function ProductBox({ product }: ProductBoxProps) {
         </div>
       </div>
 
-      <div className="mt-[15px]">
+      <div className={cn("mt-[15px]", fullHeight && "flex flex-1 flex-col")}>
         <Link
           href={href}
           className="mb-1.5 block truncate text-[clamp(16px,1.1vw,18px)] leading-none font-medium text-[#222] capitalize no-underline transition-colors duration-500 hover:text-theme"
@@ -157,7 +163,10 @@ export function ProductBox({ product }: ProductBoxProps) {
 
         <button
           type="button"
-          className="mt-2.5 block w-full cursor-pointer border-none bg-[#f6f6f6] p-[clamp(5px,0.6vw,10px)] text-center text-[clamp(14px,1vw,16px)] font-medium text-[#888] transition-all duration-300 hover:bg-theme hover:text-white max-md:mt-2"
+          className={cn(
+            "mt-2.5 block w-full cursor-pointer border-none bg-[#f6f6f6] p-[clamp(5px,0.6vw,10px)] text-center text-[clamp(14px,1vw,16px)] font-medium text-[#888] transition-all duration-300 hover:bg-theme hover:text-white max-md:mt-2",
+            fullHeight && "mt-auto",
+          )}
         >
           {PRODUCT_COPY.addToCart}
         </button>

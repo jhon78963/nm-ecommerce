@@ -12,15 +12,15 @@ export function CategoryProductLeftPanel({ title, products }: CategoryProductLef
   }
 
   return (
-    <div className="theme-card">
-      <h5 className="title-border m-0 bg-theme p-2.5 text-base font-semibold text-white capitalize">
-        {title}
-      </h5>
+    <div className="theme-card h-full">
+      <h5 className="category-product-panel-header">{title}</h5>
 
-      <div className="offer-slider mt-0 space-y-2">
-        {products.map((product) => (
-          <ProductBoxHorizontal key={product.id} product={product} className="mt-0" />
-        ))}
+      <div className="offer-slider">
+        <div>
+          {products.map((product) => (
+            <ProductBoxHorizontal key={product.id} product={product} />
+          ))}
+        </div>
       </div>
     </div>
   );

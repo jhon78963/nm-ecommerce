@@ -3,6 +3,8 @@ import { CategoryProductTabSection } from "@/features/home/components/category-p
 import type { HomeCategoryProductSectionView } from "@/features/home/types/category-product.types";
 import { cn } from "@/lib/utils";
 
+import "./category-product-section.css";
+
 interface HomeCategoryProductSectionProps {
   section: HomeCategoryProductSectionView | null;
 }
@@ -22,11 +24,11 @@ export function HomeCategoryProductSection({ section }: HomeCategoryProductSecti
   }
 
   return (
-    <section className="tools_product bg-title pb-[70px] pt-[70px]">
+    <section className="category-product-section tools_product bg-title pb-[70px] pt-[70px]">
       <div className="mx-auto w-full max-w-[1400px] px-[15px]">
-        <div className="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-12">
+        <div className={cn("category-product-row", hasLeftPanel && "has-left-panel")}>
           {hasLeftPanel ? (
-            <div className="lg:col-span-4">
+            <div className="min-w-0">
               <CategoryProductLeftPanel
                 title={section.leftPanel!.title}
                 products={section.leftPanel!.products}
@@ -35,7 +37,7 @@ export function HomeCategoryProductSection({ section }: HomeCategoryProductSecti
           ) : null}
 
           {hasRightPanel ? (
-            <div className={cn(hasLeftPanel ? "lg:col-span-8" : "col-span-full")}>
+            <div className="min-w-0">
               <CategoryProductTabSection
                 title={section.rightPanel.productCategory.title}
                 tabs={section.rightPanel.productCategory.tabs}
