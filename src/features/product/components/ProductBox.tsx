@@ -5,6 +5,7 @@ import { Heart, RefreshCw, Search, Star } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
+import { PRODUCT_COPY } from "@/features/product/constants/product-copy";
 import type { ProductBoxItem } from "@/features/product/types/product-box.types";
 import {
   formatProductBoxPrice,
@@ -66,7 +67,7 @@ function WishlistIcon({ product }: { product: ProductBoxItem }) {
   return (
     <a
       href="#"
-      title="Add to Wishlist"
+      title={PRODUCT_COPY.addToWishlist}
       className={actionButtonClass}
       onClick={(event) => {
         event.preventDefault();
@@ -123,12 +124,12 @@ export function ProductBox({ product }: ProductBoxProps) {
             <li />
             <li />
             <li>
-              <a href="#" title="Quick View" className={hoverActionClass} onClick={preventDefault}>
+              <a href="#" title={PRODUCT_COPY.quickView} className={hoverActionClass} onClick={preventDefault}>
                 <Search />
               </a>
             </li>
             <li>
-              <a href="#" title="Compare" className={hoverActionClass} onClick={preventDefault}>
+              <a href="#" title={PRODUCT_COPY.compare} className={hoverActionClass} onClick={preventDefault}>
                 <RefreshCw />
               </a>
             </li>
@@ -158,7 +159,7 @@ export function ProductBox({ product }: ProductBoxProps) {
           type="button"
           className="mt-2.5 block w-full cursor-pointer border-none bg-[#f6f6f6] p-[clamp(5px,0.6vw,10px)] text-center text-[clamp(14px,1vw,16px)] font-medium text-[#888] transition-all duration-300 hover:bg-theme hover:text-white max-md:mt-2"
         >
-          Add To Cart
+          {PRODUCT_COPY.addToCart}
         </button>
       </div>
     </div>
