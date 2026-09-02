@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import type { HomeHeroSlide } from "@/features/home/constants/home-hero.defaults";
+import type { HomeHeroSlide } from "@/features/home/types/hero.types";
 
 interface HomeSliderSlideProps {
   slide: HomeHeroSlide;
