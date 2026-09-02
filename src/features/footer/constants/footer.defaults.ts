@@ -1,15 +1,14 @@
-import { ROUTES } from "@/lib/routes";
-
 import type { StoreFooterConfig } from "@/features/footer/types/footer.types";
 
 export const FOOTER_REVALIDATE_SECONDS = 300;
 
-/** themeOptions.json → footer (adaptado a rutas nm-ecommerce) */
+/** Valores por defecto del footer (alineados con ecommerce-service). */
 export const FALLBACK_FOOTER_CONFIG: StoreFooterConfig = {
-  newsletterTitle: "KNOW IT ALL FIRST!",
-  newsletterSubtitle: "Never Miss Anything From Store By Signing Up To Our Newsletter.",
+  newsletterTitle: "¡Suscríbete ahora!",
+  newsletterSubtitle:
+    "Regístrate en nuestro Newsletter y recibe ofertas, promociones y lanzamientos.",
   aboutText:
-    "Discover the latest trends and enjoy seamless shopping with our exclusive collections.",
+    "Descubre las últimas tendencias y disfruta de una experiencia de compra única con nuestras colecciones exclusivas.",
   address: "Puesto C-74, Mercado Mayorista, Trujillo, Perú",
   supportNumber: "+51 984802248",
   supportEmail: "novedadesmaritex@gmail.com",
@@ -20,23 +19,23 @@ export const FALLBACK_FOOTER_CONFIG: StoreFooterConfig = {
   pinterestUrl: "https://pinterest.com/",
   tiktokUrl: "https://www.tiktok.com/",
   categories: [
-    { id: "500", name: "Baby Essentials", href: `${ROUTES.shop}?categoria=baby-essentials` },
-    { id: "520", name: "Bag Emporium", href: `${ROUTES.shop}?categoria=bag-emporium` },
-    { id: "540", name: "Books", href: `${ROUTES.shop}?categoria=books` },
-    { id: "560", name: "Christmas", href: `${ROUTES.shop}?categoria=christmas` },
-    { id: "580", name: "Classic Furnishings", href: `${ROUTES.shop}?categoria=classic-furnishings` },
+    { id: "nosotros-1", name: "Acerca de nosotros", href: "/acerca-de-nosotros" },
+    { id: "nosotros-2", name: "Ventas al por mayor", href: "/ventas-al-por-mayor" },
   ],
   usefulLinks: [
-    { id: "1", name: "Home", href: "/" },
-    { id: "3", name: "About Us", href: "/acerca-de-nosotros" },
-    { id: "5", name: "Offers", href: ROUTES.shop },
+    { id: "info-1", name: "Términos y condiciones", href: "/terminos-y-condiciones" },
+    { id: "info-2", name: "Libro de reclamaciones", href: "/libro-de-reclamaciones" },
+    { id: "info-3", name: "Política de privacidad", href: "/politica-de-privacidad" },
+    { id: "info-4", name: "Política de cookies", href: "/politica-de-cookies" },
   ],
   helpCenterLinks: [
-    { id: "1", name: "My Account", href: "/micuenta/miperfil" },
-    { id: "2", name: "My Orders", href: "/micuenta/pedidos" },
-    { id: "4", name: "Wishlist", href: ROUTES.favorites },
-    { id: "6", name: "Faq's", href: "/preguntas-frecuentes" },
-    { id: "7", name: "Contact Us", href: "/contactanos" },
+    {
+      id: "help-1",
+      name: "Políticas de garantía y devoluciones",
+      href: "/politicas-de-garantia-y-devoluciones",
+    },
+    { id: "help-2", name: "Tarifas y zonas de reparto", href: "/tarifas-y-zonas-de-reparto" },
+    { id: "help-3", name: "Mi cuenta", href: "/micuenta/miperfil" },
   ],
   copyrightEnabled: true,
   copyrightContent: "2026 NovedadesMaritex © Todos los derechos reservados.",

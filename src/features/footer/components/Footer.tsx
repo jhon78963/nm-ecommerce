@@ -31,25 +31,25 @@ export async function Footer() {
             </div>
 
             <div className="footer-col footer-col--categories">
-              <FooterAccordionSection title="Categories">
+              <FooterAccordionSection title="NOSOTROS">
                 <FooterCategories categories={config.categories} />
               </FooterAccordionSection>
             </div>
 
             <div className="footer-col footer-col--useful">
-              <FooterAccordionSection title="Useful Links">
+              <FooterAccordionSection title="INFORMACIÓN">
                 <FooterLinks links={config.usefulLinks} />
               </FooterAccordionSection>
             </div>
 
             <div className="footer-col footer-col--help">
-              <FooterAccordionSection title="Help Center">
+              <FooterAccordionSection title="CENTRO DE AYUDA">
                 <FooterLinks links={config.helpCenterLinks} />
               </FooterAccordionSection>
             </div>
 
             <div className="footer-col footer-col--contact">
-              <FooterAccordionSection title="Store Information">
+              <FooterAccordionSection title="CONTÁCTANOS">
                 <FooterContact
                   address={config.address}
                   supportNumber={config.supportNumber}

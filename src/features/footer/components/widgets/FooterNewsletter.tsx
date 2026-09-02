@@ -11,6 +11,15 @@ interface FooterNewsletterProps {
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+const NEWSLETTER_COPY = {
+  emailPlaceholder: "Ingresa tu correo electrónico",
+  submit: "Suscribirse",
+  submitting: "Enviando...",
+  success: "¡Gracias por suscribirte!",
+  emailRequired: "El correo es obligatorio.",
+  emailInvalid: "Correo electrónico inválido.",
+} as const;
+
 export function FooterNewsletter({ title, subtitle }: FooterNewsletterProps) {
   const [email, setEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -25,12 +34,12 @@ export function FooterNewsletter({ title, subtitle }: FooterNewsletterProps) {
     const trimmedEmail = email.trim();
 
     if (!trimmedEmail) {
-      setError("Email is required.");
+      setError(NEWSLETTER_COPY.emailRequired);
       return;
     }
 
     if (!EMAIL_PATTERN.test(trimmedEmail)) {
-      setError("Invalid email.");
+      setError(NEWSLETTER_COPY.emailInvalid);
       return;
     }
 
@@ -56,7 +65,7 @@ export function FooterNewsletter({ title, subtitle }: FooterNewsletterProps) {
                   <h4>{title}</h4>
                   <p>{subtitle}</p>
                   {isSubmitted ? (
-                    <p className="footer-newsletter-success">Thanks for subscribing!</p>
+                    <p className="footer-newsletter-success">{NEWSLETTER_COPY.success}</p>
                   ) : null}
                 </div>
               </div>
@@ -69,7 +78,7 @@ export function FooterNewsletter({ title, subtitle }: FooterNewsletterProps) {
                     <input
                       type="email"
                       className="form-control"
-                      placeholder="Enter Email Address"
+                      placeholder={NEWSLETTER_COPY.emailPlaceholder}
                       value={email}
                       onChange={(event) => {
                         setEmail(event.target.value);
@@ -85,7 +94,7 @@ export function FooterNewsletter({ title, subtitle }: FooterNewsletterProps) {
                     />
                   </div>
                   <button type="submit" className="btn-solid" disabled={isSubmitting}>
-                    {isSubmitting ? "..." : "Subscribe"}
+                    {isSubmitting ? NEWSLETTER_COPY.submitting : NEWSLETTER_COPY.submit}
                   </button>
                 </div>
                 {error ? (

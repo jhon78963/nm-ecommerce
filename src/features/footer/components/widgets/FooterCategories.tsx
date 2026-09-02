@@ -8,7 +8,7 @@ interface FooterCategoriesProps {
 
 export function FooterCategories({ categories }: FooterCategoriesProps) {
   if (categories.length === 0) {
-    return <p className="no-data-footer">No category found.</p>;
+    return <p className="no-data-footer">Sin enlaces configurados.</p>;
   }
 
   return (
