@@ -12,7 +12,7 @@ export const CATEGORY_PRODUCT_REVALIDATE_SECONDS = 300;
 export const DEFAULT_CATEGORY_PRODUCT_SECTION: HomeCategoryProductSectionConfig = {
   status: true,
   leftPanel: {
-    title: "Menos de S/ 20 | Envío gratis",
+    title: "Menos de S/ 20",
     status: true,
     productIds: [117, 114, 112, 74, 34],
   },
