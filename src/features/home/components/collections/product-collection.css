@@ -4,7 +4,13 @@
   gap: 12px;
 }
 
+.product-collection-carousel-wrapper {
+  position: relative;
+}
+
 .product-collection-carousel {
+  container-type: inline-size;
+  container-name: product-collection;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
@@ -20,11 +26,13 @@
   display: flex;
   align-items: stretch;
   gap: 12px;
+  width: max-content;
+  min-width: 100%;
 }
 
 .product-collection-slide {
   display: flex;
-  flex: 0 0 calc((100% - 12px) / 2);
+  flex: 0 0 calc((100cqw - 12px) / 2);
   scroll-snap-align: start;
 }
 
@@ -32,6 +40,46 @@
   flex: 1;
   width: 100%;
   min-width: 0;
+}
+
+.product-collection-nav {
+  position: absolute;
+  top: 38%;
+  z-index: 2;
+  display: none;
+  height: 40px;
+  width: 40px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #eee;
+  border-radius: 9999px;
+  background-color: #fff;
+  color: #222;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  transition:
+    opacity 0.2s ease,
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.product-collection-nav:hover:not(:disabled) {
+  background-color: var(--theme-color);
+  border-color: var(--theme-color);
+  color: #fff;
+}
+
+.product-collection-nav--prev {
+  left: -6px;
+}
+
+.product-collection-nav--next {
+  right: -6px;
+}
+
+.product-collection-nav--disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
 }
 
 @media (min-width: 576px) {
@@ -50,7 +98,19 @@
   }
 
   .product-collection-slide {
-    flex-basis: calc((100% - 32px) / 3);
+    flex-basis: calc((100cqw - 32px) / 3);
+  }
+
+  .product-collection-nav {
+    display: flex;
+  }
+
+  .product-collection-nav--prev {
+    left: -18px;
+  }
+
+  .product-collection-nav--next {
+    right: -18px;
   }
 }
 
@@ -60,7 +120,7 @@
   }
 
   .product-collection-slide {
-    flex-basis: calc((100% - 48px) / 4);
+    flex-basis: calc((100cqw - 48px) / 4);
   }
 }
 
@@ -70,6 +130,6 @@
   }
 
   .product-collection-slide {
-    flex-basis: calc((100% - 64px) / 5);
+    flex-basis: calc((100cqw - 64px) / 5);
   }
 }
