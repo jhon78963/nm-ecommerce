@@ -57,7 +57,6 @@ function PdpPrice({
   return (
     <div className="price-text">
       <h3>
-        <span className="text-dark fw-normal">{PDP_COPY.mrp}:</span>{" "}
         {formatPrice(salePrice)}
         {discount > 0 ? (
           <>

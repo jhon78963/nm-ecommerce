@@ -103,7 +103,6 @@ export function ProductQuickViewDetails({ product, onClose }: ProductQuickViewDe
 
       <div className="price-text">
         <h3>
-          <span className="text-dark fw-normal">{QUICK_VIEW_COPY.mrp}:</span>{" "}
           {formatProductBoxPrice(product.salePrice)}
           {product.discount > 0 ? (
             <>

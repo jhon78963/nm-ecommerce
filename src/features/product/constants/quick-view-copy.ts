@@ -1,5 +1,5 @@
 export const QUICK_VIEW_COPY = {
-  mrp: "PVP",
+  mrp: "",
   inclusiveText: "Impuestos incluidos",
   off: "dto.",
   reviews: "reseñas",
@@ -9,7 +9,7 @@ export const QUICK_VIEW_COPY = {
   addToWishlist: "Agregar a favoritos",
   addToCompare: "Comparar",
   deliveryDetails: "Detalles de envío",
-  estimatedDelivery: "Entrega estimada en 3-5 días hábiles",
-  returnPolicy: "Devoluciones fáciles dentro de 30 días",
+  estimatedDelivery: "Entrega estimada en 1-2 días hábiles",
+  returnPolicy: "Devoluciones fáciles dentro de 3 días",
   sale: "Oferta",
 } as const;

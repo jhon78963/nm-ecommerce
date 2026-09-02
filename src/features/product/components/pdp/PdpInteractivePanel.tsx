@@ -183,6 +183,22 @@ export function PdpInteractivePanel({ product }: PdpInteractivePanelProps) {
       {/* Selectors */}
       {hasSizes ? (
         <div className="pdp-selectors">
+          {/* Size selector */}
+          <div className="pdp-selector-row">
+            <div className="pdp-selector-label">
+              {PDP_COPY.sizesLabel}
+              {selectedSize ? (
+                <span>{selectedSize.label}</span>
+              ) : null}
+            </div>
+
+            <SizeChips
+              sizes={sizes}
+              selectedSizeId={selectedSizeId}
+              onSelect={handleSizeSelect}
+            />
+          </div>
+
           {/* Color selector */}
           <div className="pdp-selector-row">
             <div className="pdp-selector-label">
@@ -201,30 +217,6 @@ export function PdpInteractivePanel({ product }: PdpInteractivePanelProps) {
             ) : (
               <p className="text-sm text-gray-400 italic">Selecciona una talla primero</p>
             )}
-          </div>
-
-          {/* Size selector */}
-          <div className="pdp-selector-row">
-            <div className="pdp-selector-label">
-              {PDP_COPY.sizesLabel}
-              {selectedSize ? (
-                <span>{selectedSize.label}</span>
-              ) : null}
-              <button type="button" className="pdp-size-guide-link ml-auto">
-                <svg xmlns="http://www.w3.org/2000/svg" className="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <path d="M3 17l3-3 3 3 3-3 3 3 3-3 3 3" />
-                  <line x1="3" y1="12" x2="21" y2="12" />
-                  <line x1="3" y1="7" x2="21" y2="7" />
-                </svg>
-                {PDP_COPY.guiaDeTallas}
-              </button>
-            </div>
-
-            <SizeChips
-              sizes={sizes}
-              selectedSizeId={selectedSizeId}
-              onSelect={handleSizeSelect}
-            />
           </div>
         </div>
       ) : null}

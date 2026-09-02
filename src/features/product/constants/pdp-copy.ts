@@ -9,7 +9,7 @@ export const PDP_COPY = {
   selectedSize: (label: string) => `Talla seleccionada: ${label}`,
   agotadoParaTalla: "Agotado en esta talla",
 
-  mrp: "PVP",
+  mrp: "",
   inclusiveText: "Impuestos incluidos",
   off: "dto.",
 
@@ -26,8 +26,8 @@ export const PDP_COPY = {
   selectColorFirst: "Selecciona un color",
 
   deliveryTitle: "Detalles de envío",
-  estimatedDelivery: "Entrega estimada en 3-5 días hábiles",
-  returnPolicy: "Devoluciones fáciles dentro de 30 días",
+  estimatedDelivery: "Entrega estimada en 1-2 días hábiles",
+  returnPolicy: "Devoluciones fáciles dentro de 3 días",
 
   productInfoTitle: "Información del producto",
   skuLabel: "SKU",
