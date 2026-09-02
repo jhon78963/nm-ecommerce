@@ -1,9 +1,9 @@
 import type { NavMenuItem } from "@/features/navigation/types/navigation.types";
+import { FALLBACK_SHOP_COLLECTIONS } from "@/features/shop/constants/shop.constants";
+import { ROUTES } from "@/lib/routes";
 
-export const MAIN_NAV_ITEMS: NavMenuItem[] = [
-  { id: "home", title: "Inicio", href: "/" },
-  { id: "shop", title: "Tienda", href: "/tienda" },
-  { id: "new", title: "Novedades", href: "/tienda?sort=new" },
-  { id: "sale", title: "Ofertas", href: "/tienda?onSale=true" },
-  { id: "contact", title: "Contacto", href: "/contacto" },
-];
+export const MAIN_NAV_ITEMS: NavMenuItem[] = FALLBACK_SHOP_COLLECTIONS.map((collection) => ({
+  id: collection.slug,
+  title: collection.label,
+  href: ROUTES.collection(collection.slug),
+}));

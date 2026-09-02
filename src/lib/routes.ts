@@ -1,6 +1,6 @@
 /** Rutas públicas del storefront en español. */
 export const ROUTES = {
-  shop: "/tienda",
+  collection: (slug: string) => `/${slug}`,
   favorites: "/favoritos",
   search: "/buscar",
   product: (slugOrId: string | number) => `/producto/${slugOrId}`,

@@ -6,7 +6,7 @@ export const FALLBACK_HOME_OFFER_BANNER: HomeOfferBanner = {
   id: "default-offer-banner",
   status: true,
   imageUrl: "/images/theme/marketplace_one/marketplace_one_6.png",
-  href: ROUTES.shop,
+  href: ROUTES.collection("ofertas"),
   alt: "Banner promocional del home",
 };
 

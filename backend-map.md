@@ -47,6 +47,8 @@
 34. [Reportes — IA](#34-reportes--ia)
 35. [Storage — Archivos](#35-storage--archivos)
 36. [Health](#36-health)
+37. [Ecommerce — Colecciones PLP](#37-ecommerce--colecciones-plp)
+38. [Ecommerce — Productos PLP](#38-ecommerce--productos-plp)
 
 ---
 
@@ -2410,6 +2412,138 @@ Authorization: Bearer <refresh_token>
 
 **Autenticación:** 🔓 Público  
 **Respuesta `200`:** Estado de cada servicio (auth, catalog, inventory, pos, finance, hr, report, storage).
+
+---
+
+## 37. Ecommerce — Colecciones PLP
+
+**Módulo:** Tienda online — colecciones de producto (PLP)  
+**Servicio backend:** `ecommerce-service` (:3012)  
+**Prefijo gateway:** `/api/v1/ecommerce/shop/collections`
+
+---
+
+### `GET /api/v1/ecommerce/shop/collections`
+
+**Descripción:** Listar colecciones activas de la tienda (sidebar y rutas `/[slug]`).
+
+**Autenticación:** 🔓 Público
+
+**Respuesta `200`:**
+```json
+{
+  "collections": [
+    {
+      "id": "ninos",
+      "slug": "ninos",
+      "label": "Niños",
+      "description": "Ropa para niños",
+      "bannerImageUrl": "/api/v1/storage/files/products/banner.jpg",
+      "status": true,
+      "productIds": ["uuid-1", "uuid-2"]
+    }
+  ]
+}
+```
+
+---
+
+### `GET /api/v1/ecommerce/shop/collections/:slug`
+
+**Descripción:** Obtener una colección por slug.
+
+**Autenticación:** 🔓 Público  
+**Errores:** `404` colección no encontrada o inactiva
+
+---
+
+### `PUT /api/v1/ecommerce/shop/collections/admin`
+
+**Descripción:** Crear o reemplazar todas las colecciones de la tienda.
+
+**Autenticación:** 🛡️ Roles: `Admin`, `Super Admin`
+
+**Body:**
+```json
+{
+  "collections": [
+    {
+      "id": "ninos",
+      "slug": "ninos",
+      "label": "Niños",
+      "description": "Opcional",
+      "bannerImageUrl": "Opcional",
+      "status": true,
+      "productIds": ["uuid-1", "uuid-2", "uuid-3"]
+    }
+  ]
+}
+```
+
+**Respuesta `200`:** Misma forma que `GET /collections` (solo activas).
+
+---
+
+## 38. Ecommerce — Productos PLP
+
+**Prefijo gateway:** `/api/v1/ecommerce/shop/products`
+
+---
+
+### `GET /api/v1/ecommerce/shop/products`
+
+**Descripción:** Listar productos de una colección con paginación, filtros y facetas (tallas/colores disponibles en la colección).
+
+**Autenticación:** 🔓 Público  
+**Rate limit:** 30 req / 60s
+
+**Query Params:**
+| Param | Tipo | Descripción |
+|-------|------|-------------|
+| `collectionSlug` | string | Slug de la colección (requerido) |
+| `warehouseId` | UUID | Almacén del tenant (requerido) |
+| `sizeIds` | string | IDs de talla separados por coma |
+| `colorIds` | string | IDs de color separados por coma |
+| `minPrice` | number | Precio mínimo (precio de venta mínimo del producto) |
+| `maxPrice` | number | Precio máximo |
+| `sort` | string | `featured` \| `price_asc` \| `price_desc` \| `newest` |
+| `page` | number | Página (default: 1) |
+| `perPage` | number | Ítems por página (default: 12, máx: 100) |
+
+**Respuesta `200`:**
+```json
+{
+  "products": [
+    {
+      "id": "uuid",
+      "name": "Polo Cuello Redondo",
+      "slug": "polo-cuello-redondo-abc12345",
+      "imageUrl": "...",
+      "galleryImageUrls": ["..."],
+      "price": 45.00,
+      "salePrice": 39.00,
+      "discount": 13,
+      "stockStatus": "in_stock",
+      "ratingCount": null,
+      "reviewsCount": 0
+    }
+  ],
+  "meta": {
+    "total": 24,
+    "page": 1,
+    "perPage": 12,
+    "totalPages": 2
+  },
+  "facets": {
+    "sizes": [{ "id": "uuid", "label": "L" }],
+    "colors": [{ "id": "uuid", "label": "Rojo", "hex": "#FF0000" }]
+  }
+}
+```
+
+**Notas:**
+- Las facetas (`sizes`, `colors`) se calculan a partir de **todos** los productos asignados a la colección, no del resultado filtrado.
+- El filtro de precio en el frontend usa presets estáticos; el backend aplica `minPrice`/`maxPrice` sobre el precio mínimo de venta del producto.
 
 ---
 

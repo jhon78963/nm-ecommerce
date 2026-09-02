@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Heart } from "lucide-react";
+import { ROUTES } from "@/lib/routes";
 
 export function WishlistEmptyState() {
   return (
@@ -12,10 +13,10 @@ export function WishlistEmptyState() {
         Guarda los productos que te gusten para verlos más tarde. No necesitas iniciar sesión.
       </p>
       <Link
-        href="/tienda"
+        href={ROUTES.collection("ninos")}
         className="mt-6 inline-flex border border-theme bg-theme px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-white hover:text-theme"
       >
-        Explorar tienda
+        Explorar colecciones
       </Link>
     </div>
   );

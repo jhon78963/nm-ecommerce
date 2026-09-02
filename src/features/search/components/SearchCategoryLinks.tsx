@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import { resolveCollectionSlug } from "@/features/shop/constants/shop.constants";
+import { ROUTES } from "@/lib/routes";
 import type { SearchGender } from "@/features/search/types/search.types";
 
 interface SearchCategoryLinksProps {
@@ -17,7 +19,7 @@ export function SearchCategoryLinks({ genders, onNavigate }: SearchCategoryLinks
         {genders.map((gender) => (
           <li key={gender.id}>
             <Link
-              href={`/tienda?genderId=${gender.id}`}
+              href={ROUTES.collection(resolveCollectionSlug(gender.description))}
               onClick={onNavigate}
               className="font-medium text-theme hover:underline"
             >

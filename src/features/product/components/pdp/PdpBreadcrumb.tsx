@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 
 import { PDP_COPY } from "@/features/product/constants/pdp-copy";
+import { resolveCollectionSlug } from "@/features/shop/constants/shop.constants";
 import { ROUTES } from "@/lib/routes";
 
 interface PdpBreadcrumbProps {
@@ -17,21 +18,13 @@ export function PdpBreadcrumb({ productName, genderLabel }: PdpBreadcrumbProps) 
           <Link href="/">{PDP_COPY.breadcrumbHome}</Link>
         </li>
 
-        <li aria-hidden="true">
-          <ChevronRight className="pdp-breadcrumb__sep size-3" />
-        </li>
-
-        <li>
-          <Link href={ROUTES.shop}>{PDP_COPY.breadcrumbShop}</Link>
-        </li>
-
         {genderLabel ? (
           <>
             <li aria-hidden="true">
               <ChevronRight className="pdp-breadcrumb__sep size-3" />
             </li>
             <li>
-              <Link href={`${ROUTES.shop}?genero=${encodeURIComponent(genderLabel.toLowerCase())}`}>
+              <Link href={ROUTES.collection(resolveCollectionSlug(genderLabel))}>
                 {genderLabel}
               </Link>
             </li>

@@ -20,7 +20,7 @@ export const DEFAULT_CATEGORY_PRODUCT_SECTION: HomeCategoryProductSectionConfig 
     productBanner: {
       status: true,
       imageUrl: "/images/theme/marketplace_one/marketplace_one_7.png",
-      href: ROUTES.shop,
+      href: ROUTES.collection("ninos"),
       alt: "Banner de categoría",
     },
     productCategory: {
