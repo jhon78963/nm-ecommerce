@@ -75,18 +75,21 @@ const FALLBACK_TAB_PRODUCTS: Record<string, ProductBoxItem[]> = {
     createFallbackProduct(202, "Sillón lounge Urban", "sillon-lounge-urban", 180, 149),
     createFallbackProduct(203, "Estantería modular", "estanteria-modular", 95, 79),
     createFallbackProduct(204, "Banco de madera", "banco-de-madera", 65, 54),
+    createFallbackProduct(205, "Mesa de centro", "mesa-de-centro", 110, 89),
   ],
   "30": [
     createFallbackProduct(301, "Cuadro abstracto", "cuadro-abstracto", 45, 38),
     createFallbackProduct(302, "Florero cerámico", "florero-ceramico", 28, 22),
     createFallbackProduct(303, "Espejo redondo", "espejo-redondo", 55, 46),
     createFallbackProduct(304, "Macetero minimal", "macetero-minimal", 24, 19),
+    createFallbackProduct(305, "Lámpara de pie", "lampara-de-pie", 78, 65),
   ],
   "115": [
     createFallbackProduct(401, "Juego de toallas", "juego-de-toallas", 36, 29),
     createFallbackProduct(402, "Difusor de aromas", "difusor-de-aromas", 42, 35),
     createFallbackProduct(403, "Caja organizadora", "caja-organizadora", 18, 14.5),
     createFallbackProduct(404, "Alfombra suave", "alfombra-suave", 88, 72),
+    createFallbackProduct(405, "Set de cojines", "set-de-cojines", 32, 26),
   ],
 };
 

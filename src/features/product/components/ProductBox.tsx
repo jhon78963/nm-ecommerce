@@ -23,6 +23,7 @@ const actionButtonClass =
 interface ProductBoxProps {
   product: ProductBoxItem;
   fullHeight?: boolean;
+  featured?: boolean;
 }
 
 function toWishlistProduct(product: ProductBoxItem): SearchProduct {
@@ -80,7 +81,7 @@ function WishlistIcon({ product }: { product: ProductBoxItem }) {
   );
 }
 
-export function ProductBox({ product, fullHeight = false }: ProductBoxProps) {
+export function ProductBox({ product, fullHeight = false, featured = false }: ProductBoxProps) {
   const href = getProductBoxHref(product);
   const isOutOfStock = product.stockStatus === "out_of_stock";
 
@@ -98,11 +99,12 @@ export function ProductBox({ product, fullHeight = false }: ProductBoxProps) {
       className={cn(
         "group relative border border-[#f1f1f1] p-[clamp(7px,0.8vw,12px)] transition-all duration-500 ease-in-out",
         fullHeight && "flex h-full flex-col",
+        featured && "product-box-featured",
       )}
     >
       <div className="relative z-0 overflow-hidden bg-[#f8f8f8]">
         {product.discount > 0 ? (
-          <div className="absolute top-2.5 left-2.5 z-[1] grid aspect-square w-fit place-content-center p-2.5 text-[clamp(10px,0.9vw,14px)] font-bold text-white">
+          <div className="product-box__discount absolute top-2.5 left-2.5 z-[1] grid aspect-square w-fit place-content-center p-2.5 text-[clamp(10px,0.9vw,14px)] font-bold text-white">
             <span className="product-box__ribbon-shape" aria-hidden />
             {product.discount}%
           </div>
@@ -116,7 +118,7 @@ export function ProductBox({ product, fullHeight = false }: ProductBoxProps) {
               width={400}
               height={400}
               className={cn(
-                "block aspect-square w-full object-contain transition-transform duration-500 ease-in-out group-hover/zoom:scale-110",
+                "product-box__image block aspect-square w-full object-contain transition-transform duration-500 ease-in-out group-hover/zoom:scale-110",
                 isOutOfStock && "pointer-events-none grayscale",
               )}
             />
@@ -143,10 +145,15 @@ export function ProductBox({ product, fullHeight = false }: ProductBoxProps) {
         </div>
       </div>
 
-      <div className={cn("mt-[15px]", fullHeight && "flex flex-1 flex-col")}>
+      <div className={cn("mt-[15px]", fullHeight && "flex flex-1 flex-col", featured && "mt-[18px]")}>
         <Link
           href={href}
-          className="mb-1.5 block truncate text-[clamp(16px,1.1vw,18px)] leading-none font-medium text-[#222] capitalize no-underline transition-colors duration-500 hover:text-theme"
+          className={cn(
+            "product-box__title mb-1.5 block truncate leading-none font-medium text-[#222] capitalize no-underline transition-colors duration-500 hover:text-theme",
+            featured
+              ? "text-[clamp(17px,1.25vw,20px)]"
+              : "text-[clamp(16px,1.1vw,18px)]",
+          )}
         >
           {product.name}
         </Link>
@@ -156,7 +163,12 @@ export function ProductBox({ product, fullHeight = false }: ProductBoxProps) {
           <span className="text-[clamp(13px,0.9vw,14px)] text-[#777]">({product.reviewsCount})</span>
         </div>
 
-        <h4 className="m-0 flex flex-wrap items-center gap-2 text-[clamp(15px,1vw,18px)] font-medium text-[#222] [&_del]:text-[#999]">
+        <h4
+          className={cn(
+            "product-box__price m-0 flex flex-wrap items-center gap-2 font-medium text-[#222] [&_del]:text-[#999]",
+            featured ? "text-[clamp(16px,1.15vw,20px)]" : "text-[clamp(15px,1vw,18px)]",
+          )}
+        >
           {formatProductBoxPrice(product.salePrice)}
           {product.discount > 0 ? <del>{formatProductBoxPrice(product.price)}</del> : null}
         </h4>
@@ -164,7 +176,10 @@ export function ProductBox({ product, fullHeight = false }: ProductBoxProps) {
         <button
           type="button"
           className={cn(
-            "mt-2.5 block w-full cursor-pointer border-none bg-[#f6f6f6] p-[clamp(5px,0.6vw,10px)] text-center text-[clamp(14px,1vw,16px)] font-medium text-[#888] transition-all duration-300 hover:bg-theme hover:text-white max-md:mt-2",
+            "product-box__cta mt-2.5 block w-full cursor-pointer border-none bg-[#f6f6f6] text-center font-medium text-[#888] transition-all duration-300 hover:bg-theme hover:text-white max-md:mt-2",
+            featured
+              ? "p-[clamp(8px,0.75vw,12px)] text-[clamp(15px,1.05vw,17px)]"
+              : "p-[clamp(5px,0.6vw,10px)] text-[clamp(14px,1vw,16px)]",
             fullHeight && "mt-auto",
           )}
         >

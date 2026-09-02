@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 import { ImageLink } from "@/features/home/components/banners/ImageLink";
-import { CategoryProductTabGrid } from "@/features/home/components/category-products/CategoryProductTabGrid";
+import { CategoryProductTabCarousel } from "@/features/home/components/category-products/CategoryProductTabCarousel";
 import type {
   CategoryProductTab,
   HomeCategoryProductBannerConfig,
@@ -59,7 +59,7 @@ export function CategoryProductTabSection({
       </div>
 
       <div className="tab-content-cls">
-        <CategoryProductTabGrid products={activeProducts} />
+        <CategoryProductTabCarousel products={activeProducts} />
       </div>
 
       {banner ? (
