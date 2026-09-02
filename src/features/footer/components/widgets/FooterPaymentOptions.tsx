@@ -16,7 +16,7 @@ export function FooterPaymentOptions({ imageUrl }: FooterPaymentOptionsProps) {
         alt="Métodos de pago"
         width={280}
         height={30}
-        className="h-[30px] w-auto"
+        style={{ width: "auto", height: 30 }}
       />
     </div>
   );

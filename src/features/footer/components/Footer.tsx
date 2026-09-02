@@ -8,15 +8,13 @@ import { FooterLogo } from "@/features/footer/components/widgets/FooterLogo";
 import { FooterNewsletter } from "@/features/footer/components/widgets/FooterNewsletter";
 import { FooterPaymentOptions } from "@/features/footer/components/widgets/FooterPaymentOptions";
 import { FooterSocialLinks } from "@/features/footer/components/widgets/FooterSocialLinks";
-import type { StoreFooterConfig } from "@/features/footer/types/footer.types";
+import { getStoreFooterConfig } from "@/features/footer/services/footer.service";
 
 import "./footer.css";
 
-interface FooterOneProps {
-  config: StoreFooterConfig;
-}
+export async function Footer() {
+  const config = await getStoreFooterConfig();
 
-export function FooterOne({ config }: FooterOneProps) {
   return (
     <footer className="site-footer footer-light">
       <FooterNewsletter title={config.newsletterTitle} subtitle={config.newsletterSubtitle} />

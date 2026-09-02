@@ -444,8 +444,8 @@
 }
 
 .site-footer .payment-card-bottom img {
-  height: 30px;
-  width: auto;
+  max-height: 30px;
+  object-fit: contain;
 }
 
 @media (min-width: 768px) {
