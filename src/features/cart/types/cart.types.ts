@@ -1,12 +1,15 @@
 export interface CartLineItem {
   id: string;
   productId: string;
+  productSizeId?: string;
+  colorId?: string;
   slug?: string;
   name: string;
   imageUrl?: string;
   quantity: number;
   price: number;
   variation?: string;
+  /** @deprecated Use productSizeId + colorId */
   variationId?: string;
 }
 

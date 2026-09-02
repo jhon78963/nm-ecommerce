@@ -7,7 +7,9 @@ import { CheckCircle2, ChevronRight } from "lucide-react";
 
 import { CHECKOUT_COPY } from "@/features/checkout/constants/checkout-copy";
 import type { StoredOrder } from "@/features/checkout/types/order.types";
-import { getOrderByNumber } from "@/features/checkout/utils/order-storage";
+import {
+  fetchPublicOrder,
+} from "@/features/checkout/services/order.service";
 import { ROUTES } from "@/lib/routes";
 
 import "./order.css";
@@ -18,11 +20,35 @@ export function OrderConfirmationContent() {
   const [isHydrated, setIsHydrated] = useState(false);
 
   const orderNumber = searchParams.get("order_number") ?? "";
+  const email = searchParams.get("email") ?? "";
 
   useEffect(() => {
-    setOrder(orderNumber ? getOrderByNumber(orderNumber) : null);
-    setIsHydrated(true);
-  }, [orderNumber]);
+    if (!orderNumber || !email) {
+      setOrder(null);
+      setIsHydrated(true);
+      return;
+    }
+
+    let cancelled = false;
+
+    fetchPublicOrder(orderNumber, email)
+      .then((result) => {
+        if (!cancelled) {
+          setOrder(result);
+          setIsHydrated(true);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setOrder(null);
+          setIsHydrated(true);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [email, orderNumber]);
 
   if (!isHydrated) {
     return null;

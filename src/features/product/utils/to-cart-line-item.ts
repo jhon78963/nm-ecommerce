@@ -11,6 +11,8 @@ export function productBoxItemToCartLineItem(
 ): Omit<CartLineItem, "id"> {
   return {
     productId: String(product.id),
+    productSizeId: variation?.productSizeId,
+    colorId: variation?.colorId,
     slug: product.slug,
     name: product.name,
     imageUrl: product.imageUrl,

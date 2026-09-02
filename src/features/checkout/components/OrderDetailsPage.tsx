@@ -12,7 +12,7 @@ import { CHECKOUT_COPY } from "@/features/checkout/constants/checkout-copy";
 import { getDepartmentName } from "@/features/checkout/constants/peru-departments";
 import type { StoredOrder } from "@/features/checkout/types/order.types";
 import { formatAddress, formatFullName } from "@/features/checkout/utils/address";
-import { findOrder } from "@/features/checkout/utils/order-storage";
+import { trackOrder } from "@/features/checkout/services/order.service";
 import { ROUTES } from "@/lib/routes";
 
 import "./order.css";
@@ -26,18 +26,31 @@ export function OrderDetailsContent() {
   const emailOrPhone = searchParams.get("email_or_phone") ?? "";
 
   useEffect(() => {
-    if (!orderNumber) {
+    if (!orderNumber || !emailOrPhone) {
       setOrder(null);
       setIsHydrated(true);
       return;
     }
 
-    const found = emailOrPhone
-      ? findOrder(orderNumber, emailOrPhone)
-      : null;
+    let cancelled = false;
 
-    setOrder(found);
-    setIsHydrated(true);
+    trackOrder(orderNumber, emailOrPhone)
+      .then((result) => {
+        if (!cancelled) {
+          setOrder(result);
+          setIsHydrated(true);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setOrder(null);
+          setIsHydrated(true);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, [emailOrPhone, orderNumber]);
 
   if (!isHydrated) {

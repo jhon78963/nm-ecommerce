@@ -20,10 +20,9 @@ export function useProductVariantSelection(sizes: ProductSize[] = []) {
 
     return {
       variation: variation || undefined,
-      variationId:
-        selectedSizeId && selectedColorId
-          ? `${selectedSizeId}-${selectedColorId}`
-          : selectedSizeId ?? undefined,
+      productSizeId: selectedSizeId ?? undefined,
+      colorId: selectedColorId ?? undefined,
+      variationId: selectedSizeId ?? undefined,
     };
   }, [selectedColor?.label, selectedSize?.label, selectedColorId, selectedSizeId]);
 

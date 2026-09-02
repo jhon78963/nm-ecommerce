@@ -4,7 +4,10 @@ import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { CHECKOUT_COPY } from "@/features/checkout/constants/checkout-copy";
-import { findOrder } from "@/features/checkout/utils/order-storage";
+import {
+  getOrderApiErrorMessage,
+  trackOrder,
+} from "@/features/checkout/services/order.service";
 import { ROUTES } from "@/lib/routes";
 
 import "./order.css";
@@ -14,8 +17,9 @@ export function OrderTrackingForm() {
   const [orderNumber, setOrderNumber] = useState("");
   const [emailOrPhone, setEmailOrPhone] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     if (!orderNumber.trim() || !emailOrPhone.trim()) {
@@ -23,15 +27,18 @@ export function OrderTrackingForm() {
       return;
     }
 
-    const order = findOrder(orderNumber, emailOrPhone);
-    if (!order) {
-      setError(CHECKOUT_COPY.orderNotFound);
-      return;
-    }
+    setIsSubmitting(true);
+    setError(null);
 
-    router.push(
-      `${ROUTES.orderDetails}?order_number=${encodeURIComponent(order.orderNumber)}&email_or_phone=${encodeURIComponent(emailOrPhone)}`,
-    );
+    try {
+      const order = await trackOrder(orderNumber, emailOrPhone);
+      router.push(
+        `${ROUTES.orderDetails}?order_number=${encodeURIComponent(order.orderNumber)}&email_or_phone=${encodeURIComponent(emailOrPhone)}`,
+      );
+    } catch (submitError) {
+      setError(getOrderApiErrorMessage(submitError));
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -70,8 +77,8 @@ export function OrderTrackingForm() {
 
         {error ? <p className="form-error">{error}</p> : null}
 
-        <button type="submit" className="btn btn-solid">
-          {CHECKOUT_COPY.track}
+        <button type="submit" className="btn btn-solid" disabled={isSubmitting}>
+          {isSubmitting ? "Buscando..." : CHECKOUT_COPY.track}
         </button>
       </form>
     </div>

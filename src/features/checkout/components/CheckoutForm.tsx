@@ -9,17 +9,20 @@ import { CheckoutSummary } from "@/features/checkout/components/CheckoutSummary"
 import { CHECKOUT_COPY } from "@/features/checkout/constants/checkout-copy";
 import { PAYMENT_METHODS } from "@/features/checkout/constants/payment-methods";
 import { isTrujilloZone, resolveShippingZone } from "@/features/checkout/constants/peru-departments";
-import type { CheckoutAddress, CheckoutFormData } from "@/features/checkout/types/checkout.types";
-import type { StoredOrder } from "@/features/checkout/types/order.types";
+import type { CheckoutAddress } from "@/features/checkout/types/checkout.types";
 import { createEmptyAddress } from "@/features/checkout/utils/address";
 import {
   calculateCheckoutTotals,
-  generateOrderNumber,
   getShippingMethodById,
   getShippingMethodsForZone,
   validateCoupon,
 } from "@/features/checkout/utils/checkout-totals";
-import { saveOrder } from "@/features/checkout/utils/order-storage";
+import {
+  buildCreateOrderPayload,
+  createOrder,
+  getOrderApiErrorMessage,
+  getWarehouseIdForCheckout,
+} from "@/features/checkout/services/order.service";
 import {
   clearCheckoutDraftFromStorage,
   readCheckoutDraftFromStorage,
@@ -66,6 +69,7 @@ export function CheckoutForm() {
   const [couponDiscount, setCouponDiscount] = useState(0);
   const [couponError, setCouponError] = useState<string | null>(null);
   const [errors, setErrors] = useState<FormErrors>({});
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isFormHydrated, setIsFormHydrated] = useState(false);
   const isCompletingOrderRef = useRef(false);
@@ -222,59 +226,52 @@ export function CheckoutForm() {
     return !Object.values(nextErrors).some(Boolean);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!validateForm() || items.length === 0) return;
+
+    const missingVariant = items.some((item) => !item.productSizeId && !item.variationId);
+    if (missingVariant) {
+      setSubmitError("Uno o más productos del carrito no tienen talla seleccionada. Vuelve a agregarlos.");
+      return;
+    }
 
     const shippingMethod = getShippingMethodById(shippingMethodId, shippingZone);
     const paymentMethod = paymentMethods.find((method) => method.id === paymentMethodId);
 
     if (!shippingMethod || !paymentMethod) {
-      setIsSubmitting(false);
       return;
     }
 
     isCompletingOrderRef.current = true;
     setIsSubmitting(true);
+    setSubmitError(null);
 
-    const orderNumber = generateOrderNumber();
-    const formData: CheckoutFormData = {
-      billing,
-      shipping: sameAsBilling ? billing : shipping,
-      email,
-      orderNotes,
-      shippingMethodId,
-      paymentMethodId,
-      couponCode: appliedCouponCode,
-    };
+    try {
+      const payload = buildCreateOrderPayload(
+        getWarehouseIdForCheckout(),
+        email,
+        billing,
+        sameAsBilling ? billing : shipping,
+        sameAsBilling,
+        orderNotes,
+        shippingMethod.id,
+        paymentMethod.id,
+        appliedCouponCode,
+        items,
+      );
 
-    const order: StoredOrder = {
-      id: crypto.randomUUID(),
-      orderNumber,
-      status: "pending",
-      createdAt: new Date().toISOString(),
-      email: formData.email,
-      billing: formData.billing,
-      shipping: formData.shipping,
-      orderNotes: formData.orderNotes || undefined,
-      items: [...items],
-      shippingMethodId: shippingMethod.id,
-      shippingMethodTitle: shippingMethod.title,
-      shippingTotal: shippingMethod.cost,
-      paymentMethodId: paymentMethod.id,
-      paymentMethodTitle: paymentMethod.title,
-      paymentStatus: "pending",
-      subtotal: totals.subtotal,
-      couponCode: appliedCouponCode || undefined,
-      couponDiscount: totals.couponDiscount,
-      total: totals.total,
-    };
+      const order = await createOrder(payload);
 
-    saveOrder(order);
-    clearCheckoutDraftFromStorage();
-    clearCart();
-    router.replace(
-      `${ROUTES.orderConfirmation}?order_number=${encodeURIComponent(orderNumber)}`,
-    );
+      clearCheckoutDraftFromStorage();
+      clearCart();
+      router.replace(
+        `${ROUTES.orderConfirmation}?order_number=${encodeURIComponent(order.orderNumber)}&email=${encodeURIComponent(order.email)}`,
+      );
+    } catch (error) {
+      isCompletingOrderRef.current = false;
+      setIsSubmitting(false);
+      setSubmitError(getOrderApiErrorMessage(error));
+    }
   };
 
   if (!isHydrated || !isFormHydrated) {
@@ -389,6 +386,7 @@ export function CheckoutForm() {
         </div>
 
         <div className="col-right">
+          {submitError ? <p className="form-error mb-4">{submitError}</p> : null}
           <CheckoutSummary
             items={items}
             totals={totals}

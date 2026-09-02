@@ -14,5 +14,8 @@ export interface ProductSize {
 
 export interface ProductCartVariation {
   variation?: string;
+  productSizeId?: string;
+  colorId?: string;
+  /** @deprecated Use productSizeId + colorId */
   variationId?: string;
 }

@@ -57,7 +57,19 @@ export async function apiGet<T>(path: string, options: RequestOptions = {}): Pro
   });
 
   if (!response.ok) {
-    throw new HttpError(`API request failed: ${response.status}`, response.status);
+    let message = `API request failed: ${response.status}`;
+    try {
+      const body = (await response.json()) as { message?: string | string[] };
+      if (typeof body.message === "string") {
+        message = body.message;
+      } else if (Array.isArray(body.message)) {
+        message = body.message.join(", ");
+      }
+    } catch {
+      // ignore JSON parse errors
+    }
+
+    throw new HttpError(message, response.status);
   }
 
   return response.json() as Promise<T>;
@@ -76,7 +88,19 @@ export async function apiPost<T>(
   });
 
   if (!response.ok) {
-    throw new HttpError(`API request failed: ${response.status}`, response.status);
+    let message = `API request failed: ${response.status}`;
+    try {
+      const body = (await response.json()) as { message?: string | string[] };
+      if (typeof body.message === "string") {
+        message = body.message;
+      } else if (Array.isArray(body.message)) {
+        message = body.message.join(", ");
+      }
+    } catch {
+      // ignore JSON parse errors
+    }
+
+    throw new HttpError(message, response.status);
   }
 
   if (response.status === 204) {
