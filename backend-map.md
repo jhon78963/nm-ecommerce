@@ -2457,6 +2457,16 @@ Authorization: Bearer <refresh_token>
 
 ---
 
+### `GET /api/v1/ecommerce/shop/collections/admin`
+
+**Descripción:** Listar todas las colecciones (incluye inactivas) para el panel admin.
+
+**Autenticación:** 🛡️ Roles: `Admin`, `Super Admin`
+
+**Respuesta `200`:** Misma forma que el listado público, sin filtrar por `status`.
+
+---
+
 ### `PUT /api/v1/ecommerce/shop/collections/admin`
 
 **Descripción:** Crear o reemplazar todas las colecciones de la tienda.
