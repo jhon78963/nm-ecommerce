@@ -1,36 +1,80 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# NM Ecommerce
 
-## Getting Started
+Tienda en línea de **Novedades Maritex**, construida con Next.js 16 (App Router), React 19 y Tailwind CSS 4.
 
-First, run the development server:
+Frontend del e-commerce orientado a features, integrado con el backend `nm-backend-v3` (NestJS).
+
+## Stack
+
+- **Next.js** 16.3.4 — App Router
+- **React** 19.2
+- **TypeScript** 5
+- **Tailwind CSS** 4
+- **lucide-react** — iconografía
+- **clsx** + **tailwind-merge** — utilidades de clases
+
+## Estructura del proyecto
+
+```
+src/
+├── app/                    # Routing (pages, layouts)
+├── components/
+│   └── layout/             # Header global
+├── features/
+│   ├── cart/               # Carrito off-canvas + context
+│   └── navigation/         # Top bar, menú, búsqueda, nav móvil
+└── lib/                    # Utilidades compartidas
+```
+
+## Inicio rápido
+
+### Requisitos
+
+- Node.js 20+
+- npm
+
+### Instalación
+
+```bash
+npm install
+```
+
+### Desarrollo
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abre [http://localhost:3012](http://localhost:3012).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Producción
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+npm start
+```
 
-## Learn More
+## Scripts
 
-To learn more about Next.js, take a look at the following resources:
+| Comando        | Descripción                          |
+|----------------|--------------------------------------|
+| `npm run dev`  | Servidor de desarrollo (puerto 3012) |
+| `npm run build`| Build de producción                  |
+| `npm start`    | Servidor de producción (puerto 3012) |
+| `npm run lint` | ESLint                               |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Backend
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+La API se documenta en [`backend-map.md`](./backend-map.md).
 
-## Deploy on Vercel
+- **Base URL:** `http://localhost:3000`
+- **Prefijo:** `/api/v1/<recurso>`
+- **Auth:** `Authorization: Bearer <access_token>`
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Convenciones
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Ver [`.cursorrules`](./.cursorrules) para arquitectura, patrones y buenas prácticas del proyecto.
+
+## Licencia
+
+Proyecto privado — Novedades Maritex.
