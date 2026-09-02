@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { StoreImage } from "@/components/ui/StoreImage";
 
 interface FooterPaymentOptionsProps {
   imageUrl: string;
@@ -11,7 +11,7 @@ export function FooterPaymentOptions({ imageUrl }: FooterPaymentOptionsProps) {
 
   return (
     <div className="payment-card-bottom">
-      <Image
+      <StoreImage
         src={imageUrl}
         alt="Métodos de pago"
         width={280}

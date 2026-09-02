@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { StoreImage } from "@/components/ui/StoreImage";
 
 import type { HomeServiceItem } from "@/features/home/types/home-services.types";
 
@@ -12,7 +12,7 @@ export function ServiceBlock({ service }: ServiceBlockProps) {
   return (
     <div className="home-service-block">
       <div className="media">
-        <Image
+        <StoreImage
           src={service.imageUrl}
           alt={service.title}
           width={60}

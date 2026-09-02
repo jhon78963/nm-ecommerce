@@ -1,10 +1,9 @@
 import { env } from "@/config/env";
+import { STORE_CONTENT_REVALIDATE_SECONDS } from "@/config/store-content";
 import type { PublicCatalogProductsResponse } from "@/features/product/types/catalog.types";
 import type { ProductBoxItem } from "@/features/product/types/product-box.types";
 import { mapPublicProductToProductBoxItem } from "@/features/product/utils/map-catalog-product";
 import { apiGet } from "@/services/http-client";
-
-export const CATALOG_REVALIDATE_SECONDS = 60;
 
 export async function getProductsByIds(
   ids: Array<string | number>,
@@ -15,7 +14,9 @@ export async function getProductsByIds(
     return [];
   }
 
-  if (!env.storeWarehouseId) {
+  const warehouseId = env.storeWarehouseId;
+
+  if (!warehouseId) {
     return [];
   }
 
@@ -23,9 +24,9 @@ export async function getProductsByIds(
     const response = await apiGet<PublicCatalogProductsResponse>("ecommerce/products/public", {
       params: {
         ids: uniqueIds.join(","),
-        warehouseId: env.storeWarehouseId,
+        warehouseId,
       },
-      revalidate: CATALOG_REVALIDATE_SECONDS,
+      revalidate: STORE_CONTENT_REVALIDATE_SECONDS,
     });
 
     return response.products.map(mapPublicProductToProductBoxItem);

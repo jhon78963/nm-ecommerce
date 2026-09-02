@@ -2,7 +2,7 @@
 
 import type { MouseEvent } from "react";
 import { Heart, RefreshCw, Star } from "lucide-react";
-import Image from "next/image";
+import { StoreImage } from "@/components/ui/StoreImage";
 import Link from "next/link";
 
 import { PRODUCT_COPY } from "@/features/product/constants/product-copy";
@@ -99,12 +99,12 @@ export function ProductBox({ product, fullHeight = false, featured = false }: Pr
   return (
     <div
       className={cn(
-        "group relative border border-[#f1f1f1] p-[clamp(7px,0.8vw,12px)] transition-all duration-500 ease-in-out",
-        fullHeight && "flex h-full flex-col",
+        "group relative min-w-0 border border-[#f1f1f1] p-[clamp(7px,0.8vw,12px)] transition-all duration-500 ease-in-out",
+        fullHeight ? "flex h-full flex-col" : "flex flex-col",
         featured && "product-box-featured",
       )}
     >
-      <div className="relative z-0 overflow-hidden bg-[#f8f8f8]">
+      <div className="relative z-0 aspect-square w-full shrink-0 overflow-hidden bg-[#f8f8f8]">
         {product.discount > 0 ? (
           <div className="product-box__discount absolute top-2.5 left-2.5 z-[1] grid aspect-square w-fit place-content-center p-2.5 text-[clamp(10px,0.9vw,14px)] font-bold text-white">
             <span className="product-box__ribbon-shape" aria-hidden />
@@ -112,15 +112,15 @@ export function ProductBox({ product, fullHeight = false, featured = false }: Pr
           </div>
         ) : null}
 
-        <div className="group/zoom overflow-hidden">
-          <Link href={href}>
-            <Image
+        <div className="group/zoom h-full w-full overflow-hidden">
+          <Link href={href} className="block h-full w-full">
+            <StoreImage
               src={product.imageUrl}
               alt={product.name}
               width={400}
               height={400}
               className={cn(
-                "product-box__image block aspect-square w-full object-contain transition-transform duration-500 ease-in-out group-hover/zoom:scale-110",
+                "product-box__image block h-full w-full object-cover transition-transform duration-500 ease-in-out group-hover/zoom:scale-110",
                 isOutOfStock && "pointer-events-none grayscale",
               )}
             />
@@ -145,14 +145,21 @@ export function ProductBox({ product, fullHeight = false, featured = false }: Pr
         </div>
       </div>
 
-      <div className={cn("mt-[15px]", fullHeight && "flex flex-1 flex-col", featured && "mt-[18px]")}>
+      <div
+        className={cn(
+          "mt-[15px] min-w-0",
+          fullHeight && "flex flex-1 flex-col",
+          featured && "mt-[18px]",
+        )}
+      >
         <Link
           href={href}
+          title={product.name}
           className={cn(
-            "product-box__title mb-1.5 block truncate leading-none font-medium text-[#222] capitalize no-underline transition-colors duration-500 hover:text-theme",
+            "product-box__title mb-1.5 block min-w-0 overflow-hidden font-medium text-[#222] capitalize no-underline transition-colors duration-500 hover:text-theme",
             featured
-              ? "text-[clamp(17px,1.25vw,20px)]"
-              : "text-[clamp(16px,1.1vw,18px)]",
+              ? "line-clamp-2 h-[2.6em] text-[clamp(17px,1.25vw,20px)] leading-[1.3]"
+              : "line-clamp-2 h-[2.5em] text-[clamp(16px,1.1vw,18px)] leading-[1.25]",
           )}
         >
           {product.name}

@@ -1,7 +1,8 @@
 "use client";
 
-import Link from "next/link";
+import { StoreImage } from "@/components/ui/StoreImage";
 import Image from "next/image";
+import Link from "next/link";
 
 import {
   DEFAULT_BRAND_LOGO_URL,
@@ -19,7 +20,7 @@ export function HeaderLogo({
   if (isFullLogoImage) {
     return (
       <Link href="/" aria-label={brandName} className="inline-flex py-[clamp(15px,2.5vw,35px)]">
-        <Image
+        <StoreImage
           src={resolvedLogoUrl}
           alt={brandName}
           width={176}

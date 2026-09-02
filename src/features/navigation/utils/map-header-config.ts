@@ -4,6 +4,7 @@ import type {
   StoreHeaderConfig,
 } from "@/features/navigation/types/header.types";
 import type { NavMenuItem } from "@/features/navigation/types/navigation.types";
+import { resolveStoreMediaUrl } from "@/utils/resolve-store-media-url";
 
 function mapNavigationItem(item: PublicNavigationItem): NavMenuItem {
   return {
@@ -39,7 +40,7 @@ export function mapPublicHeaderToConfig(response: PublicHeaderResponse): StoreHe
   });
 
   return {
-    logoUrl: response.logoUrl,
+    logoUrl: resolveStoreMediaUrl(response.logoUrl) || null,
     brandName: response.logoText,
     topBarEnabled: response.topBarEnabled,
     sticky: response.stickyEnabled,

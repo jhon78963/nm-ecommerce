@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { cn } from "@/lib/utils";
+import { resolveStoreMediaUrl } from "@/utils/resolve-store-media-url";
 
 interface ImageLinkProps {
   href: string;
@@ -23,19 +24,21 @@ export function ImageLink({
   className,
   imageClassName,
 }: ImageLinkProps) {
+  const resolvedImageUrl = resolveStoreMediaUrl(imageUrl);
+
   const imageContent = bgImage ? (
     <div
       className={cn(
         "banner-bg-size block w-full bg-cover bg-center bg-no-repeat",
         imageClassName,
       )}
-      style={{ backgroundImage: `url(${imageUrl})` }}
+      style={{ backgroundImage: `url(${resolvedImageUrl})` }}
       role="img"
       aria-label={alt}
     />
   ) : (
     <img
-      src={imageUrl}
+      src={resolvedImageUrl}
       alt={alt}
       className={cn("block h-auto w-full", imageClassName)}
     />

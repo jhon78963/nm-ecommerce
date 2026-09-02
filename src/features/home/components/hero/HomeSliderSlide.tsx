@@ -1,6 +1,6 @@
-import Image from "next/image";
 import Link from "next/link";
 
+import { StoreImage } from "@/components/ui/StoreImage";
 import type { HomeHeroSlide } from "@/features/home/types/hero.types";
 
 interface HomeSliderSlideProps {
@@ -14,7 +14,7 @@ function isExternalHref(href: string): boolean {
 
 export function HomeSliderSlide({ slide, priority = false }: HomeSliderSlideProps) {
   const image = (
-    <Image
+    <StoreImage
       src={slide.imageUrl}
       alt={slide.alt}
       fill

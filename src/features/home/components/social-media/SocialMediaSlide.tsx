@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { StoreImage } from "@/components/ui/StoreImage";
 import Link from "next/link";
 
 import { InstagramIcon } from "@/features/home/components/social-media/InstagramIcon";
@@ -22,7 +22,7 @@ export function SocialMediaSlide({ banner, platform }: SocialMediaSlideProps) {
         rel="noopener noreferrer"
         className="home-social-media-box instagram-box"
       >
-        <Image
+        <StoreImage
           src={banner.imageUrl}
           alt=""
           width={400}

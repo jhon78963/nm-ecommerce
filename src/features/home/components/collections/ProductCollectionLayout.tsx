@@ -20,7 +20,7 @@ export function ProductCollectionLayout({ products }: ProductCollectionLayoutPro
         <div className="product-collection-track">
           {products.map((product) => (
             <div key={product.id} className="product-collection-slide">
-              <ProductBox product={product} />
+              <ProductBox product={product} fullHeight />
             </div>
           ))}
         </div>
@@ -31,7 +31,7 @@ export function ProductCollectionLayout({ products }: ProductCollectionLayoutPro
   return (
     <div className="product-collection-grid">
       {products.map((product) => (
-        <ProductBox key={product.id} product={product} />
+        <ProductBox key={product.id} product={product} fullHeight />
       ))}
     </div>
   );

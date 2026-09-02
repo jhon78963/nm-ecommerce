@@ -1,18 +1,16 @@
-import {
-  FALLBACK_HOME_SOCIAL_MEDIA,
-  HOME_SOCIAL_MEDIA_REVALIDATE_SECONDS,
-} from "@/features/home/constants/home-social-media.defaults";
+import { STORE_CONTENT_REVALIDATE_SECONDS } from "@/config/store-content";
 import type {
   HomeSocialMediaBanner,
   HomeSocialMediaConfig,
   PublicHomeSocialMediaResponse,
 } from "@/features/home/types/home-social-media.types";
 import { apiGet } from "@/services/http-client";
+import { resolveStoreMediaUrl } from "@/utils/resolve-store-media-url";
 
 export async function getHomeSocialMedia(): Promise<HomeSocialMediaConfig | null> {
   try {
     const response = await apiGet<PublicHomeSocialMediaResponse>("ecommerce/home/social-media", {
-      revalidate: HOME_SOCIAL_MEDIA_REVALIDATE_SECONDS,
+      revalidate: STORE_CONTENT_REVALIDATE_SECONDS,
     });
 
     if (!response.socialMedia || response.socialMedia.status === false) {
@@ -21,7 +19,7 @@ export async function getHomeSocialMedia(): Promise<HomeSocialMediaConfig | null
 
     return normalizeSocialMediaConfig(response.socialMedia);
   } catch {
-    return normalizeSocialMediaConfig(FALLBACK_HOME_SOCIAL_MEDIA);
+    return null;
   }
 }
 
@@ -39,5 +37,10 @@ function normalizeSocialMediaConfig(config: HomeSocialMediaConfig): HomeSocialMe
 }
 
 function filterActiveBanners(banners: HomeSocialMediaBanner[]): HomeSocialMediaBanner[] {
-  return banners.filter((banner) => banner.status !== false && banner.imageUrl);
+  return banners
+    .filter((banner) => banner.status !== false && banner.imageUrl)
+    .map((banner) => ({
+      ...banner,
+      imageUrl: resolveStoreMediaUrl(banner.imageUrl),
+    }));
 }

@@ -1,7 +1,4 @@
-import {
-  DEFAULT_TODAYS_DEAL_COLLECTION,
-  FALLBACK_TODAYS_DEAL_PRODUCTS,
-} from "@/features/home/constants/collections/todays-deal.defaults";
+import { STORE_CONTENT_REVALIDATE_SECONDS } from "@/config/store-content";
 import type {
   HomeCollectionItem,
   HomeCollectionView,
@@ -10,33 +7,25 @@ import type {
 import { getProductsByIds } from "@/features/product/services/catalog.service";
 import { apiGet } from "@/services/http-client";
 
-export const COLLECTIONS_REVALIDATE_SECONDS = 300;
-
-const FALLBACK_COLLECTIONS_BY_ID: Record<string, typeof FALLBACK_TODAYS_DEAL_PRODUCTS> = {
-  "todays-deal": FALLBACK_TODAYS_DEAL_PRODUCTS,
-};
-
 export async function getHomeCollections(): Promise<HomeCollectionView[]> {
   try {
     const response = await apiGet<PublicCollectionsResponse>("ecommerce/home/collections", {
-      revalidate: COLLECTIONS_REVALIDATE_SECONDS,
+      revalidate: STORE_CONTENT_REVALIDATE_SECONDS,
     });
 
     if (!response.collections?.length) {
-      return buildFallbackCollections();
+      return [];
     }
 
     const collections = await Promise.all(
       response.collections.map((collection) => resolveCollection(collection)),
     );
 
-    const activeCollections = collections.filter(
+    return collections.filter(
       (collection): collection is HomeCollectionView => collection !== null,
     );
-
-    return activeCollections.length > 0 ? activeCollections : buildFallbackCollections();
   } catch {
-    return buildFallbackCollections();
+    return [];
   }
 }
 
@@ -47,12 +36,8 @@ async function resolveCollection(
     return null;
   }
 
-  let products =
+  const products =
     collection.productIds.length > 0 ? await getProductsByIds(collection.productIds) : [];
-
-  if (products.length === 0) {
-    products = FALLBACK_COLLECTIONS_BY_ID[collection.id] ?? [];
-  }
 
   if (products.length === 0) {
     return null;
@@ -66,17 +51,4 @@ async function resolveCollection(
     status: true,
     products,
   };
-}
-
-function buildFallbackCollections(): HomeCollectionView[] {
-  return [
-    {
-      id: DEFAULT_TODAYS_DEAL_COLLECTION.id ?? "todays-deal",
-      tag: DEFAULT_TODAYS_DEAL_COLLECTION.tag,
-      title: DEFAULT_TODAYS_DEAL_COLLECTION.title,
-      description: DEFAULT_TODAYS_DEAL_COLLECTION.description,
-      status: DEFAULT_TODAYS_DEAL_COLLECTION.status !== false,
-      products: FALLBACK_TODAYS_DEAL_PRODUCTS,
-    },
-  ];
 }

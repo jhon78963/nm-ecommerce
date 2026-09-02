@@ -1,10 +1,4 @@
-import {
-  buildFallbackCategoryProductSection,
-  CATEGORY_PRODUCT_REVALIDATE_SECONDS,
-  FALLBACK_CATEGORY_TABS,
-  FALLBACK_LEFT_PANEL_PRODUCTS,
-  FALLBACK_TAB_PRODUCTS,
-} from "@/features/home/constants/category-product.defaults";
+import { STORE_CONTENT_REVALIDATE_SECONDS } from "@/config/store-content";
 import type {
   HomeCategoryProductSectionConfig,
   HomeCategoryProductSectionView,
@@ -13,12 +7,13 @@ import type {
 import { getProductsByIds } from "@/features/product/services/catalog.service";
 import type { ProductBoxItem } from "@/features/product/types/product-box.types";
 import { apiGet } from "@/services/http-client";
+import { resolveStoreMediaUrl } from "@/utils/resolve-store-media-url";
 
 export async function getHomeCategoryProductSection(): Promise<HomeCategoryProductSectionView | null> {
   try {
     const response = await apiGet<PublicCategoryProductSectionResponse>(
       "ecommerce/home/category-products",
-      { revalidate: CATEGORY_PRODUCT_REVALIDATE_SECONDS },
+      { revalidate: STORE_CONTENT_REVALIDATE_SECONDS },
     );
 
     if (!response.section || response.section.status === false) {
@@ -27,7 +22,7 @@ export async function getHomeCategoryProductSection(): Promise<HomeCategoryProdu
 
     return resolveCategoryProductSection(response.section);
   } catch {
-    return buildFallbackCategoryProductSection();
+    return null;
   }
 }
 
@@ -38,7 +33,7 @@ async function resolveCategoryProductSection(
   const rightPanel = await resolveRightPanel(config);
 
   if (!leftPanel && rightPanel.productCategory.tabs.length === 0) {
-    return buildFallbackCategoryProductSection();
+    return null;
   }
 
   return {
@@ -55,14 +50,10 @@ async function resolveLeftPanel(
     return null;
   }
 
-  let products =
+  const products =
     config.leftPanel.productIds.length > 0
       ? await getProductsByIds(config.leftPanel.productIds)
       : [];
-
-  if (products.length === 0) {
-    products = FALLBACK_LEFT_PANEL_PRODUCTS;
-  }
 
   if (products.length === 0) {
     return null;
@@ -80,14 +71,11 @@ async function resolveRightPanel(
 ): Promise<HomeCategoryProductSectionView["rightPanel"]> {
   const productCategory = config.rightPanel.productCategory;
   const tabsConfig = productCategory.tabs ?? [];
-  const tabs =
-    tabsConfig.length > 0
-      ? tabsConfig.map((tab) => ({
-          id: tab.id,
-          name: tab.name,
-          slug: tab.slug,
-        }))
-      : FALLBACK_CATEGORY_TABS;
+  const tabs = tabsConfig.map((tab) => ({
+    id: tab.id,
+    name: tab.name,
+    slug: tab.slug,
+  }));
 
   const productsByCategoryId: Record<string, ProductBoxItem[]> = {};
 
@@ -95,14 +83,10 @@ async function resolveRightPanel(
     await Promise.all(
       tabs.map(async (tab) => {
         const tabConfig = tabsConfig.find((item) => item.id === tab.id);
-        let products =
+        const products =
           tabConfig && tabConfig.productIds.length > 0
             ? await getProductsByIds(tabConfig.productIds)
             : [];
-
-        if (products.length === 0) {
-          products = FALLBACK_TAB_PRODUCTS[tab.id] ?? [];
-        }
 
         if (products.length > 0) {
           productsByCategoryId[tab.id] = products;
@@ -115,7 +99,10 @@ async function resolveRightPanel(
 
   const banner =
     config.rightPanel.productBanner?.status !== false && config.rightPanel.productBanner?.imageUrl
-      ? config.rightPanel.productBanner
+      ? {
+          ...config.rightPanel.productBanner,
+          imageUrl: resolveStoreMediaUrl(config.rightPanel.productBanner.imageUrl),
+        }
       : null;
 
   return {

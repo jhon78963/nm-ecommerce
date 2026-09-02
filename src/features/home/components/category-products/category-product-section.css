@@ -106,6 +106,7 @@
 
 .category-product-track {
   display: flex;
+  align-items: stretch;
   gap: 16px;
 }
 
@@ -127,15 +128,13 @@
 }
 
 .category-product-slide > .product-box-featured {
+  flex: 1;
   width: 100%;
+  min-width: 0;
 }
 
 .category-product-carousel .product-box-featured {
   padding: clamp(10px, 1.1vw, 18px);
-}
-
-.category-product-carousel .product-box-featured .product-box__image {
-  min-height: clamp(180px, 16vw, 260px);
 }
 
 .category-product-banner {

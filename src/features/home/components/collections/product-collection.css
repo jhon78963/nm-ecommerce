@@ -18,12 +18,20 @@
 
 .product-collection-track {
   display: flex;
+  align-items: stretch;
   gap: 12px;
 }
 
 .product-collection-slide {
+  display: flex;
   flex: 0 0 calc((100% - 12px) / 2);
   scroll-snap-align: start;
+}
+
+.product-collection-slide > * {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
 }
 
 @media (min-width: 576px) {
