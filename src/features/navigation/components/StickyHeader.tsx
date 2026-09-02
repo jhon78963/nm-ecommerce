@@ -16,7 +16,6 @@ import type { HeaderLogoProps, TopBarConfig } from "@/features/navigation/types/
 import { cn } from "@/lib/utils";
 
 interface StickyHeaderProps extends HeaderLogoProps, TopBarConfig {
-  isAuthenticated?: boolean;
   sticky?: boolean;
 }
 
@@ -27,7 +26,6 @@ export function StickyHeader({
   enabled: topBarEnabled = true,
   siteName,
   supportNumber,
-  isAuthenticated = false,
   sticky = true,
 }: StickyHeaderProps) {
   const [isSticky, setIsSticky] = useState(false);
@@ -132,7 +130,7 @@ export function StickyHeader({
                     </li>
 
                     <li className={cn(iconNavItemClass, "onhover-dropdown mobile-cart")}>
-                      <HeaderUserMenu isAuthenticated={isAuthenticated} />
+                      <HeaderUserMenu />
                     </li>
                   </ul>
                 </div>

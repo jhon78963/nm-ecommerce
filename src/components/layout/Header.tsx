@@ -2,7 +2,6 @@ import { StickyHeader } from "@/features/navigation/components/StickyHeader";
 import type { HeaderLogoProps, TopBarConfig } from "@/features/navigation/types/navigation.types";
 
 export interface HeaderProps extends HeaderLogoProps, TopBarConfig {
-  isAuthenticated?: boolean;
   sticky?: boolean;
 }
 
@@ -13,7 +12,6 @@ export function Header({
   enabled: topBarEnabled = true,
   siteName,
   supportNumber,
-  isAuthenticated = false,
   sticky = true,
 }: HeaderProps) {
   return (
@@ -24,7 +22,6 @@ export function Header({
       enabled={topBarEnabled}
       siteName={siteName}
       supportNumber={supportNumber}
-      isAuthenticated={isAuthenticated}
       sticky={sticky}
     />
   );

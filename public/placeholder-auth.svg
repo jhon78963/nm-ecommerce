@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 900" fill="none">
+  <rect width="800" height="900" fill="#f3f3f3"/>
+  <rect x="120" y="180" width="560" height="540" fill="#ec8951" opacity="0.15"/>
+  <circle cx="400" cy="360" r="90" fill="#ec8951" opacity="0.35"/>
+  <rect x="250" y="500" width="300" height="24" rx="4" fill="#ddd"/>
+  <rect x="290" y="550" width="220" height="18" rx="4" fill="#e8e8e8"/>
+  <text x="400" y="720" text-anchor="middle" fill="#999" font-family="Arial, sans-serif" font-size="28">Novedades Maritex</text>
+</svg>
