@@ -1,7 +1,7 @@
 import type {
-  ProductDetailColor,
-  ProductDetailSize,
-} from "@/features/product/types/product-detail.types";
+  ProductColor,
+  ProductSize,
+} from "@/features/product/types/product-variant.types";
 
 /**
  * STUB DATA — Solo para desarrollo UI.
@@ -9,7 +9,7 @@ import type {
  * Ver: backend-map.md → GET /ecommerce/products/public/by-slug/:slug
  */
 
-const STUB_COLORS: ProductDetailColor[] = [
+const STUB_COLORS: ProductColor[] = [
   { id: "c-negro", label: "Negro", hex: "#1a1a1a" },
   { id: "c-blanco", label: "Blanco", hex: "#f0ede8" },
   { id: "c-marino", label: "Azul Marino", hex: "#1a2a5e" },
@@ -22,7 +22,7 @@ const STUB_COLORS: ProductDetailColor[] = [
   { id: "c-rosado", label: "Rosado", hex: "#e07a99" },
 ];
 
-export const STUB_PRODUCT_SIZES: ProductDetailSize[] = [
+export const STUB_PRODUCT_SIZES: ProductSize[] = [
   {
     id: "sz-xs",
     label: "XS",

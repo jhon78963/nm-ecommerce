@@ -1,6 +1,7 @@
 "use client";
 
 import type { MouseEvent } from "react";
+import { useMemo } from "react";
 import { Heart, RefreshCw, Star } from "lucide-react";
 import { StoreImage } from "@/components/ui/StoreImage";
 import Link from "next/link";
@@ -8,11 +9,14 @@ import Link from "next/link";
 import { PRODUCT_COPY } from "@/features/product/constants/product-copy";
 import { CartButton } from "@/features/product/components/cart-button/CartButton";
 import { ProductQuickViewButton } from "@/features/product/components/quick-view/ProductQuickViewButton";
+import { ProductVariantSelectors } from "@/features/product/components/variants/ProductVariantSelectors";
+import { useProductVariantSelection } from "@/features/product/hooks/use-product-variant-selection";
 import type { ProductBoxItem } from "@/features/product/types/product-box.types";
 import {
   formatProductBoxPrice,
   getProductBoxHref,
 } from "@/features/product/utils/format-product-price";
+import { enrichProductWithVariants } from "@/features/product/utils/enrich-product-variants";
 import type { SearchProduct } from "@/features/search/types/search.types";
 import { useWishlist } from "@/features/wishlist/context/WishlistProvider";
 import { cn } from "@/lib/utils";
@@ -84,6 +88,9 @@ function WishlistIcon({ product }: { product: ProductBoxItem }) {
 }
 
 export function ProductBox({ product, fullHeight = false, featured = false }: ProductBoxProps) {
+  const enrichedProduct = useMemo(() => enrichProductWithVariants(product), [product]);
+  const variantSelection = useProductVariantSelection(enrichedProduct.sizes);
+
   const href = getProductBoxHref(product);
   const isOutOfStock = product.stockStatus === "out_of_stock";
 
@@ -180,11 +187,35 @@ export function ProductBox({ product, fullHeight = false, featured = false }: Pr
           {product.discount > 0 ? <del>{formatProductBoxPrice(product.price)}</del> : null}
         </h4>
 
+        {variantSelection.hasSizes ? (
+          <>
+            <ProductVariantSelectors
+              compact
+              sizes={variantSelection.sizes}
+              selectedSizeId={variantSelection.selectedSizeId}
+              selectedColorId={variantSelection.selectedColorId}
+              selectedSize={variantSelection.selectedSize}
+              selectedColor={variantSelection.selectedColor}
+              availableColors={variantSelection.availableColors}
+              onSizeSelect={variantSelection.handleSizeSelect}
+              onColorSelect={variantSelection.handleColorSelect}
+            />
+
+            {variantSelection.validationError ? (
+              <p className="product-variant-selectors__error">
+                {variantSelection.validationError}
+              </p>
+            ) : null}
+          </>
+        ) : null}
+
         <CartButton
           product={product}
           enableModal
           featured={featured}
           pushToBottom={fullHeight}
+          cartVariation={variantSelection.cartVariation}
+          validateBeforeAdd={variantSelection.validate}
         />
       </div>
     </div>

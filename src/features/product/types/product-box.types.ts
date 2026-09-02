@@ -1,3 +1,5 @@
+import type { ProductSize } from "@/features/product/types/product-variant.types";
+
 export type ProductStockStatus = "in_stock" | "out_of_stock";
 
 export interface ProductBoxItem {
@@ -13,4 +15,6 @@ export interface ProductBoxItem {
   reviewsCount: number;
   stockStatus: ProductStockStatus;
   href?: string;
+  /** Backend-pending: tallas y colores disponibles para el producto. */
+  sizes?: ProductSize[];
 }

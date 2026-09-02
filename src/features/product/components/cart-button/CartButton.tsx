@@ -8,6 +8,7 @@ import { CART_BUTTON_COPY } from "@/features/product/constants/cart-button-copy"
 import { PRODUCT_COPY } from "@/features/product/constants/product-copy";
 import { useProductCartItem } from "@/features/product/hooks/use-product-cart-item";
 import type { ProductBoxItem } from "@/features/product/types/product-box.types";
+import type { ProductCartVariation } from "@/features/product/types/product-variant.types";
 import { productBoxItemToCartLineItem } from "@/features/product/utils/to-cart-line-item";
 import { cn } from "@/lib/utils";
 
@@ -24,6 +25,8 @@ interface CartButtonProps {
   enableModal?: boolean;
   featured?: boolean;
   pushToBottom?: boolean;
+  cartVariation?: ProductCartVariation;
+  validateBeforeAdd?: () => boolean;
 }
 
 export function CartButton({
@@ -34,9 +37,11 @@ export function CartButton({
   enableModal: _enableModal = false,
   featured = false,
   pushToBottom = false,
+  cartVariation,
+  validateBeforeAdd,
 }: CartButtonProps) {
   const { addItem, updateQuantity } = useCart();
-  const cartItem = useProductCartItem(String(product.id));
+  const cartItem = useProductCartItem(String(product.id), cartVariation?.variationId);
   const isInStock = product.stockStatus === "in_stock";
   const isInCart = Boolean(cartItem && cartItem.quantity > 0);
 
@@ -47,7 +52,11 @@ export function CartButton({
       return;
     }
 
-    addItem(productBoxItemToCartLineItem(product, 1));
+    if (validateBeforeAdd && !validateBeforeAdd()) {
+      return;
+    }
+
+    addItem(productBoxItemToCartLineItem(product, 1, cartVariation));
   }
 
   function handleQuantityChange(delta: number) {

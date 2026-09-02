@@ -1,7 +1,6 @@
 import { Star } from "lucide-react";
 
 import { formatPrice } from "@/features/cart/utils/format-price";
-import { STUB_PRODUCT_SIZES } from "@/features/product/constants/pdp-stubs";
 import { PDP_COPY } from "@/features/product/constants/pdp-copy";
 import { PdpBreadcrumb } from "@/features/product/components/pdp/PdpBreadcrumb";
 import { PdpDeliveryInfo } from "@/features/product/components/pdp/PdpDeliveryInfo";
@@ -11,6 +10,7 @@ import { PdpProductInfo } from "@/features/product/components/pdp/PdpProductInfo
 import { PdpProductTabs } from "@/features/product/components/pdp/PdpProductTabs";
 import { PdpSafeCheckout } from "@/features/product/components/pdp/PdpSafeCheckout";
 import type { ProductDetail } from "@/features/product/types/product-detail.types";
+import { enrichProductWithVariants } from "@/features/product/utils/enrich-product-variants";
 import { cn } from "@/lib/utils";
 
 import "@/features/product/components/quick-view/product-quick-view.css";
@@ -72,25 +72,8 @@ function PdpPrice({
   );
 }
 
-/**
- * Enriquece el producto con stub de tallas/colores si el backend aún
- * no los expone. Eliminar `stubSizes` cuando el endpoint devuelva `sizes`.
- */
-function enrichWithStubs(product: ProductDetail): ProductDetail {
-  if (product.sizes && product.sizes.length > 0) {
-    return product;
-  }
-
-  const stubSizes = STUB_PRODUCT_SIZES.map((size) => ({
-    ...size,
-    salePrice: product.salePrice,
-  }));
-
-  return { ...product, sizes: stubSizes };
-}
-
 export function ProductDetailPage({ product }: ProductDetailPageProps) {
-  const enrichedProduct = enrichWithStubs(product);
+  const enrichedProduct = enrichProductWithVariants(product);
 
   return (
     <>
