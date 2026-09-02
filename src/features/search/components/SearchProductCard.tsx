@@ -16,8 +16,8 @@ export function SearchProductCard({ product, onNavigate }: SearchProductCardProp
   const isOutOfStock = product.sizes?.every((size) => size.stock <= 0) ?? true;
 
   return (
-    <article className={cn("basic-product group", isOutOfStock && "opacity-70")}>
-      <div className="img-wrapper relative overflow-hidden bg-[#f8f8f8]">
+    <article className={cn("group", isOutOfStock && "opacity-70")}>
+      <div className="relative overflow-hidden bg-[#f8f8f8]">
         <Link href={href} onClick={onNavigate} className="block aspect-square">
           <div className="flex h-full items-center justify-center p-4">
             <Image
@@ -53,13 +53,13 @@ export function SearchProductCard({ product, onNavigate }: SearchProductCardProp
         </ul>
       </div>
 
-      <div className="product-detail mt-3">
+      <div className="mt-3">
         <Link href={href} onClick={onNavigate}>
           <h6 className="line-clamp-2 text-sm font-medium text-[#222] transition-colors group-hover:text-theme">
             {product.name}
           </h6>
         </Link>
-        <p className="price mt-1 text-base font-semibold text-theme">{formatProductPrice(product)}</p>
+        <p className="mt-1 text-base font-semibold text-theme">{formatProductPrice(product)}</p>
       </div>
     </article>
   );

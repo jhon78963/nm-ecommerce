@@ -1,4 +1,4 @@
-import { BannerImageLink } from "@/features/home/components/BannerImageLink";
+import { BannerImageLink } from "@/features/home/components/banners/BannerImageLink";
 import type { HomeBanner } from "@/features/home/types/banner.types";
 import { getBannerGridClass } from "@/features/home/utils/banner-grid";
 

@@ -2,7 +2,7 @@ import { WishlistTable } from "@/features/wishlist/components/WishlistTable";
 
 export function WishlistPage() {
   return (
-    <section className="wishlist-section section-b-space pt-0">
+    <section className="wishlist-section pt-0 pb-[70px]">
       <div className="mx-auto w-full max-w-[1400px] px-4 py-8 md:py-12">
         <div className="mb-8 text-center">
           <h1 className="text-2xl font-bold text-[#222] md:text-3xl">Mis Favoritos</h1>

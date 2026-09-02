@@ -3,8 +3,8 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useCallback, useState } from "react";
 
+import { HomeSliderSlide } from "@/features/home/components/hero/HomeSliderSlide";
 import type { HomeHeroSlide } from "@/features/home/types/hero.types";
-import { HomeSliderSlide } from "@/features/home/components/HomeSliderSlide";
 
 interface HomeHeroSliderProps {
   slides: HomeHeroSlide[];

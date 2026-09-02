@@ -1,4 +1,4 @@
-import { HomeHeroSlider } from "@/features/home/components/HomeHeroSlider";
+import { HomeHeroSlider } from "@/features/home/components/hero/HomeHeroSlider";
 import type { HomeHeroSlide } from "@/features/home/types/hero.types";
 
 interface HomeHeroSectionProps {
