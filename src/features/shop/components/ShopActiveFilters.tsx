@@ -3,19 +3,18 @@
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { X } from "lucide-react";
 import { buildFilterUrl, getActiveFilters } from "../utils/shop-url.utils";
-import type { ShopActiveFilter } from "../types/shop.types";
+import type { ShopActiveFilter, ShopProductsFacets } from "../types/shop.types";
 
 interface ShopActiveFiltersProps {
-  sizeLabels: Record<string, string>;
-  colorLabels: Record<string, string>;
+  facets: ShopProductsFacets;
 }
 
-export function ShopActiveFilters({ sizeLabels, colorLabels }: ShopActiveFiltersProps) {
+export function ShopActiveFilters({ facets }: ShopActiveFiltersProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const activeFilters = getActiveFilters(searchParams, sizeLabels, colorLabels);
+  const activeFilters = getActiveFilters(searchParams, facets);
 
   if (activeFilters.length === 0) return null;
 

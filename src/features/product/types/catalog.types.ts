@@ -16,6 +16,21 @@ export interface CatalogProduct {
   sizes?: CatalogProductSize[];
 }
 
+export interface PublicCatalogProductColor {
+  id: string;
+  label: string;
+  hex: string;
+  stock: number;
+}
+
+export interface PublicCatalogProductSize {
+  id: string;
+  label: string;
+  stock: number;
+  salePrice: number;
+  colors: PublicCatalogProductColor[];
+}
+
 export interface PublicCatalogProductItem {
   id: string;
   name: string;
@@ -28,6 +43,7 @@ export interface PublicCatalogProductItem {
   stockStatus: "in_stock" | "out_of_stock";
   ratingCount: null;
   reviewsCount: number;
+  sizes?: PublicCatalogProductSize[];
 }
 
 export interface PublicCatalogProductsResponse {

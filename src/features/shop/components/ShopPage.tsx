@@ -19,9 +19,6 @@ export function ShopPage({
 }: ShopPageProps) {
   const { totalPages, start, end } = getPaginationInfo(totalCount, currentPage);
 
-  const sizeLabels = Object.fromEntries(facets.sizes.map((size) => [size.id, size.label]));
-  const colorLabels = Object.fromEntries(facets.colors.map((color) => [color.id, color.label]));
-
   return (
     <section className="py-8 md:py-12">
       <div className="container mx-auto px-4">
@@ -61,7 +58,7 @@ export function ShopPage({
             </Suspense>
 
             <Suspense>
-              <ShopActiveFilters sizeLabels={sizeLabels} colorLabels={colorLabels} />
+              <ShopActiveFilters facets={facets} />
             </Suspense>
 
             <ShopProductGrid products={products} />

@@ -9,8 +9,11 @@ interface ProductWithOptionalSizes {
 export function enrichProductWithVariants<T extends ProductWithOptionalSizes>(
   product: T,
 ): T & { sizes: ProductSize[] } {
-  if (product.sizes && product.sizes.length > 0) {
-    return product as T & { sizes: ProductSize[] };
+  if (product.sizes !== undefined) {
+    return {
+      ...product,
+      sizes: product.sizes,
+    };
   }
 
   return {

@@ -3,6 +3,7 @@ import type {
   PublicCatalogProductItem,
 } from "@/features/product/types/catalog.types";
 import type { ProductBoxItem } from "@/features/product/types/product-box.types";
+import type { ProductSize } from "@/features/product/types/product-variant.types";
 import { buildProductSlug, resolveProductSlug } from "@/utils/product-slug";
 import { resolveStoreMediaUrl } from "@/utils/resolve-store-media-url";
 
@@ -11,6 +12,24 @@ const PLACEHOLDER_PRODUCT_IMAGE_URL = "/placeholder-product.svg";
 interface MapCatalogProductOptions {
   imageUrl?: string;
   galleryImageUrls?: string[];
+}
+
+function mapPublicSizes(sizes: PublicCatalogProductItem["sizes"]): ProductSize[] | undefined {
+  if (!sizes) {
+    return undefined;
+  }
+
+  return sizes.map((size) => ({
+    id: size.id,
+    label: size.label,
+    stock: size.stock,
+    salePrice: size.salePrice,
+    colors: size.colors.map((color) => ({
+      id: color.id,
+      label: color.label,
+      hex: color.hex,
+    })),
+  }));
 }
 
 export function mapPublicProductToProductBoxItem(
@@ -35,6 +54,7 @@ export function mapPublicProductToProductBoxItem(
     ratingCount: product.ratingCount,
     reviewsCount: product.reviewsCount,
     stockStatus: product.stockStatus,
+    sizes: mapPublicSizes(product.sizes),
   };
 }
 

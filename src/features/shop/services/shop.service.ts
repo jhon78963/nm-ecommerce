@@ -38,6 +38,18 @@ interface ShopProductsApiResponse {
     stockStatus: "in_stock" | "out_of_stock";
     ratingCount: null;
     reviewsCount: number;
+    sizes?: Array<{
+      id: string;
+      label: string;
+      stock: number;
+      salePrice: number;
+      colors: Array<{
+        id: string;
+        label: string;
+        hex: string;
+        stock: number;
+      }>;
+    }>;
   }>;
   meta: {
     total: number;
@@ -105,7 +117,7 @@ export async function getShopCollectionProducts(
         page: filters.page,
         perPage: SHOP_PER_PAGE,
       },
-      revalidate: false,
+      cache: "no-store",
     });
 
     return {
@@ -113,7 +125,8 @@ export async function getShopCollectionProducts(
       totalCount: response.meta.total,
       facets: response.facets,
     };
-  } catch {
+  } catch (error) {
+    console.error(`[shop] Failed to load products for "${collectionSlug}":`, error);
     return {
       products: [],
       totalCount: 0,

@@ -20,6 +20,8 @@ interface PageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
+export const dynamic = "force-dynamic";
+
 export async function generateStaticParams() {
   const collections = await getShopCollections();
 

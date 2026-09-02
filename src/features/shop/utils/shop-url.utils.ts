@@ -1,6 +1,24 @@
 import type { ReadonlyURLSearchParams } from "next/navigation";
-import type { ParsedShopFilters, ShopActiveFilter, ShopSortOption } from "../types/shop.types";
+import type {
+  ParsedShopFilters,
+  ShopActiveFilter,
+  ShopProductsFacets,
+  ShopSortOption,
+} from "../types/shop.types";
 import { SHOP_PER_PAGE } from "../constants/shop.constants";
+
+const UUID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function resolveFacetLabel(
+  id: string,
+  items: ShopProductsFacets["sizes"],
+  genericLabel: string,
+): string {
+  const match = items.find((item) => item.id === id);
+  if (match) return match.label;
+  return UUID_PATTERN.test(id) ? genericLabel : id;
+}
 
 export function parseSearchParams(
   params: Record<string, string | string[] | undefined>,
@@ -39,8 +57,7 @@ export function buildFilterUrl(
 
 export function getActiveFilters(
   searchParams: ReadonlyURLSearchParams,
-  sizeLabels: Record<string, string>,
-  colorLabels: Record<string, string>,
+  facets: ShopProductsFacets,
 ): ShopActiveFilter[] {
   const filters: ShopActiveFilter[] = [];
   const min = searchParams.get("minPrice");
@@ -51,11 +68,19 @@ export function getActiveFilters(
   }
 
   for (const sizeId of (searchParams.get("tallas") ?? "").split(",").filter(Boolean)) {
-    filters.push({ key: "tallas", label: sizeLabels[sizeId] ?? sizeId, value: sizeId });
+    filters.push({
+      key: "tallas",
+      label: resolveFacetLabel(sizeId, facets.sizes, "Talla"),
+      value: sizeId,
+    });
   }
 
   for (const colorId of (searchParams.get("colores") ?? "").split(",").filter(Boolean)) {
-    filters.push({ key: "colores", label: colorLabels[colorId] ?? colorId, value: colorId });
+    filters.push({
+      key: "colores",
+      label: resolveFacetLabel(colorId, facets.colors, "Color"),
+      value: colorId,
+    });
   }
 
   return filters;
