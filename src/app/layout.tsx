@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Montserrat } from "next/font/google";
 
+import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
 import { AuthProvider } from "@/features/auth/context/AuthProvider";
 import { CartProvider } from "@/features/cart/context/CartProvider";
@@ -33,6 +34,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             <CartProvider>
               <Header />
               <main className="flex flex-1 flex-col">{children}</main>
+              <Footer />
             </CartProvider>
           </WishlistProvider>
         </AuthProvider>

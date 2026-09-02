@@ -9,6 +9,8 @@ import { WishlistRow } from "@/features/wishlist/components/WishlistRow";
 import { WishlistSkeleton } from "@/features/wishlist/components/WishlistSkeleton";
 import { useWishlistProducts } from "@/features/wishlist/hooks/use-wishlist-products";
 
+import "./wishlist.css";
+
 function buildFallbackProducts(
   storedItems: ReturnType<typeof useWishlist>["items"],
 ): SearchProduct[] {
@@ -36,34 +38,15 @@ export function WishlistTable() {
   }
 
   return (
-    <div className="table-responsive overflow-x-auto">
-      <table className="cart-table w-full min-w-[720px] border border-[#eee]">
+    <div className="table-responsive">
+      <table className="cart-table">
         <thead>
           <tr className="table-head">
-            <th scope="col" className="bg-[#f8f8f8] px-3 py-4 text-center text-[17px] font-semibold text-[#222]">
-              Imagen
-            </th>
-            <th scope="col" className="bg-[#f8f8f8] px-3 py-4 text-center text-[17px] font-semibold text-[#222]">
-              Producto
-            </th>
-            <th
-              scope="col"
-              className="hidden bg-[#f8f8f8] px-3 py-4 text-center text-[17px] font-semibold text-[#222] md:table-cell"
-            >
-              Precio
-            </th>
-            <th
-              scope="col"
-              className="hidden bg-[#f8f8f8] px-3 py-4 text-center text-[17px] font-semibold text-[#222] md:table-cell"
-            >
-              Disponibilidad
-            </th>
-            <th
-              scope="col"
-              className="hidden bg-[#f8f8f8] px-3 py-4 text-center text-[17px] font-semibold text-[#222] md:table-cell"
-            >
-              Acción
-            </th>
+            <th scope="col">Imagen</th>
+            <th scope="col">Producto</th>
+            <th scope="col">Precio</th>
+            <th scope="col">Disponibilidad</th>
+            <th scope="col">Acción</th>
           </tr>
         </thead>
         <tbody>

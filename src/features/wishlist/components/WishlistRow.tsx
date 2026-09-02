@@ -24,74 +24,74 @@ export function WishlistRow({ product }: WishlistRowProps) {
 
   return (
     <tr>
-      <td className="border-b border-[#eee] px-3 py-4 text-center align-middle">
-        <Link href={href} className="inline-block">
+      <td>
+        <Link href={href} className="product-image-link">
           <Image
             src="/placeholder-product.svg"
             alt={product.name}
             width={90}
             height={90}
-            className="mx-auto size-[clamp(70px,8vw,90px)] object-contain"
+            className="wishlist-product-image"
           />
         </Link>
       </td>
 
-      <td className="border-b border-[#eee] px-3 py-4 align-middle">
-        <Link href={href} className="name text-base font-medium text-[#222] hover:text-theme">
+      <td>
+        <Link href={href} className="name">
           {product.name}
         </Link>
 
-        <div className="mobile-cart-content mt-3 grid gap-3 md:hidden">
-          <p className="text-sm text-[#777]">{getStockStatusLabel(stockStatus)}</p>
-          <h2 className="td-color text-base font-semibold text-[#222]">{formatProductPrice(product)}</h2>
-          <div className="remove-icon-box">
-            <div className="td-color flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => removeItem(product.id)}
-                className="icon flex size-8 items-center justify-center border border-[#eee] bg-[#f8f8f8] text-[#777] hover:text-theme"
-                aria-label={`Quitar ${product.name} de favoritos`}
-              >
-                <X className="size-4" />
-              </button>
-              {isInStock ? (
-                <Link
-                  href={href}
-                  className="icon flex size-8 items-center justify-center border border-[#eee] bg-[#f8f8f8] text-[#777] hover:text-theme"
-                  aria-label={`Ver ${product.name}`}
+        <div className="mobile-cart-content">
+          <div className="col">
+            <p>{getStockStatusLabel(stockStatus)}</p>
+          </div>
+          <div className="col">
+            <h2 className="td-color">{formatProductPrice(product)}</h2>
+          </div>
+          <div className="col">
+            <div className="remove-icon-box">
+              <h2 className="td-color">
+                <button
+                  type="button"
+                  onClick={() => removeItem(product.id)}
+                  className="icon"
+                  aria-label={`Quitar ${product.name} de favoritos`}
                 >
-                  <ShoppingBag className="size-4" />
-                </Link>
-              ) : null}
+                  <X className="size-4" />
+                </button>
+                {isInStock ? (
+                  <Link href={href} className="icon" aria-label={`Ver ${product.name}`}>
+                    <ShoppingBag className="size-4" />
+                  </Link>
+                ) : null}
+              </h2>
             </div>
           </div>
         </div>
       </td>
 
-      <td className="hidden border-b border-[#eee] px-3 py-4 text-center align-middle md:table-cell">
-        <h2 className="text-base font-semibold text-[#222]">{formatProductPrice(product)}</h2>
+      <td>
+        <div className="table-price">
+          <h2>{formatProductPrice(product)}</h2>
+        </div>
       </td>
 
-      <td className="hidden border-b border-[#eee] px-3 py-4 text-center align-middle md:table-cell">
-        <p className="text-sm text-[#777]">{getStockStatusLabel(stockStatus)}</p>
+      <td>
+        <p>{getStockStatusLabel(stockStatus)}</p>
       </td>
 
-      <td className="hidden border-b border-[#eee] px-3 py-4 align-middle md:table-cell">
-        <div className="icon-box flex items-center justify-center gap-2">
+      <td>
+        <div className="icon-box">
           <button
             type="button"
             onClick={() => removeItem(product.id)}
-            className="icon flex size-8 items-center justify-center border border-[#eee] bg-[#f8f8f8] text-[#777] hover:text-theme"
+            className="icon"
             aria-label={`Quitar ${product.name} de favoritos`}
           >
             <X className="size-4" />
           </button>
           {isInStock ? (
-            <Link
-              href={href}
-              className="icon flex size-8 items-center justify-center border border-[#eee] bg-[#f8f8f8] text-[#777] hover:text-theme"
-              aria-label={`Ver ${product.name}`}
-            >
+            <Link href={href} className="icon" aria-label={`Ver ${product.name}`}>
               <ShoppingBag className="size-4" />
             </Link>
           ) : null}

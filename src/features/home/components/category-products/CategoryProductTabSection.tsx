@@ -33,10 +33,10 @@ export function CategoryProductTabSection({
 
   return (
     <div className="theme-tab h-full">
-      <div className="category-product-tab-header">
-        <h5 className="category-product-tab-header__title">{title}</h5>
+      <div className="category-product-tab-header bg-title-part">
+        <h5 className="category-product-tab-header__title title-border">{title}</h5>
 
-        <ul className="category-product-tab-header__tabs">
+        <ul className="category-product-tab-header__tabs tab-title">
           {tabs.map((tab) => {
             const isActive = tab.id === activeTabId;
 
