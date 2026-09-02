@@ -4,6 +4,7 @@ const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3012";
 export const env = {
   apiBaseUrl,
   apiAccessToken: process.env.API_ACCESS_TOKEN,
+  storeWarehouseId: process.env.STORE_WAREHOUSE_ID,
   appUrl,
   googleClientId: process.env.GOOGLE_CLIENT_ID,
   googleClientSecret: process.env.GOOGLE_CLIENT_SECRET,
