@@ -26,12 +26,16 @@ export const DEFAULT_CATEGORY_PRODUCT_SECTION: HomeCategoryProductSectionConfig 
     productCategory: {
       title: "RECOMENDACIONES PARA TI",
       status: true,
-      categoryIds: [29, 30, 115],
+      tabs: [
+        { id: "29", name: "Muebles", slug: "muebles", productIds: [] },
+        { id: "30", name: "Decoración", slug: "decoracion", productIds: [] },
+        { id: "115", name: "Hogar", slug: "hogar", productIds: [] },
+      ],
     },
   },
 };
 
-const FALLBACK_CATEGORY_TABS: CategoryProductTab[] = [
+export const FALLBACK_CATEGORY_TABS: CategoryProductTab[] = [
   { id: "29", name: "Muebles", slug: "muebles" },
   { id: "30", name: "Decoración", slug: "decoracion" },
   { id: "115", name: "Hogar", slug: "hogar" },
@@ -61,7 +65,7 @@ function createFallbackProduct(
   };
 }
 
-const FALLBACK_LEFT_PANEL_PRODUCTS: ProductBoxItem[] = [
+export const FALLBACK_LEFT_PANEL_PRODUCTS: ProductBoxItem[] = [
   createFallbackProduct(117, "Silla de comedor Prisma", "prisma-dining-chair", 22, 18.5),
   createFallbackProduct(114, "Lámpara de mesa Nordic", "nordic-table-lamp", 19, 15.99),
   createFallbackProduct(112, "Set de cojines decorativos", "decorative-cushion-set", 16, 12.5),
@@ -69,7 +73,7 @@ const FALLBACK_LEFT_PANEL_PRODUCTS: ProductBoxItem[] = [
   createFallbackProduct(34, "Silla Prisma", "prisma-dinning-chair", 14, 13.72),
 ];
 
-const FALLBACK_TAB_PRODUCTS: Record<string, ProductBoxItem[]> = {
+export const FALLBACK_TAB_PRODUCTS: Record<string, ProductBoxItem[]> = {
   "29": [
     createFallbackProduct(201, "Mesa auxiliar Oslo", "mesa-auxiliar-oslo", 120, 99),
     createFallbackProduct(202, "Sillón lounge Urban", "sillon-lounge-urban", 180, 149),

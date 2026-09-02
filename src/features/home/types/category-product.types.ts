@@ -6,6 +6,13 @@ export interface CategoryProductTab {
   slug?: string;
 }
 
+export interface HomeCategoryProductTabConfigItem {
+  id: string;
+  name: string;
+  slug?: string;
+  productIds: Array<string | number>;
+}
+
 export interface HomeCategoryProductLeftPanel {
   title: string;
   status?: boolean;
@@ -15,7 +22,7 @@ export interface HomeCategoryProductLeftPanel {
 export interface HomeCategoryProductTabConfig {
   title: string;
   status?: boolean;
-  categoryIds: Array<string | number>;
+  tabs: HomeCategoryProductTabConfigItem[];
 }
 
 export interface HomeCategoryProductBannerConfig {
