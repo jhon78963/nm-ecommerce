@@ -8,7 +8,6 @@ export interface HeaderProps extends HeaderLogoProps, TopBarConfig {
 export function Header({
   logoUrl,
   brandName,
-  initials,
   enabled: topBarEnabled = true,
   siteName,
   supportNumber,
@@ -18,7 +17,6 @@ export function Header({
     <StickyHeader
       logoUrl={logoUrl}
       brandName={brandName}
-      initials={initials}
       enabled={topBarEnabled}
       siteName={siteName}
       supportNumber={supportNumber}

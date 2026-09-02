@@ -22,7 +22,6 @@ interface StickyHeaderProps extends HeaderLogoProps, TopBarConfig {
 export function StickyHeader({
   logoUrl,
   brandName,
-  initials,
   enabled: topBarEnabled = true,
   siteName,
   supportNumber,
@@ -97,7 +96,7 @@ export function StickyHeader({
                 </button>
 
                 <div className="brand-logo">
-                  <HeaderLogo logoUrl={logoUrl} brandName={brandName} initials={initials} />
+                  <HeaderLogo logoUrl={logoUrl} brandName={brandName} />
                 </div>
               </div>
 

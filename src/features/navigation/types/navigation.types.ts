@@ -8,7 +8,6 @@ export interface NavMenuItem {
 export interface HeaderLogoProps {
   logoUrl?: string | null;
   brandName?: string;
-  initials?: string;
 }
 
 export interface TopBarConfig {
