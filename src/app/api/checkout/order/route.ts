@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { getCustomerAccessToken } from "@/features/customer-auth/utils/customer-auth-cookies";
 import {
   getStoreWarehouseId,
   proxyEcommerceJson,
@@ -25,9 +26,16 @@ export async function POST(request: Request) {
     );
   }
 
+  const accessToken = await getCustomerAccessToken();
+  const headers: Record<string, string> = {};
+  if (accessToken) {
+    headers.Authorization = `Bearer ${accessToken}`;
+  }
+
   const response = await proxyEcommerceJson("/ecommerce/orders", {
     method: "POST",
     body: JSON.stringify({ ...payload, warehouseId }),
+    headers,
   });
 
   const text = await response.text();
