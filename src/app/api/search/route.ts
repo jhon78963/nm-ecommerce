@@ -12,7 +12,7 @@ export async function GET(request: Request) {
     return NextResponse.json(data);
   } catch {
     return NextResponse.json(
-      { products: [], genders: [], query: q ?? "" },
+      { products: [], collections: [], genders: [], query: q ?? "" },
       { status: 200 },
     );
   }

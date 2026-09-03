@@ -1,50 +1,50 @@
-import { apiGet } from "@/services/http-client";
+import { mapPublicProductToProductBoxItem } from "@/features/product/utils/map-catalog-product";
+import { getStoreWarehouseId, proxyEcommerceJson } from "@/lib/ecommerce-backend";
 
 import type {
-  ProductsSearchResponse,
-  SearchGender,
   SearchModalResult,
   SearchQueryParams,
+  StoreSearchApiResponse,
 } from "@/features/search/types/search.types";
 
 const DEFAULT_PER_PAGE = 4;
 
-function filterGenders(genders: SearchGender[], query?: string) {
-  if (!query?.trim()) return genders.slice(0, DEFAULT_PER_PAGE);
-
-  const normalized = query.trim().toLowerCase();
-  return genders
-    .filter((gender) => gender.description.toLowerCase().includes(normalized))
-    .slice(0, DEFAULT_PER_PAGE);
+function toLegacyGenders(
+  collections: StoreSearchApiResponse["collections"],
+): SearchModalResult["genders"] {
+  return collections.map((collection) => ({
+    id: collection.id,
+    description: collection.label,
+  }));
 }
 
 export async function getSearchModalData({
   q,
   perPage = DEFAULT_PER_PAGE,
 }: SearchQueryParams): Promise<SearchModalResult> {
-  const [productsResult, gendersResult] = await Promise.allSettled([
-    apiGet<ProductsSearchResponse>("products", {
-      params: {
-        search: q,
-        page: 1,
-        perPage,
-        sortBy: "name",
-      },
-    }),
-    apiGet<SearchGender[]>("genders"),
-  ]);
+  const warehouseId = getStoreWarehouseId();
+  const params = new URLSearchParams({
+    warehouseId,
+    perPage: String(perPage),
+  });
 
-  const products =
-    productsResult.status === "fulfilled" ? productsResult.value.data : [];
+  if (q?.trim()) {
+    params.set("q", q.trim());
+  }
 
-  const genders =
-    gendersResult.status === "fulfilled"
-      ? filterGenders(gendersResult.value, q)
-      : [];
+  const response = await proxyEcommerceJson(`/ecommerce/search?${params.toString()}`);
+
+  if (!response.ok) {
+    throw new Error(`Search request failed: ${response.status}`);
+  }
+
+  const data = (await response.json()) as StoreSearchApiResponse;
+  const collections = data.collections ?? [];
 
   return {
-    products,
-    genders,
-    query: q ?? "",
+    products: (data.products ?? []).map(mapPublicProductToProductBoxItem),
+    collections,
+    genders: toLegacyGenders(collections),
+    query: data.query ?? q ?? "",
   };
 }

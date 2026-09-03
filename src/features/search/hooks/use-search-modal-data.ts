@@ -6,6 +6,7 @@ import type { SearchModalResult } from "@/features/search/types/search.types";
 
 const EMPTY_RESULT: SearchModalResult = {
   products: [],
+  collections: [],
   genders: [],
   query: "",
 };

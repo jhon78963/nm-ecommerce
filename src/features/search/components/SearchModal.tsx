@@ -6,11 +6,11 @@ import { Search, X } from "lucide-react";
 
 import { SearchCategoryLinks } from "@/features/search/components/SearchCategoryLinks";
 import { SearchEmptyState } from "@/features/search/components/SearchEmptyState";
-import { SearchProductCard } from "@/features/search/components/SearchProductCard";
 import {
   SearchCategorySkeleton,
   SearchProductSkeleton,
 } from "@/features/search/components/SearchSkeleton";
+import { ProductBox } from "@/features/product/components/ProductBox";
 import { useSearchModalData } from "@/features/search/hooks/use-search-modal-data";
 import { useTypewriterPlaceholder } from "@/features/search/hooks/use-typewriter-placeholder";
 import { cn } from "@/lib/utils";
@@ -122,7 +122,7 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
                 <SearchCategorySkeleton />
               </ul>
             ) : (
-              <SearchCategoryLinks genders={data.genders} onNavigate={onClose} />
+              <SearchCategoryLinks collections={data.collections} onNavigate={onClose} />
             )}
           </div>
 
@@ -136,7 +136,19 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
                 <SearchProductSkeleton count={4} />
               ) : data.products.length > 0 ? (
                 data.products.map((product) => (
-                  <SearchProductCard key={product.id} product={product} onNavigate={onClose} />
+                  <div
+                    key={product.id}
+                    className="min-w-0"
+                    onClick={(event) => {
+                      if ((event.target as HTMLElement).closest("a,button")) {
+                        onClose();
+                      }
+                    }}
+                    onKeyDown={undefined}
+                    role="presentation"
+                  >
+                    <ProductBox product={product} fullHeight />
+                  </div>
                 ))
               ) : (
                 <div className="col-span-full">
