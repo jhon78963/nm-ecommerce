@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { isUuid } from "@/features/cart/utils/cart-variant";
 import { PDP_COPY } from "@/features/product/constants/pdp-copy";
@@ -45,22 +45,6 @@ function resolveInitialSelection(
   return { sizeId: size.id, colorId: color.id };
 }
 
-function mergeInitialSelection(
-  sizes: ProductSize[],
-  initialSelection?: ProductVariantInitialSelection,
-  storedSelection?: ProductVariantInitialSelection,
-): ProductVariantInitialSelection | undefined {
-  if (initialSelection?.sizeId) {
-    return initialSelection;
-  }
-
-  if (storedSelection?.sizeId) {
-    return storedSelection;
-  }
-
-  return undefined;
-}
-
 export function useProductVariantSelection(
   sizes: ProductSize[] = [],
   initialSelection?: ProductVariantInitialSelection,
@@ -68,31 +52,18 @@ export function useProductVariantSelection(
 ) {
   const { productId, persist = false } = options ?? {};
   const shouldPersist = persist && Boolean(productId);
-  const hasHydratedRef = useRef(false);
-
-  const [storedSelection] = useState<ProductVariantInitialSelection | undefined>(() => {
-    if (!shouldPersist || !productId) {
-      return undefined;
-    }
-
-    return readProductVariantSelection(productId);
-  });
-
-  const effectiveInitialSelection = useMemo(
-    () => mergeInitialSelection(sizes, initialSelection, storedSelection),
-    [initialSelection, sizes, storedSelection],
-  );
 
   const [selectedSizeId, setSelectedSizeId] = useState<string | null>(
-    () => resolveInitialSelection(sizes, effectiveInitialSelection).sizeId,
+    () => resolveInitialSelection(sizes, initialSelection).sizeId,
   );
   const [selectedColorId, setSelectedColorId] = useState<string | null>(
-    () => resolveInitialSelection(sizes, effectiveInitialSelection).colorId,
+    () => resolveInitialSelection(sizes, initialSelection).colorId,
   );
   const [validationError, setValidationError] = useState<string | null>(null);
+  const [hasRestoredFromStorage, setHasRestoredFromStorage] = useState(!shouldPersist);
 
   useEffect(() => {
-    const resolved = resolveInitialSelection(sizes, effectiveInitialSelection);
+    const resolved = resolveInitialSelection(sizes, initialSelection);
     if (!resolved.sizeId) {
       return;
     }
@@ -100,14 +71,28 @@ export function useProductVariantSelection(
     setSelectedSizeId(resolved.sizeId);
     setSelectedColorId(resolved.colorId);
     setValidationError(null);
-  }, [effectiveInitialSelection?.colorId, effectiveInitialSelection?.sizeId, sizes]);
+    setHasRestoredFromStorage(true);
+  }, [initialSelection?.colorId, initialSelection?.sizeId, sizes]);
 
   useEffect(() => {
-    hasHydratedRef.current = true;
-  }, []);
+    if (!shouldPersist || !productId || initialSelection?.sizeId) {
+      setHasRestoredFromStorage(true);
+      return;
+    }
+
+    const stored = readProductVariantSelection(productId);
+    const resolved = resolveInitialSelection(sizes, stored);
+
+    if (resolved.sizeId) {
+      setSelectedSizeId(resolved.sizeId);
+      setSelectedColorId(resolved.colorId);
+    }
+
+    setHasRestoredFromStorage(true);
+  }, [initialSelection?.sizeId, productId, shouldPersist, sizes]);
 
   useEffect(() => {
-    if (!shouldPersist || !productId || !hasHydratedRef.current) {
+    if (!shouldPersist || !productId || !hasRestoredFromStorage) {
       return;
     }
 
@@ -115,7 +100,7 @@ export function useProductVariantSelection(
       sizeId: selectedSizeId,
       colorId: selectedColorId,
     });
-  }, [productId, selectedColorId, selectedSizeId, shouldPersist]);
+  }, [hasRestoredFromStorage, productId, selectedColorId, selectedSizeId, shouldPersist]);
 
   const hasSizes = sizes.length > 0;
   const selectedSize = sizes.find((size) => size.id === selectedSizeId) ?? null;
@@ -123,7 +108,7 @@ export function useProductVariantSelection(
   const selectedColor = availableColors.find((color) => color.id === selectedColorId) ?? null;
 
   useEffect(() => {
-    if (sizes.length !== 1 || selectedSizeId) {
+    if (!hasRestoredFromStorage || sizes.length !== 1 || selectedSizeId) {
       return;
     }
 
@@ -138,7 +123,7 @@ export function useProductVariantSelection(
     if (colors.length === 1 && isUuid(colors[0].id) && colors[0].stock > 0) {
       setSelectedColorId(colors[0].id);
     }
-  }, [sizes, selectedSizeId]);
+  }, [hasRestoredFromStorage, sizes, selectedSizeId]);
 
   const cartVariation = useMemo<ProductCartVariation>(() => {
     const variation = [selectedSize?.label, selectedColor?.label].filter(Boolean).join(" — ");
