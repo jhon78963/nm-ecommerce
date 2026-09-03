@@ -71,7 +71,7 @@ export function CheckoutForm() {
   const [orderNotes, setOrderNotes] = useState("");
   const [sameAsBilling, setSameAsBilling] = useState(true);
   const [shippingMethodId, setShippingMethodId] = useState("");
-  const [paymentMethodId, setPaymentMethodId] = useState("culqi");
+  const [paymentMethodId, setPaymentMethodId] = useState("bacs");
   const [couponCode, setCouponCode] = useState("");
   const [appliedCouponCode, setAppliedCouponCode] = useState("");
   const [couponDiscount, setCouponDiscount] = useState(0);
@@ -222,7 +222,7 @@ export function CheckoutForm() {
 
   useEffect(() => {
     if (!paymentMethods.some((method) => method.id === paymentMethodId)) {
-      setPaymentMethodId(paymentMethods[0]?.id ?? "culqi");
+      setPaymentMethodId(paymentMethods[0]?.id ?? "bacs");
     }
   }, [paymentMethods, paymentMethodId]);
 
