@@ -1,15 +1,14 @@
-import { apiGet } from "@/services/http-client";
+import { getProductsByIds } from "@/features/product/services/catalog.service";
+import type { ProductBoxItem } from "@/features/product/types/product-box.types";
 
-import type { SearchProduct } from "@/features/search/types/search.types";
+export async function getWishlistProducts(ids: string[]): Promise<ProductBoxItem[]> {
+  if (ids.length === 0) {
+    return [];
+  }
 
-export async function getWishlistProducts(ids: string[]) {
-  if (ids.length === 0) return [];
+  const products = await getProductsByIds(ids);
 
-  const results = await Promise.allSettled(
-    ids.map((id) => apiGet<SearchProduct>(`products/${id}`)),
-  );
-
-  return results
-    .filter((result): result is PromiseFulfilledResult<SearchProduct> => result.status === "fulfilled")
-    .map((result) => result.value);
+  return ids
+    .map((id) => products.find((product) => String(product.id) === id))
+    .filter((product): product is ProductBoxItem => Boolean(product));
 }

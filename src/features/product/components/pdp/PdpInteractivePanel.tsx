@@ -1,6 +1,7 @@
 "use client";
 
 import { Heart, Minus, Plus, RefreshCw, Share2, ShoppingCart } from "lucide-react";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 import { useCart } from "@/features/cart/context/CartProvider";
@@ -8,9 +9,9 @@ import { ProductVariantSelectors } from "@/features/product/components/variants/
 import { PDP_COPY } from "@/features/product/constants/pdp-copy";
 import { useProductVariantSelection } from "@/features/product/hooks/use-product-variant-selection";
 import type { ProductDetail } from "@/features/product/types/product-detail.types";
-import type { SearchProduct } from "@/features/search/types/search.types";
 import { enrichProductWithVariants } from "@/features/product/utils/enrich-product-variants";
 import { clampQuantity, getVariantStock } from "@/features/product/utils/get-variant-stock";
+import { parseVariantSearchParams } from "@/features/product/utils/product-variant-url";
 import { useWishlist } from "@/features/wishlist/context/WishlistProvider";
 import { cn } from "@/lib/utils";
 
@@ -18,28 +19,18 @@ interface PdpInteractivePanelProps {
   product: ProductDetail;
 }
 
-function toWishlistProduct(product: ProductDetail): SearchProduct {
-  return {
-    id: String(product.id),
-    name: product.name,
-    isOnSale: product.discount > 0,
-    sizes: [
-      {
-        id: `${product.id}-default`,
-        salePrice: product.salePrice,
-        stock: product.stockStatus === "in_stock" ? 10 : 0,
-      },
-    ],
-  };
-}
-
 export function PdpInteractivePanel({ product }: PdpInteractivePanelProps) {
   const { addItem, openCart } = useCart();
   const { isInWishlist, toggleItem } = useWishlist();
   const [quantity, setQuantity] = useState(1);
+  const searchParams = useSearchParams();
 
   const enrichedProduct = useMemo(() => enrichProductWithVariants(product), [product]);
-  const variantSelection = useProductVariantSelection(enrichedProduct.sizes);
+  const initialSelection = useMemo(() => parseVariantSearchParams(searchParams), [searchParams]);
+  const variantSelection = useProductVariantSelection(enrichedProduct.sizes, initialSelection, {
+    productId: String(product.id),
+    persist: true,
+  });
 
   const isInStock = product.stockStatus === "in_stock";
   const isWishlisted = isInWishlist(String(product.id));
@@ -193,7 +184,7 @@ export function PdpInteractivePanel({ product }: PdpInteractivePanelProps) {
         <button
           type="button"
           className="quick-view-action-link"
-          onClick={() => toggleItem(toWishlistProduct(product))}
+          onClick={() => toggleItem(product, variantSelection.cartVariation)}
         >
           <Heart
             className={cn("size-4", isWishlisted && "fill-theme text-theme")}

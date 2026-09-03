@@ -6,6 +6,7 @@ import { X } from "lucide-react";
 
 import { ProductQuickViewDetails } from "@/features/product/components/quick-view/ProductQuickViewDetails";
 import { ProductQuickViewGallery } from "@/features/product/components/quick-view/ProductQuickViewGallery";
+import type { ProductVariantInitialSelection } from "@/features/product/hooks/use-product-variant-selection";
 import type { ProductBoxItem } from "@/features/product/types/product-box.types";
 import { cn } from "@/lib/utils";
 
@@ -15,10 +16,15 @@ const QUICK_VIEW_ANIMATION_MS = 360;
 
 interface ProductQuickViewModalProps {
   product: ProductBoxItem;
+  initialSelection?: ProductVariantInitialSelection;
   onClose: () => void;
 }
 
-export function ProductQuickViewModal({ product, onClose }: ProductQuickViewModalProps) {
+export function ProductQuickViewModal({
+  product,
+  initialSelection,
+  onClose,
+}: ProductQuickViewModalProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
 
@@ -107,7 +113,11 @@ export function ProductQuickViewModal({ product, onClose }: ProductQuickViewModa
               </div>
 
               <div className="quick-view-modal__details-col rtl-text">
-                <ProductQuickViewDetails product={product} onClose={handleClose} />
+                <ProductQuickViewDetails
+                  product={product}
+                  initialSelection={initialSelection}
+                  onClose={handleClose}
+                />
               </div>
             </div>
           </div>

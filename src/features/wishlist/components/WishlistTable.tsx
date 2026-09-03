@@ -2,23 +2,30 @@
 
 import { useMemo } from "react";
 
-import type { SearchProduct } from "@/features/search/types/search.types";
+import type { ProductBoxItem } from "@/features/product/types/product-box.types";
 import { useWishlist } from "@/features/wishlist/context/WishlistProvider";
 import { WishlistEmptyState } from "@/features/wishlist/components/WishlistEmptyState";
 import { WishlistRow } from "@/features/wishlist/components/WishlistRow";
 import { WishlistSkeleton } from "@/features/wishlist/components/WishlistSkeleton";
 import { useWishlistProducts } from "@/features/wishlist/hooks/use-wishlist-products";
+import type { WishlistStoredItem } from "@/features/wishlist/types/wishlist.types";
 
 import "./wishlist.css";
 
-function buildFallbackProducts(
-  storedItems: ReturnType<typeof useWishlist>["items"],
-): SearchProduct[] {
-  return storedItems.map((item) => ({
+function buildFallbackProduct(item: WishlistStoredItem): ProductBoxItem {
+  return {
     id: item.productId,
+    slug: item.slug ?? item.productId,
     name: item.name,
-    sizes: item.price > 0 ? [{ id: item.productId, salePrice: item.price, stock: 0 }] : [],
-  }));
+    imageUrl: item.imageUrl ?? "/placeholder-product.svg",
+    price: item.price,
+    salePrice: item.price,
+    discount: 0,
+    ratingCount: null,
+    reviewsCount: 0,
+    stockStatus: "out_of_stock",
+    sizes: [],
+  };
 }
 
 export function WishlistTable({ embedded = false }: { embedded?: boolean }) {
@@ -26,7 +33,11 @@ export function WishlistTable({ embedded = false }: { embedded?: boolean }) {
   const productIds = useMemo(() => items.map((item) => item.productId), [items]);
   const { products, isLoading } = useWishlistProducts(productIds);
 
-  const displayProducts = products.length > 0 ? products : buildFallbackProducts(items);
+  const productsById = useMemo(
+    () => new Map(products.map((product) => [String(product.id), product])),
+    [products],
+  );
+
   const showSkeleton = !isHydrated || (items.length > 0 && isLoading && products.length === 0);
 
   if (showSkeleton) {
@@ -51,8 +62,12 @@ export function WishlistTable({ embedded = false }: { embedded?: boolean }) {
           </tr>
         </thead>
         <tbody>
-          {displayProducts.map((product) => (
-            <WishlistRow key={product.id} product={product} />
+          {items.map((item) => (
+            <WishlistRow
+              key={item.productId}
+              storedItem={item}
+              product={productsById.get(item.productId) ?? buildFallbackProduct(item)}
+            />
           ))}
         </tbody>
       </table>

@@ -11,14 +11,24 @@ import { cn } from "@/lib/utils";
 interface ProductQuickViewButtonProps {
   product: ProductBoxItem;
   className?: string;
+  selectedSizeId?: string | null;
+  selectedColorId?: string | null;
 }
 
-export function ProductQuickViewButton({ product, className }: ProductQuickViewButtonProps) {
+export function ProductQuickViewButton({
+  product,
+  className,
+  selectedSizeId,
+  selectedColorId,
+}: ProductQuickViewButtonProps) {
   const { openQuickView } = useQuickView();
 
   function handleClick(event: MouseEvent<HTMLAnchorElement>) {
     event.preventDefault();
-    openQuickView(product);
+    openQuickView(product, {
+      sizeId: selectedSizeId,
+      colorId: selectedColorId,
+    });
   }
 
   return (

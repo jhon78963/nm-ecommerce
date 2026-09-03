@@ -9,7 +9,10 @@ import { cartLineHasValidVariant } from "@/features/cart/utils/cart-variant";
 import { PRODUCT_COPY } from "@/features/product/constants/product-copy";
 import { QUICK_VIEW_COPY } from "@/features/product/constants/quick-view-copy";
 import { ProductVariantSelectors } from "@/features/product/components/variants/ProductVariantSelectors";
-import { useProductVariantSelection } from "@/features/product/hooks/use-product-variant-selection";
+import {
+  useProductVariantSelection,
+  type ProductVariantInitialSelection,
+} from "@/features/product/hooks/use-product-variant-selection";
 import type { ProductBoxItem } from "@/features/product/types/product-box.types";
 import { enrichProductWithVariants } from "@/features/product/utils/enrich-product-variants";
 import { clampQuantity, getVariantStock } from "@/features/product/utils/get-variant-stock";
@@ -17,30 +20,16 @@ import {
   formatProductBoxPrice,
   getProductBoxHref,
 } from "@/features/product/utils/format-product-price";
+import { buildProductHrefWithVariants } from "@/features/product/utils/product-variant-url";
 import { productBoxItemToCartLineItem } from "@/features/product/utils/to-cart-line-item";
 import { isStarFilled } from "@/features/product/utils/product-rating";
-import type { SearchProduct } from "@/features/search/types/search.types";
 import { useWishlist } from "@/features/wishlist/context/WishlistProvider";
 import { cn } from "@/lib/utils";
 
 interface ProductQuickViewDetailsProps {
   product: ProductBoxItem;
+  initialSelection?: ProductVariantInitialSelection;
   onClose: () => void;
-}
-
-function toWishlistProduct(product: ProductBoxItem): SearchProduct {
-  return {
-    id: String(product.id),
-    name: product.name,
-    isOnSale: product.discount > 0,
-    sizes: [
-      {
-        id: `${product.id}-size`,
-        salePrice: product.salePrice,
-        stock: product.stockStatus === "in_stock" ? 10 : 0,
-      },
-    ],
-  };
 }
 
 function ProductRating({ rating, reviewsCount }: { rating: number | null; reviewsCount: number }) {
@@ -66,15 +55,25 @@ function ProductRating({ rating, reviewsCount }: { rating: number | null; review
   );
 }
 
-export function ProductQuickViewDetails({ product, onClose }: ProductQuickViewDetailsProps) {
+export function ProductQuickViewDetails({
+  product,
+  initialSelection,
+  onClose,
+}: ProductQuickViewDetailsProps) {
   const { addItem, openCart } = useCart();
   const { isInWishlist, toggleItem } = useWishlist();
   const [quantity, setQuantity] = useState(1);
 
   const enrichedProduct = useMemo(() => enrichProductWithVariants(product), [product]);
-  const variantSelection = useProductVariantSelection(enrichedProduct.sizes);
+  const variantSelection = useProductVariantSelection(enrichedProduct.sizes, initialSelection, {
+    productId: String(product.id),
+    persist: true,
+  });
 
-  const href = getProductBoxHref(product);
+  const href = buildProductHrefWithVariants(getProductBoxHref(product), {
+    sizeId: variantSelection.selectedSizeId,
+    colorId: variantSelection.selectedColorId,
+  });
   const isInStock = product.stockStatus === "in_stock";
   const isWishlisted = isInWishlist(String(product.id));
 
@@ -223,7 +222,7 @@ export function ProductQuickViewDetails({ product, onClose }: ProductQuickViewDe
       <div className="compare-box buy-box">
         <button
           type="button"
-          onClick={() => toggleItem(toWishlistProduct(product))}
+          onClick={() => toggleItem(product, variantSelection.cartVariation)}
           className="quick-view-action-link"
         >
           <Heart className={cn("size-4", isWishlisted && "fill-theme text-theme")} />

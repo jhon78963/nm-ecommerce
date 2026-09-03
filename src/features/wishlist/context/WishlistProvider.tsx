@@ -10,9 +10,13 @@ import {
   type ReactNode,
 } from "react";
 
-import type { SearchProduct } from "@/features/search/types/search.types";
-import type { WishlistContextValue, WishlistStoredItem } from "@/features/wishlist/types/wishlist.types";
-import { getProductMinPrice } from "@/features/search/utils/product";
+import type { ProductCartVariation } from "@/features/product/types/product-variant.types";
+import type {
+  WishlistContextValue,
+  WishlistProductInput,
+  WishlistStoredItem,
+} from "@/features/wishlist/types/wishlist.types";
+import { toWishlistStoredItem } from "@/features/wishlist/utils/to-wishlist-stored-item";
 import {
   readWishlistFromStorage,
   writeWishlistToStorage,
@@ -24,13 +28,26 @@ interface WishlistProviderProps {
   children: ReactNode;
 }
 
-function toStoredItem(product: SearchProduct): WishlistStoredItem {
-  return {
-    productId: product.id,
-    name: product.name,
-    price: getProductMinPrice(product),
-    addedAt: new Date().toISOString(),
-  };
+function upsertWishlistItem(
+  current: WishlistStoredItem[],
+  product: WishlistProductInput,
+  variant?: ProductCartVariation,
+): WishlistStoredItem[] {
+  const nextItem = toWishlistStoredItem(product, variant);
+  const existing = current.find((item) => item.productId === nextItem.productId);
+
+  if (!existing) {
+    return [nextItem, ...current];
+  }
+
+  return current.map((item) =>
+    item.productId === nextItem.productId
+      ? {
+          ...nextItem,
+          addedAt: existing.addedAt,
+        }
+      : item,
+  );
 }
 
 export function WishlistProvider({ children }: WishlistProviderProps) {
@@ -52,28 +69,23 @@ export function WishlistProvider({ children }: WishlistProviderProps) {
     [items],
   );
 
-  const addItem = useCallback((product: SearchProduct) => {
-    setItems((current) => {
-      if (current.some((item) => item.productId === product.id)) {
-        return current;
-      }
-
-      return [toStoredItem(product), ...current];
-    });
+  const addItem = useCallback((product: WishlistProductInput, variant?: ProductCartVariation) => {
+    setItems((current) => upsertWishlistItem(current, product, variant));
   }, []);
 
   const removeItem = useCallback((productId: string) => {
     setItems((current) => current.filter((item) => item.productId !== productId));
   }, []);
 
-  const toggleItem = useCallback((product: SearchProduct) => {
+  const toggleItem = useCallback((product: WishlistProductInput, variant?: ProductCartVariation) => {
     setItems((current) => {
-      const exists = current.some((item) => item.productId === product.id);
+      const exists = current.some((item) => item.productId === String(product.id));
+
       if (exists) {
-        return current.filter((item) => item.productId !== product.id);
+        return current.filter((item) => item.productId !== String(product.id));
       }
 
-      return [toStoredItem(product), ...current];
+      return upsertWishlistItem(current, product, variant);
     });
   }, []);
 

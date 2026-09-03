@@ -1,15 +1,121 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { isUuid } from "@/features/cart/utils/cart-variant";
 import { PDP_COPY } from "@/features/product/constants/pdp-copy";
 import type { ProductCartVariation, ProductSize } from "@/features/product/types/product-variant.types";
+import {
+  readProductVariantSelection,
+  writeProductVariantSelection,
+} from "@/features/product/utils/product-variant-selection-storage";
 
-export function useProductVariantSelection(sizes: ProductSize[] = []) {
-  const [selectedSizeId, setSelectedSizeId] = useState<string | null>(null);
-  const [selectedColorId, setSelectedColorId] = useState<string | null>(null);
+export interface ProductVariantInitialSelection {
+  sizeId?: string | null;
+  colorId?: string | null;
+}
+
+export interface UseProductVariantSelectionOptions {
+  productId?: string;
+  persist?: boolean;
+}
+
+function resolveInitialSelection(
+  sizes: ProductSize[],
+  initialSelection?: ProductVariantInitialSelection,
+): { sizeId: string | null; colorId: string | null } {
+  if (!initialSelection?.sizeId) {
+    return { sizeId: null, colorId: null };
+  }
+
+  const size = sizes.find((item) => item.id === initialSelection.sizeId);
+  if (!size || !isUuid(size.id)) {
+    return { sizeId: null, colorId: null };
+  }
+
+  if (!initialSelection.colorId) {
+    return { sizeId: size.id, colorId: null };
+  }
+
+  const color = size.colors?.find((item) => item.id === initialSelection.colorId);
+  if (!color || !isUuid(color.id) || color.stock <= 0) {
+    return { sizeId: size.id, colorId: null };
+  }
+
+  return { sizeId: size.id, colorId: color.id };
+}
+
+function mergeInitialSelection(
+  sizes: ProductSize[],
+  initialSelection?: ProductVariantInitialSelection,
+  storedSelection?: ProductVariantInitialSelection,
+): ProductVariantInitialSelection | undefined {
+  if (initialSelection?.sizeId) {
+    return initialSelection;
+  }
+
+  if (storedSelection?.sizeId) {
+    return storedSelection;
+  }
+
+  return undefined;
+}
+
+export function useProductVariantSelection(
+  sizes: ProductSize[] = [],
+  initialSelection?: ProductVariantInitialSelection,
+  options?: UseProductVariantSelectionOptions,
+) {
+  const { productId, persist = false } = options ?? {};
+  const shouldPersist = persist && Boolean(productId);
+  const hasHydratedRef = useRef(false);
+
+  const [storedSelection] = useState<ProductVariantInitialSelection | undefined>(() => {
+    if (!shouldPersist || !productId) {
+      return undefined;
+    }
+
+    return readProductVariantSelection(productId);
+  });
+
+  const effectiveInitialSelection = useMemo(
+    () => mergeInitialSelection(sizes, initialSelection, storedSelection),
+    [initialSelection, sizes, storedSelection],
+  );
+
+  const [selectedSizeId, setSelectedSizeId] = useState<string | null>(
+    () => resolveInitialSelection(sizes, effectiveInitialSelection).sizeId,
+  );
+  const [selectedColorId, setSelectedColorId] = useState<string | null>(
+    () => resolveInitialSelection(sizes, effectiveInitialSelection).colorId,
+  );
   const [validationError, setValidationError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const resolved = resolveInitialSelection(sizes, effectiveInitialSelection);
+    if (!resolved.sizeId) {
+      return;
+    }
+
+    setSelectedSizeId(resolved.sizeId);
+    setSelectedColorId(resolved.colorId);
+    setValidationError(null);
+  }, [effectiveInitialSelection?.colorId, effectiveInitialSelection?.sizeId, sizes]);
+
+  useEffect(() => {
+    hasHydratedRef.current = true;
+  }, []);
+
+  useEffect(() => {
+    if (!shouldPersist || !productId || !hasHydratedRef.current) {
+      return;
+    }
+
+    writeProductVariantSelection(productId, {
+      sizeId: selectedSizeId,
+      colorId: selectedColorId,
+    });
+  }, [productId, selectedColorId, selectedSizeId, shouldPersist]);
 
   const hasSizes = sizes.length > 0;
   const selectedSize = sizes.find((size) => size.id === selectedSizeId) ?? null;

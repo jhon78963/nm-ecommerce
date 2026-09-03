@@ -10,40 +10,55 @@ import {
 } from "react";
 
 import { ProductQuickViewModal } from "@/features/product/components/quick-view/ProductQuickViewModal";
+import type { ProductVariantInitialSelection } from "@/features/product/hooks/use-product-variant-selection";
 import type { ProductBoxItem } from "@/features/product/types/product-box.types";
+
+interface QuickViewState {
+  product: ProductBoxItem;
+  initialSelection: ProductVariantInitialSelection;
+}
 
 interface QuickViewContextValue {
   product: ProductBoxItem | null;
-  openQuickView: (product: ProductBoxItem) => void;
+  openQuickView: (product: ProductBoxItem, initialSelection?: ProductVariantInitialSelection) => void;
   closeQuickView: () => void;
 }
 
 const QuickViewContext = createContext<QuickViewContextValue | null>(null);
 
 export function QuickViewProvider({ children }: { children: ReactNode }) {
-  const [product, setProduct] = useState<ProductBoxItem | null>(null);
+  const [quickViewState, setQuickViewState] = useState<QuickViewState | null>(null);
 
-  const openQuickView = useCallback((nextProduct: ProductBoxItem) => {
-    setProduct(nextProduct);
-  }, []);
+  const openQuickView = useCallback(
+    (nextProduct: ProductBoxItem, initialSelection: ProductVariantInitialSelection = {}) => {
+      setQuickViewState({ product: nextProduct, initialSelection });
+    },
+    [],
+  );
 
   const closeQuickView = useCallback(() => {
-    setProduct(null);
+    setQuickViewState(null);
   }, []);
 
   const value = useMemo(
     () => ({
-      product,
+      product: quickViewState?.product ?? null,
       openQuickView,
       closeQuickView,
     }),
-    [product, openQuickView, closeQuickView],
+    [quickViewState?.product, openQuickView, closeQuickView],
   );
 
   return (
     <QuickViewContext.Provider value={value}>
       {children}
-      {product ? <ProductQuickViewModal product={product} onClose={closeQuickView} /> : null}
+      {quickViewState ? (
+        <ProductQuickViewModal
+          product={quickViewState.product}
+          initialSelection={quickViewState.initialSelection}
+          onClose={closeQuickView}
+        />
+      ) : null}
     </QuickViewContext.Provider>
   );
 }

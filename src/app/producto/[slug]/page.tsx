@@ -8,6 +8,7 @@ import { resolveProductSlug } from "@/utils/product-slug";
 
 interface ProductPageProps {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
 export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
@@ -26,8 +27,9 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
   };
 }
 
-export default async function ProductPage({ params }: ProductPageProps) {
+export default async function ProductPage({ params, searchParams }: ProductPageProps) {
   const { slug } = await params;
+  const rawSearchParams = await searchParams;
   const product = await getProductBySlug(slug);
 
   if (!product) {
@@ -37,7 +39,20 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const canonicalSlug = resolveProductSlug(product);
 
   if (slug !== canonicalSlug) {
-    permanentRedirect(getProductHref(canonicalSlug));
+    const query = new URLSearchParams();
+
+    for (const [key, value] of Object.entries(rawSearchParams)) {
+      if (typeof value === "string") {
+        query.set(key, value);
+      } else if (Array.isArray(value)) {
+        value.forEach((entry) => query.append(key, entry));
+      }
+    }
+
+    const queryString = query.toString();
+    permanentRedirect(
+      getProductHref(canonicalSlug) + (queryString ? `?${queryString}` : ""),
+    );
   }
 
   return <ProductDetailPage product={product} />;

@@ -2,15 +2,15 @@
 
 import { useEffect, useState } from "react";
 
-import type { SearchProduct } from "@/features/search/types/search.types";
+import type { ProductBoxItem } from "@/features/product/types/product-box.types";
 
 interface UseWishlistProductsResult {
-  products: SearchProduct[];
+  products: ProductBoxItem[];
   isLoading: boolean;
 }
 
 export function useWishlistProducts(productIds: string[]): UseWishlistProductsResult {
-  const [products, setProducts] = useState<SearchProduct[]>([]);
+  const [products, setProducts] = useState<ProductBoxItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -36,7 +36,7 @@ export function useWishlistProducts(productIds: string[]): UseWishlistProductsRe
           return;
         }
 
-        const data = (await response.json()) as { products: SearchProduct[] };
+        const data = (await response.json()) as { products: ProductBoxItem[] };
         setProducts(data.products);
       } catch (error) {
         if ((error as Error).name !== "AbortError") {

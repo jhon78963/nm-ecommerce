@@ -14,17 +14,18 @@ import { ProductQuickViewButton } from "@/features/product/components/quick-view
 import { ProductVariantSelectors } from "@/features/product/components/variants/ProductVariantSelectors";
 import { useProductVariantSelection } from "@/features/product/hooks/use-product-variant-selection";
 import type { ProductBoxItem } from "@/features/product/types/product-box.types";
+import type { ProductCartVariation } from "@/features/product/types/product-variant.types";
 import {
   formatProductBoxPrice,
   getProductBoxHref,
 } from "@/features/product/utils/format-product-price";
 import { enrichProductWithVariants } from "@/features/product/utils/enrich-product-variants";
+import { buildProductHrefWithVariants } from "@/features/product/utils/product-variant-url";
 import {
   hasProductPromoPrice,
   resolveProductDiscountBadge,
 } from "@/features/product/utils/product-discount-badge";
 import { isStarFilled } from "@/features/product/utils/product-rating";
-import type { SearchProduct } from "@/features/search/types/search.types";
 import { useWishlist } from "@/features/wishlist/context/WishlistProvider";
 import { cn } from "@/lib/utils";
 
@@ -37,21 +38,6 @@ interface ProductBoxProps {
   product: ProductBoxItem;
   fullHeight?: boolean;
   featured?: boolean;
-}
-
-function toWishlistProduct(product: ProductBoxItem): SearchProduct {
-  return {
-    id: String(product.id),
-    name: product.name,
-    isOnSale: hasProductPromoPrice(product),
-    sizes: [
-      {
-        id: `${product.id}-size`,
-        salePrice: product.salePrice,
-        stock: product.stockStatus === "in_stock" ? 10 : 0,
-      },
-    ],
-  };
 }
 
 function ProductRating({ rating }: { rating: number | null }) {
@@ -72,9 +58,14 @@ function ProductRating({ rating }: { rating: number | null }) {
   );
 }
 
-function WishlistIcon({ product }: { product: ProductBoxItem }) {
+function WishlistIcon({
+  product,
+  cartVariation,
+}: {
+  product: ProductBoxItem;
+  cartVariation: ProductCartVariation;
+}) {
   const { isInWishlist, toggleItem } = useWishlist();
-  const wishlistProduct = toWishlistProduct(product);
   const active = isInWishlist(String(product.id));
 
   return (
@@ -84,7 +75,7 @@ function WishlistIcon({ product }: { product: ProductBoxItem }) {
       className={actionButtonClass}
       onClick={(event) => {
         event.preventDefault();
-        toggleItem(wishlistProduct);
+        toggleItem(product, cartVariation);
       }}
     >
       <Heart className={cn(active && "fill-theme")} />
@@ -94,11 +85,17 @@ function WishlistIcon({ product }: { product: ProductBoxItem }) {
 
 export function ProductBox({ product, fullHeight = false, featured = false }: ProductBoxProps) {
   const enrichedProduct = useMemo(() => enrichProductWithVariants(product), [product]);
-  const variantSelection = useProductVariantSelection(enrichedProduct.sizes);
+  const variantSelection = useProductVariantSelection(enrichedProduct.sizes, undefined, {
+    productId: String(product.id),
+    persist: true,
+  });
   const discountBadge = useMemo(() => resolveProductDiscountBadge(product), [product]);
   const showOriginalPrice = hasProductPromoPrice(product) && product.price > product.salePrice;
 
-  const href = getProductBoxHref(product);
+  const href = buildProductHrefWithVariants(getProductBoxHref(product), {
+    sizeId: variantSelection.selectedSizeId,
+    colorId: variantSelection.selectedColorId,
+  });
   const isOutOfStock = product.stockStatus === "out_of_stock";
 
   const preventDefault = (event: MouseEvent<HTMLAnchorElement>) => {
@@ -151,13 +148,18 @@ export function ProductBox({ product, fullHeight = false, featured = false }: Pr
         </div>
 
         <div className="absolute top-2.5 right-2.5 flex flex-col gap-2 max-md:top-2 max-md:right-2 max-md:gap-1">
-          <WishlistIcon product={product} />
+          <WishlistIcon product={product} cartVariation={variantSelection.cartVariation} />
 
           <ul className="m-0 flex list-none flex-col gap-2 p-0 max-md:gap-1 [&>li:empty]:hidden group-hover:[&>li:nth-child(3)_a]:animate-[product-box-fade-in-down_700ms_ease-in-out] group-hover:[&>li:nth-child(4)_a]:animate-[product-box-fade-in-down_1s_ease-in-out]">
             <li />
             <li />
             <li>
-              <ProductQuickViewButton product={product} className={hoverActionClass} />
+              <ProductQuickViewButton
+                product={product}
+                className={hoverActionClass}
+                selectedSizeId={variantSelection.selectedSizeId}
+                selectedColorId={variantSelection.selectedColorId}
+              />
             </li>
             <li>
               <a href="#" title={PRODUCT_COPY.compare} className={hoverActionClass} onClick={preventDefault}>
