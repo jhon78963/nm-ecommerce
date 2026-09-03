@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Heart } from "lucide-react";
 
 import { useWishlist } from "@/features/wishlist/context/WishlistProvider";
+import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 
 export function WishlistTrigger() {
@@ -11,7 +12,7 @@ export function WishlistTrigger() {
 
   return (
     <Link
-      href="/favoritos"
+      href={ROUTES.favorites}
       className="relative inline-flex items-center justify-center text-[#6a6a6a] transition-colors hover:text-theme"
       aria-label="Lista de favoritos"
     >

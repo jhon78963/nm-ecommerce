@@ -21,7 +21,7 @@ function buildFallbackProducts(
   }));
 }
 
-export function WishlistTable() {
+export function WishlistTable({ embedded = false }: { embedded?: boolean }) {
   const { items, isHydrated } = useWishlist();
   const productIds = useMemo(() => items.map((item) => item.productId), [items]);
   const { products, isLoading } = useWishlistProducts(productIds);
@@ -38,8 +38,9 @@ export function WishlistTable() {
   }
 
   return (
-    <div className="table-responsive">
-      <table className="cart-table">
+    <div className={`wishlist-block${embedded ? " wishlist-block--embedded" : ""}`}>
+      <div className="table-responsive">
+        <table className="cart-table">
         <thead>
           <tr className="table-head">
             <th scope="col">Imagen</th>
@@ -55,6 +56,7 @@ export function WishlistTable() {
           ))}
         </tbody>
       </table>
+    </div>
     </div>
   );
 }

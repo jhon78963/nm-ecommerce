@@ -7,6 +7,17 @@ export const ROUTES = {
   orderDetails: "/pedido/detalle",
   orderConfirmation: "/pedido/confirmacion",
   favorites: "/favoritos",
+  account: {
+    root: "/micuenta/miperfil",
+    dashboard: "/micuenta/miperfil",
+    orders: "/micuenta/pedidos",
+    orderDetail: (orderNumber: string) =>
+      `/micuenta/pedidos/${encodeURIComponent(orderNumber)}`,
+    addresses: "/micuenta/direcciones",
+    notifications: "/micuenta/notificaciones",
+    refunds: "/micuenta/reembolsos",
+    favorites: "/micuenta/favoritos",
+  },
   search: "/buscar",
   product: (slugOrId: string | number) => `/producto/${slugOrId}`,
   institutional: {
