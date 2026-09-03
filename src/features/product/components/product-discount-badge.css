@@ -1,0 +1,82 @@
+@keyframes product-discount-badge-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.product-discount-badge {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-content: center;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.1;
+  pointer-events: none;
+}
+
+/* Porcentaje — estrella / burst (hereda look del product-box) */
+.product-discount-badge--percent {
+  aspect-ratio: 1;
+  width: fit-content;
+  min-width: 2.75rem;
+  padding: 0.65rem;
+  font-size: clamp(10px, 0.9vw, 14px);
+}
+
+.product-discount-badge__ribbon {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(
+      35% 35%,
+      rgba(0, 0, 0, 0) 96%,
+      rgba(0, 0, 0, 0) 97% 99%,
+      rgba(0, 0, 0, 0)
+    )
+    var(--theme-color);
+  clip-path: polygon(
+    100% 50%,
+    88.04% 62.36%,
+    90.45% 79.39%,
+    73.51% 82.36%,
+    65.45% 97.55%,
+    50% 90%,
+    34.55% 97.55%,
+    26.49% 82.36%,
+    9.55% 79.39%,
+    11.96% 62.36%,
+    0% 50%,
+    11.96% 37.64%,
+    9.55% 20.61%,
+    26.49% 17.64%,
+    34.55% 2.45%,
+    50% 10%,
+    65.45% 2.45%,
+    73.51% 17.64%,
+    90.45% 20.61%,
+    88.04% 37.64%
+  );
+  animation: product-discount-badge-spin 20s linear infinite;
+}
+
+/* Efectivo — pill compacta, legible para "- S/ 20" */
+.product-discount-badge--cash {
+  min-height: 1.75rem;
+  padding: 0.35rem 0.55rem;
+  border-radius: 6px;
+  background: linear-gradient(135deg, var(--theme-color) 0%, color-mix(in srgb, var(--theme-color) 82%, #000) 100%);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--theme-color) 35%, transparent);
+  font-size: clamp(10px, 0.82vw, 12px);
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+.product-discount-badge__label {
+  position: relative;
+  z-index: 1;
+}

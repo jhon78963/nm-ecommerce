@@ -3,6 +3,7 @@ import type {
   PublicCatalogProductItem,
 } from "@/features/product/types/catalog.types";
 import type { ProductBoxItem } from "@/features/product/types/product-box.types";
+import type { ProductDetail } from "@/features/product/types/product-detail.types";
 import type { ProductSize } from "@/features/product/types/product-variant.types";
 import { buildProductSlug, resolveProductSlug } from "@/utils/product-slug";
 import { resolveStoreMediaUrl } from "@/utils/resolve-store-media-url";
@@ -54,7 +55,29 @@ export function mapPublicProductToProductBoxItem(
     ratingCount: product.ratingCount,
     reviewsCount: product.reviewsCount,
     stockStatus: product.stockStatus,
+    shortDescription: product.shortDescription ?? undefined,
+    isFeatured: product.isFeatured ?? false,
+    isOnSale: product.isOnSale ?? false,
+    isNew: product.isNew ?? false,
+    cashDiscount: product.cashDiscount ?? undefined,
+    percentageDiscount: product.percentageDiscount
+      ? Number(product.percentageDiscount) || undefined
+      : undefined,
     sizes: mapPublicSizes(product.sizes),
+  };
+}
+
+export function mapPublicProductToProductDetail(
+  product: PublicCatalogProductItem,
+): ProductDetail {
+  const box = mapPublicProductToProductBoxItem(product);
+
+  return {
+    ...box,
+    description: product.description ?? undefined,
+    additionalInfo: product.additionalInfo ?? undefined,
+    sku: product.barcode ?? undefined,
+    genderLabel: product.genderLabel ?? undefined,
   };
 }
 

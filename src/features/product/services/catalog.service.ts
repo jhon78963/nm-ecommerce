@@ -1,8 +1,9 @@
 import { env } from "@/config/env";
 import { STORE_CONTENT_REVALIDATE_SECONDS } from "@/config/store-content";
 import type { PublicCatalogProductItem } from "@/features/product/types/catalog.types";
+import type { ProductDetail } from "@/features/product/types/product-detail.types";
 import type { ProductBoxItem } from "@/features/product/types/product-box.types";
-import { mapPublicProductToProductBoxItem } from "@/features/product/utils/map-catalog-product";
+import { mapPublicProductToProductBoxItem, mapPublicProductToProductDetail } from "@/features/product/utils/map-catalog-product";
 import { apiGet } from "@/services/http-client";
 import { extractProductIdPrefixFromSlug, resolveProductSlug } from "@/utils/product-slug";
 
@@ -42,7 +43,7 @@ export async function getProductsByIds(
   }
 }
 
-export async function getProductBySlug(slug: string): Promise<ProductBoxItem | null> {
+export async function getProductBySlug(slug: string): Promise<ProductDetail | null> {
   const warehouseId = env.storeWarehouseId;
   const normalizedSlug = slug.trim();
 
@@ -67,7 +68,7 @@ export async function getProductBySlug(slug: string): Promise<ProductBoxItem | n
 
     const product = response.products[0];
     if (product) {
-      return mapPublicProductToProductBoxItem(product);
+      return mapPublicProductToProductDetail(product);
     }
   } catch {
     // Continúa con los fallbacks.
@@ -80,7 +81,7 @@ export async function getProductBySlug(slug: string): Promise<ProductBoxItem | n
       requestOptions,
     );
 
-    return mapPublicProductToProductBoxItem(product);
+    return mapPublicProductToProductDetail(product);
   } catch {
     // Continúa con los fallbacks.
   }
@@ -88,7 +89,8 @@ export async function getProductBySlug(slug: string): Promise<ProductBoxItem | n
   // 3) Slug UUID directo
   if (UUID_PATTERN.test(normalizedSlug)) {
     const products = await getProductsByIds([normalizedSlug]);
-    return products[0] ?? null;
+    const product = products[0];
+    return product ? { ...product } : null;
   }
 
   // 4) Slug SEO con sufijo de 8 chars — buscar en catálogo público del home
@@ -103,7 +105,7 @@ export async function getProductBySlug(slug: string): Promise<ProductBoxItem | n
 async function findProductBySlugFromHomeCatalog(
   slug: string,
   _warehouseId: string,
-): Promise<ProductBoxItem | null> {
+): Promise<ProductDetail | null> {
   const idPrefix = extractProductIdPrefixFromSlug(slug);
   if (!idPrefix) {
     return null;

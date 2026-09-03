@@ -37,9 +37,9 @@ export function PdpGallery({ product }: PdpGalleryProps) {
           <Image
             src={activeImage}
             alt={product.name}
-            width={640}
-            height={640}
+            fill
             className="pdp-gallery__main-image"
+            sizes="(min-width: 992px) 42vw, 100vw"
             priority
           />
         </div>

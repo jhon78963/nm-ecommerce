@@ -39,7 +39,11 @@ function AdditionalInfoTab({ product }: { product: ProductDetail }) {
   ].filter(Boolean) as Array<{ label: string; value: string }>;
 
   return (
-    <div className="pdp-tab-content">
+    <div className="pdp-tab-content space-y-4">
+      {product.additionalInfo ? (
+        <div dangerouslySetInnerHTML={{ __html: product.additionalInfo }} />
+      ) : null}
+
       <table className="w-full text-sm">
         <tbody>
           {rows.map((row) => (

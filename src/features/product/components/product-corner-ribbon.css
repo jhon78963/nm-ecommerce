@@ -1,0 +1,47 @@
+.product-corner-ribbon {
+  position: absolute;
+  z-index: 2;
+  overflow: hidden;
+  width: 75px;
+  height: 75px;
+  pointer-events: none;
+}
+
+.product-corner-ribbon--left {
+  top: -5px;
+  left: -5px;
+}
+
+.product-corner-ribbon--right {
+  top: -5px;
+  right: -5px;
+}
+
+.product-corner-ribbon span {
+  position: absolute;
+  display: block;
+  width: 105px;
+  font-size: clamp(10px, 0.85vw, 12px);
+  font-weight: 700;
+  line-height: clamp(20px, 1.6vw, 25px);
+  color: #fff;
+  text-align: center;
+  text-transform: capitalize;
+  background: var(--theme-color);
+}
+
+.product-corner-ribbon--dark span {
+  background: #222;
+}
+
+.product-corner-ribbon--left span {
+  top: 19px;
+  left: -21px;
+  transform: rotate(-45deg);
+}
+
+.product-corner-ribbon--right span {
+  top: 19px;
+  right: -21px;
+  transform: rotate(45deg);
+}

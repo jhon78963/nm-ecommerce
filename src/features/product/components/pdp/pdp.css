@@ -59,24 +59,23 @@
 .pdp-gallery__main-wrap {
   flex: 1;
   position: relative;
-  background-color: #f8f8f8;
-  border: 1px solid #ebebeb;
+  background-color: transparent;
   overflow: hidden;
 }
 
 .pdp-gallery__main-inner {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 320px;
-  padding: 16px;
-  aspect-ratio: 1 / 1;
+  width: 100%;
+  min-height: 280px;
+  height: min(72vh, 580px);
 }
 
 .pdp-gallery__main-image {
-  width: 100%;
-  height: 100%;
   object-fit: contain;
+  object-position: center;
   transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -153,7 +152,7 @@
   width: 72px;
   height: 72px;
   border: 1.5px solid #eee;
-  background-color: #f8f8f8;
+  background-color: #fff;
   overflow: hidden;
   padding: 0;
   cursor: pointer;

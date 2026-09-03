@@ -95,7 +95,7 @@ export const CHECKOUT_COPY = {
   confirmationOrderNumber: "Número de pedido",
   confirmationNextSteps: "Próximos pasos",
   confirmationBacs:
-    "Si elegiste transferencia, Yape o Plin, envía tu comprobante indicando el número de pedido a nuestro WhatsApp o correo electrónico.",
+    "Para pagos con Yape, Plin o transferencia, envía tu comprobante con el número de pedido al WhatsApp +51 901259663 o a soporte@novedadesmaritex.net.pe.",
   viewOrder: "Ver detalle del pedido",
   trackAnother: "Rastrear otro pedido",
 } as const;

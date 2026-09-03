@@ -9,6 +9,7 @@ export type { ProductColor, ProductSize };
  */
 export interface ProductDetail extends ProductBoxItem {
   description?: string;
+  additionalInfo?: string;
   sku?: string;
   genderLabel?: string;
 }

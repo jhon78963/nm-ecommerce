@@ -15,6 +15,12 @@ export interface ProductBoxItem {
   reviewsCount: number;
   stockStatus: ProductStockStatus;
   href?: string;
+  shortDescription?: string;
+  isFeatured?: boolean;
+  isOnSale?: boolean;
+  isNew?: boolean;
+  cashDiscount?: number;
+  percentageDiscount?: number;
   /** Backend-pending: tallas y colores disponibles para el producto. */
   sizes?: ProductSize[];
 }

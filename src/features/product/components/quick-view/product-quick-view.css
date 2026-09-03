@@ -138,8 +138,7 @@
 
 .quick-view-gallery__main {
   position: relative;
-  background-color: #f8f8f8;
-  border: 1px solid #eee;
+  background-color: transparent;
 }
 
 .quick-view-gallery__main .slider-main-img {
@@ -147,13 +146,15 @@
   align-items: center;
   justify-content: center;
   min-height: 280px;
-  padding: 12px;
+  max-height: min(60vh, 480px);
+  padding: 0;
 }
 
 .quick-view-gallery__image {
-  width: 100%;
+  width: auto;
   height: auto;
-  max-height: 420px;
+  max-width: 100%;
+  max-height: min(60vh, 480px);
   object-fit: contain;
 }
 

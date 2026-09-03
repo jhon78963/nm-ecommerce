@@ -7,6 +7,7 @@ import {
   formatProductBoxPrice,
   getProductBoxHref,
 } from "@/features/product/utils/format-product-price";
+import { hasProductPromoPrice } from "@/features/product/utils/product-discount-badge";
 import { cn } from "@/lib/utils";
 
 import "./product-box-horizontal.css";
@@ -38,7 +39,7 @@ function ProductRating({ rating }: { rating: number | null }) {
 
 export function ProductBoxHorizontal({ product, className }: ProductBoxHorizontalProps) {
   const href = getProductBoxHref(product);
-  const hasDiscount = product.discount > 0;
+  const hasDiscount = hasProductPromoPrice(product) && product.price > product.salePrice;
 
   return (
     <div className={cn("product-box-horizontal media", className)}>

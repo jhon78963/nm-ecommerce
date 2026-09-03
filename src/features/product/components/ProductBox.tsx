@@ -8,6 +8,8 @@ import Link from "next/link";
 
 import { PRODUCT_COPY } from "@/features/product/constants/product-copy";
 import { CartButton } from "@/features/product/components/cart-button/CartButton";
+import { ProductCornerRibbon } from "@/features/product/components/ProductCornerRibbon";
+import { ProductDiscountBadge } from "@/features/product/components/ProductDiscountBadge";
 import { ProductQuickViewButton } from "@/features/product/components/quick-view/ProductQuickViewButton";
 import { ProductVariantSelectors } from "@/features/product/components/variants/ProductVariantSelectors";
 import { useProductVariantSelection } from "@/features/product/hooks/use-product-variant-selection";
@@ -17,6 +19,10 @@ import {
   getProductBoxHref,
 } from "@/features/product/utils/format-product-price";
 import { enrichProductWithVariants } from "@/features/product/utils/enrich-product-variants";
+import {
+  hasProductPromoPrice,
+  resolveProductDiscountBadge,
+} from "@/features/product/utils/product-discount-badge";
 import type { SearchProduct } from "@/features/search/types/search.types";
 import { useWishlist } from "@/features/wishlist/context/WishlistProvider";
 import { cn } from "@/lib/utils";
@@ -36,7 +42,7 @@ function toWishlistProduct(product: ProductBoxItem): SearchProduct {
   return {
     id: String(product.id),
     name: product.name,
-    isOnSale: product.discount > 0,
+    isOnSale: hasProductPromoPrice(product),
     sizes: [
       {
         id: `${product.id}-size`,
@@ -90,6 +96,8 @@ function WishlistIcon({ product }: { product: ProductBoxItem }) {
 export function ProductBox({ product, fullHeight = false, featured = false }: ProductBoxProps) {
   const enrichedProduct = useMemo(() => enrichProductWithVariants(product), [product]);
   const variantSelection = useProductVariantSelection(enrichedProduct.sizes);
+  const discountBadge = useMemo(() => resolveProductDiscountBadge(product), [product]);
+  const showOriginalPrice = hasProductPromoPrice(product) && product.price > product.salePrice;
 
   const href = getProductBoxHref(product);
   const isOutOfStock = product.stockStatus === "out_of_stock";
@@ -112,22 +120,31 @@ export function ProductBox({ product, fullHeight = false, featured = false }: Pr
       )}
     >
       <div className="relative z-0 aspect-square w-full shrink-0 overflow-hidden bg-[#f8f8f8]">
-        {product.discount > 0 ? (
-          <div className="product-box__discount absolute top-2.5 left-2.5 z-[1] grid aspect-square w-fit place-content-center p-2.5 text-[clamp(10px,0.9vw,14px)] font-bold text-white">
-            <span className="product-box__ribbon-shape" aria-hidden />
-            {product.discount}%
-          </div>
+        {discountBadge ? (
+          <ProductDiscountBadge
+            badge={discountBadge}
+            className={cn(
+              "absolute left-2.5",
+              product.isNew || product.isFeatured ? "bottom-2.5" : "top-2.5",
+            )}
+          />
         ) : null}
 
-        <div className="group/zoom h-full w-full overflow-hidden">
-          <Link href={href} className="block h-full w-full">
+        {product.isNew ? (
+          <ProductCornerRibbon label="Nuevo" position="left" />
+        ) : product.isFeatured ? (
+          <ProductCornerRibbon label="Destacado" position="left" variant="dark" />
+        ) : null}
+
+        <div className="group/zoom absolute inset-0 overflow-hidden">
+          <Link href={href} className="relative block h-full w-full">
             <StoreImage
               src={product.imageUrl}
               alt={product.name}
-              width={400}
-              height={400}
+              fill
+              sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
               className={cn(
-                "product-box__image block h-full w-full object-cover transition-transform duration-500 ease-in-out group-hover/zoom:scale-110",
+                "product-box__image object-cover transition-transform duration-500 ease-in-out group-hover/zoom:scale-110",
                 isOutOfStock && "pointer-events-none grayscale",
               )}
             />
@@ -184,7 +201,7 @@ export function ProductBox({ product, fullHeight = false, featured = false }: Pr
           )}
         >
           {formatProductBoxPrice(product.salePrice)}
-          {product.discount > 0 ? <del>{formatProductBoxPrice(product.price)}</del> : null}
+          {showOriginalPrice ? <del>{formatProductBoxPrice(product.price)}</del> : null}
         </h4>
 
         {variantSelection.hasSizes ? (

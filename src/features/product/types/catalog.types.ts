@@ -43,6 +43,16 @@ export interface PublicCatalogProductItem {
   stockStatus: "in_stock" | "out_of_stock";
   ratingCount: null;
   reviewsCount: number;
+  shortDescription?: string | null;
+  description?: string | null;
+  additionalInfo?: string | null;
+  barcode?: string | null;
+  isFeatured?: boolean;
+  isOnSale?: boolean;
+  isNew?: boolean;
+  percentageDiscount?: string | null;
+  cashDiscount?: number | null;
+  genderLabel?: string | null;
   sizes?: PublicCatalogProductSize[];
 }
 
