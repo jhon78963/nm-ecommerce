@@ -1,15 +1,17 @@
 "use server";
 
 import {
-  clearCustomerAccessToken,
+  clearCustomerAuthTokens,
   getCustomerAccessToken,
-  setCustomerAccessToken,
+  setCustomerAuthTokens,
 } from "@/features/customer-auth/utils/customer-auth-cookies";
-import type {
-  CustomerAuthResponse,
-  CustomerUser,
-} from "@/features/customer-auth/types/customer-auth.types";
-import { proxyEcommerceJson, readUpstreamError } from "@/lib/ecommerce-backend";
+import type { CustomerUser } from "@/features/customer-auth/types/customer-auth.types";
+import {
+  getAuthErrorMessage,
+  getCustomerProfile,
+  loginCustomer,
+  registerCustomer,
+} from "@/features/customer-auth/services/customer-auth.service";
 
 export async function registerCustomerAction(
   _prevState: { success: boolean; error: string | null },
@@ -32,19 +34,16 @@ export async function registerCustomerAction(
     return { success: false, error: "Las contraseñas no coinciden." };
   }
 
-  const response = await proxyEcommerceJson("/ecommerce/customers/auth/register", {
-    method: "POST",
-    body: JSON.stringify({ name, email, password }),
-  });
-
-  if (!response.ok) {
-    return { success: false, error: await readUpstreamError(response) };
+  try {
+    const data = await registerCustomer({ name, email, password });
+    await setCustomerAuthTokens(data.access_token, data.refresh_token);
+    return { success: true, error: null };
+  } catch (error) {
+    return {
+      success: false,
+      error: getAuthErrorMessage(error, "No se pudo crear la cuenta."),
+    };
   }
-
-  const data = (await response.json()) as CustomerAuthResponse;
-  await setCustomerAccessToken(data.access_token);
-
-  return { success: true, error: null };
 }
 
 export async function loginCustomerAction(
@@ -58,23 +57,20 @@ export async function loginCustomerAction(
     return { success: false, error: "Correo y contraseña son obligatorios." };
   }
 
-  const response = await proxyEcommerceJson("/ecommerce/customers/auth/login", {
-    method: "POST",
-    body: JSON.stringify({ email, password }),
-  });
-
-  if (!response.ok) {
-    return { success: false, error: await readUpstreamError(response) };
+  try {
+    const data = await loginCustomer({ email, password });
+    await setCustomerAuthTokens(data.access_token, data.refresh_token);
+    return { success: true, error: null };
+  } catch (error) {
+    return {
+      success: false,
+      error: getAuthErrorMessage(error, "Credenciales incorrectas."),
+    };
   }
-
-  const data = (await response.json()) as CustomerAuthResponse;
-  await setCustomerAccessToken(data.access_token);
-
-  return { success: true, error: null };
 }
 
 export async function logoutCustomerAction() {
-  await clearCustomerAccessToken();
+  await clearCustomerAuthTokens();
 }
 
 export async function getCurrentCustomerAction(): Promise<CustomerUser | null> {
@@ -83,18 +79,12 @@ export async function getCurrentCustomerAction(): Promise<CustomerUser | null> {
     return null;
   }
 
-  const response = await proxyEcommerceJson("/ecommerce/customers/auth/me", {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
-
-  if (!response.ok) {
-    await clearCustomerAccessToken();
+  try {
+    return await getCustomerProfile(accessToken);
+  } catch {
+    await clearCustomerAuthTokens();
     return null;
   }
-
-  return (await response.json()) as CustomerUser;
 }
 
 export async function getCustomerAccessTokenAction() {
