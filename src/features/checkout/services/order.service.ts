@@ -1,8 +1,7 @@
-import { env } from "@/config/env";
 import type { CartLineItem } from "@/features/cart/types/cart.types";
+import { resolveCartLineVariantIds } from "@/features/cart/utils/cart-variant";
 import type { CheckoutAddress } from "@/features/checkout/types/checkout.types";
 import type { OrderStatusSlug, StoredOrder } from "@/features/checkout/types/order.types";
-import { apiGet, apiPost, HttpError } from "@/services/http-client";
 
 interface ApiOrderItem {
   id: string;
@@ -41,7 +40,6 @@ interface ApiOrder {
 }
 
 export interface CreateOrderPayload {
-  warehouseId: string;
   email: string;
   billing: CheckoutAddress;
   shipping: CheckoutAddress;
@@ -60,6 +58,16 @@ export interface CreateOrderPayload {
     quantity: number;
     unitPrice: number;
   }>;
+}
+
+export class CheckoutApiError extends Error {
+  constructor(
+    message: string,
+    readonly status: number,
+  ) {
+    super(message);
+    this.name = "CheckoutApiError";
+  }
 }
 
 function mapApiOrderToStoredOrder(order: ApiOrder): StoredOrder {
@@ -96,8 +104,36 @@ function mapApiOrderToStoredOrder(order: ApiOrder): StoredOrder {
   };
 }
 
+async function requestCheckoutApi<T>(input: string, init?: RequestInit): Promise<T> {
+  const response = await fetch(input, {
+    ...init,
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      ...init?.headers,
+    },
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    let message = "No pudimos procesar tu pedido. Intenta nuevamente.";
+
+    try {
+      const body = (await response.json()) as { message?: string };
+      if (body.message) {
+        message = body.message;
+      }
+    } catch {
+      // ignore parse errors
+    }
+
+    throw new CheckoutApiError(message, response.status);
+  }
+
+  return response.json() as Promise<T>;
+}
+
 export function buildCreateOrderPayload(
-  warehouseId: string,
   email: string,
   billing: CheckoutAddress,
   shipping: CheckoutAddress,
@@ -109,7 +145,6 @@ export function buildCreateOrderPayload(
   items: CartLineItem[],
 ): CreateOrderPayload {
   return {
-    warehouseId,
     email,
     billing,
     shipping,
@@ -118,28 +153,35 @@ export function buildCreateOrderPayload(
     shippingMethodId,
     paymentMethodId,
     couponCode: couponCode || undefined,
-    items: items.map((item) => ({
-      productId: item.productId,
-      productSizeId: item.productSizeId ?? item.variationId ?? "",
-      colorId: item.colorId,
-      name: item.name,
-      variation: item.variation,
-      imageUrl: item.imageUrl,
-      quantity: item.quantity,
-      unitPrice: item.price,
-    })),
+    items: items.map((item) => {
+      const { productSizeId, colorId } = resolveCartLineVariantIds(item);
+
+      return {
+        productId: item.productId,
+        productSizeId: productSizeId ?? "",
+        colorId,
+        name: item.name,
+        variation: item.variation,
+        imageUrl: item.imageUrl,
+        quantity: item.quantity,
+        unitPrice: item.price,
+      };
+    }),
   };
 }
 
 export async function createOrder(payload: CreateOrderPayload): Promise<StoredOrder> {
-  const response = await apiPost<ApiOrder>("ecommerce/orders", payload);
+  const response = await requestCheckoutApi<ApiOrder>("/api/checkout/order", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+
   return mapApiOrderToStoredOrder(response);
 }
 
 export async function trackOrder(orderNumber: string, contact: string): Promise<StoredOrder> {
-  const response = await apiGet<ApiOrder>("ecommerce/orders/track", {
-    params: { orderNumber, contact },
-  });
+  const params = new URLSearchParams({ orderNumber, contact });
+  const response = await requestCheckoutApi<ApiOrder>(`/api/checkout/track?${params.toString()}`);
 
   return mapApiOrderToStoredOrder(response);
 }
@@ -148,33 +190,26 @@ export async function fetchPublicOrder(
   orderNumber: string,
   email: string,
 ): Promise<StoredOrder> {
-  const response = await apiGet<ApiOrder>(
-    `ecommerce/orders/public/${encodeURIComponent(orderNumber)}`,
-    { params: { email } },
+  const params = new URLSearchParams({ email });
+  const response = await requestCheckoutApi<ApiOrder>(
+    `/api/checkout/order/${encodeURIComponent(orderNumber)}?${params.toString()}`,
   );
 
   return mapApiOrderToStoredOrder(response);
 }
 
 export function getOrderApiErrorMessage(error: unknown): string {
-  if (error instanceof HttpError) {
+  if (error instanceof CheckoutApiError) {
     if (error.status === 404) {
       return "No encontramos un pedido con esos datos.";
     }
 
-    if (error.status === 422) {
-      return "Uno o más productos no tienen stock suficiente. Revisa tu carrito.";
-    }
+    return error.message;
+  }
+
+  if (error instanceof Error && error.message) {
+    return error.message;
   }
 
   return "No pudimos procesar tu pedido. Intenta nuevamente.";
-}
-
-export function getWarehouseIdForCheckout(): string {
-  const warehouseId = env.storeWarehouseId;
-  if (!warehouseId) {
-    throw new Error("STORE_WAREHOUSE_ID no está configurado.");
-  }
-
-  return warehouseId;
 }

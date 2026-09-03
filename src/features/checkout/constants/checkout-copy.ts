@@ -27,6 +27,8 @@ export const CHECKOUT_COPY = {
   selectDepartment: "Selecciona un departamento",
   requiredField: "Este campo es obligatorio",
   invalidEmail: "Ingresa un correo válido",
+  invalidCartVariant:
+    "Uno o más productos del carrito no tienen talla válida. Elimínalos y vuelve a agregarlos desde la ficha del producto.",
 
   summaryTitle: "Resumen del pedido",
   summarySubtitle: "Verifica tus productos antes de finalizar.",
@@ -93,7 +95,7 @@ export const CHECKOUT_COPY = {
   confirmationOrderNumber: "Número de pedido",
   confirmationNextSteps: "Próximos pasos",
   confirmationBacs:
-    "Si elegiste transferencia, Yape o Plin, envía tu comprobante indicando el número de pedido.",
+    "Si elegiste transferencia, Yape o Plin, envía tu comprobante indicando el número de pedido a nuestro WhatsApp o correo electrónico.",
   viewOrder: "Ver detalle del pedido",
   trackAnother: "Rastrear otro pedido",
 } as const;

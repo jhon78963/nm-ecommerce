@@ -27,6 +27,7 @@ interface CartButtonProps {
   pushToBottom?: boolean;
   cartVariation?: ProductCartVariation;
   validateBeforeAdd?: () => boolean;
+  requiresVariantSelection?: boolean;
 }
 
 export function CartButton({
@@ -39,16 +40,19 @@ export function CartButton({
   pushToBottom = false,
   cartVariation,
   validateBeforeAdd,
+  requiresVariantSelection = false,
 }: CartButtonProps) {
   const { addItem, updateQuantity } = useCart();
   const cartItem = useProductCartItem(String(product.id), cartVariation?.variationId);
   const isInStock = product.stockStatus === "in_stock";
   const isInCart = Boolean(cartItem && cartItem.quantity > 0);
+  const needsVariantSelection = requiresVariantSelection && !cartVariation?.productSizeId;
+  const isAddDisabled = !isInStock || needsVariantSelection;
 
   function handleAddToCart(event?: MouseEvent) {
     event?.preventDefault();
 
-    if (!isInStock) {
+    if (isAddDisabled) {
       return;
     }
 
@@ -107,6 +111,7 @@ export function CartButton({
             id={`add-to-cart-${product.id}`}
             className={cn("add-button add_cart", className)}
             onClick={handleAddToCart}
+            disabled={isAddDisabled}
           >
             {text}
           </button>
@@ -158,6 +163,7 @@ export function CartButton({
         type="button"
         className={cn("cart-button-icon", isInCart && "active", className)}
         onClick={handleAddToCart}
+        disabled={isAddDisabled}
         aria-label={isInCart ? CART_BUTTON_COPY.added : text}
         title={isInCart ? CART_BUTTON_COPY.added : text}
       >
@@ -178,6 +184,7 @@ export function CartButton({
         className,
       )}
       onClick={handleAddToCart}
+      disabled={isAddDisabled}
     >
       {isInCart ? CART_BUTTON_COPY.added : text}
     </button>

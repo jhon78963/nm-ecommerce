@@ -12,6 +12,7 @@ import {
 
 import type { CartContextValue, CartLineItem } from "@/features/cart/types/cart.types";
 import { readCartFromStorage, writeCartToStorage } from "@/features/cart/utils/cart-storage";
+import { resolveCartLineVariantIds } from "@/features/cart/utils/cart-variant";
 
 const CartContext = createContext<CartContextValue | null>(null);
 
@@ -51,9 +52,18 @@ export function CartProvider({
 
   const addItem = useCallback((item: Omit<CartLineItem, "id"> & { id?: string }) => {
     setItems((current) => {
-      const existing = current.find(
-        (line) => line.productId === item.productId && line.variationId === item.variationId,
-      );
+      const incomingVariant = resolveCartLineVariantIds(item as CartLineItem);
+      const existing = current.find((line) => {
+        if (line.productId !== item.productId) {
+          return false;
+        }
+
+        const lineVariant = resolveCartLineVariantIds(line);
+        return (
+          lineVariant.productSizeId === incomingVariant.productSizeId
+          && lineVariant.colorId === incomingVariant.colorId
+        );
+      });
 
       if (existing) {
         return current.map((line) =>
@@ -63,11 +73,16 @@ export function CartProvider({
         );
       }
 
+      const variantKey =
+        incomingVariant.productSizeId
+        ?? item.variationId
+        ?? "default";
+
       return [
         ...current,
         {
           ...item,
-          id: item.id ?? `${item.productId}-${item.variationId ?? "default"}-${Date.now()}`,
+          id: item.id ?? `${item.productId}-${variantKey}-${Date.now()}`,
         },
       ];
     });

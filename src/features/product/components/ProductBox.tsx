@@ -215,7 +215,8 @@ export function ProductBox({ product, fullHeight = false, featured = false }: Pr
           featured={featured}
           pushToBottom={fullHeight}
           cartVariation={variantSelection.cartVariation}
-          validateBeforeAdd={variantSelection.validate}
+          validateBeforeAdd={variantSelection.hasSizes ? variantSelection.validate : undefined}
+          requiresVariantSelection={variantSelection.hasSizes}
         />
       </div>
     </div>

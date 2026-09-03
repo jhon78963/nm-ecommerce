@@ -13,11 +13,4 @@ export const PAYMENT_METHODS: PaymentMethodOption[] = [
     description:
       "Paga por Yape, Plin o transferencia bancaria. Te enviaremos los datos al confirmar el pedido.",
   },
-  {
-    id: "cod",
-    title: "Contra entrega",
-    description:
-      "Paga en efectivo al recibir tu pedido o al recoger en tienda (solo Trujillo).",
-    trujilloOnly: true,
-  },
 ];

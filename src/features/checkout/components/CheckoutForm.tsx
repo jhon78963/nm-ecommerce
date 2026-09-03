@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { useCart } from "@/features/cart/context/CartProvider";
+import { cartLineHasValidVariant } from "@/features/cart/utils/cart-variant";
 import { CheckoutAddressFields } from "@/features/checkout/components/CheckoutAddressFields";
 import { CheckoutSummary } from "@/features/checkout/components/CheckoutSummary";
 import { CHECKOUT_COPY } from "@/features/checkout/constants/checkout-copy";
@@ -21,7 +22,6 @@ import {
   buildCreateOrderPayload,
   createOrder,
   getOrderApiErrorMessage,
-  getWarehouseIdForCheckout,
 } from "@/features/checkout/services/order.service";
 import {
   clearCheckoutDraftFromStorage,
@@ -229,9 +229,9 @@ export function CheckoutForm() {
   const handleSubmit = async () => {
     if (!validateForm() || items.length === 0) return;
 
-    const missingVariant = items.some((item) => !item.productSizeId && !item.variationId);
+    const missingVariant = items.some((item) => !cartLineHasValidVariant(item));
     if (missingVariant) {
-      setSubmitError("Uno o más productos del carrito no tienen talla seleccionada. Vuelve a agregarlos.");
+      setSubmitError(CHECKOUT_COPY.invalidCartVariant);
       return;
     }
 
@@ -248,7 +248,6 @@ export function CheckoutForm() {
 
     try {
       const payload = buildCreateOrderPayload(
-        getWarehouseIdForCheckout(),
         email,
         billing,
         sameAsBilling ? billing : shipping,

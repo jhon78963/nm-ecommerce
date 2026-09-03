@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
+import { isUuid } from "@/features/cart/utils/cart-variant";
 import { PDP_COPY } from "@/features/product/constants/pdp-copy";
 import type { ProductCartVariation, ProductSize } from "@/features/product/types/product-variant.types";
 
@@ -14,6 +15,24 @@ export function useProductVariantSelection(sizes: ProductSize[] = []) {
   const selectedSize = sizes.find((size) => size.id === selectedSizeId) ?? null;
   const availableColors = selectedSize?.colors ?? [];
   const selectedColor = availableColors.find((color) => color.id === selectedColorId) ?? null;
+
+  useEffect(() => {
+    if (sizes.length !== 1 || selectedSizeId) {
+      return;
+    }
+
+    const onlySize = sizes[0];
+    if (!isUuid(onlySize.id)) {
+      return;
+    }
+
+    setSelectedSizeId(onlySize.id);
+
+    const colors = onlySize.colors ?? [];
+    if (colors.length === 1 && isUuid(colors[0].id)) {
+      setSelectedColorId(colors[0].id);
+    }
+  }, [sizes, selectedSizeId]);
 
   const cartVariation = useMemo<ProductCartVariation>(() => {
     const variation = [selectedSize?.label, selectedColor?.label].filter(Boolean).join(" — ");

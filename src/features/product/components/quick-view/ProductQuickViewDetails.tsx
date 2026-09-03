@@ -2,16 +2,21 @@
 
 import Link from "next/link";
 import { ArrowLeftRight, Heart, Minus, Plus, RefreshCw, Share2, ShoppingCart, Star, Truck } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import { useCart } from "@/features/cart/context/CartProvider";
+import { cartLineHasValidVariant } from "@/features/cart/utils/cart-variant";
 import { PRODUCT_COPY } from "@/features/product/constants/product-copy";
 import { QUICK_VIEW_COPY } from "@/features/product/constants/quick-view-copy";
+import { ProductVariantSelectors } from "@/features/product/components/variants/ProductVariantSelectors";
+import { useProductVariantSelection } from "@/features/product/hooks/use-product-variant-selection";
 import type { ProductBoxItem } from "@/features/product/types/product-box.types";
+import { enrichProductWithVariants } from "@/features/product/utils/enrich-product-variants";
 import {
   formatProductBoxPrice,
   getProductBoxHref,
 } from "@/features/product/utils/format-product-price";
+import { productBoxItemToCartLineItem } from "@/features/product/utils/to-cart-line-item";
 import type { SearchProduct } from "@/features/search/types/search.types";
 import { useWishlist } from "@/features/wishlist/context/WishlistProvider";
 import { cn } from "@/lib/utils";
@@ -66,27 +71,34 @@ export function ProductQuickViewDetails({ product, onClose }: ProductQuickViewDe
   const { isInWishlist, toggleItem } = useWishlist();
   const [quantity, setQuantity] = useState(1);
 
+  const enrichedProduct = useMemo(() => enrichProductWithVariants(product), [product]);
+  const variantSelection = useProductVariantSelection(enrichedProduct.sizes);
+
   const href = getProductBoxHref(product);
   const isInStock = product.stockStatus === "in_stock";
   const isWishlisted = isInWishlist(String(product.id));
+  const canAddToCart =
+    isInStock
+    && (!variantSelection.hasSizes || Boolean(variantSelection.selectedSizeId))
+    && cartLineHasValidVariant(
+      productBoxItemToCartLineItem(product, 1, variantSelection.cartVariation),
+    );
 
   function updateQuantity(delta: number) {
     setQuantity((current) => Math.max(1, current + delta));
   }
 
   function handleAddToCart() {
-    if (!isInStock) {
+    if (!isInStock || !variantSelection.validate()) {
       return;
     }
 
-    addItem({
-      productId: String(product.id),
-      name: product.name,
-      imageUrl: product.imageUrl,
-      quantity,
-      price: product.salePrice,
-    });
+    const lineItem = productBoxItemToCartLineItem(product, quantity, variantSelection.cartVariation);
+    if (!cartLineHasValidVariant(lineItem)) {
+      return;
+    }
 
+    addItem(lineItem);
     onClose();
     openCart();
   }
@@ -115,6 +127,25 @@ export function ProductQuickViewDetails({ product, onClose }: ProductQuickViewDe
         </h3>
         <span>{QUICK_VIEW_COPY.inclusiveText}</span>
       </div>
+
+      {variantSelection.hasSizes ? (
+        <>
+          <ProductVariantSelectors
+            sizes={variantSelection.sizes}
+            selectedSizeId={variantSelection.selectedSizeId}
+            selectedColorId={variantSelection.selectedColorId}
+            selectedSize={variantSelection.selectedSize}
+            selectedColor={variantSelection.selectedColor}
+            availableColors={variantSelection.availableColors}
+            onSizeSelect={variantSelection.handleSizeSelect}
+            onColorSelect={variantSelection.handleColorSelect}
+          />
+
+          {variantSelection.validationError ? (
+            <p className="product-variant-selectors__error">{variantSelection.validationError}</p>
+          ) : null}
+        </>
+      ) : null}
 
       <div className="product-buttons">
         <div className="qty-section">
@@ -152,7 +183,7 @@ export function ProductQuickViewDetails({ product, onClose }: ProductQuickViewDe
           <button
             type="button"
             className="btn btn-solid buy-button"
-            disabled={!isInStock}
+            disabled={!canAddToCart}
             onClick={handleAddToCart}
           >
             <ShoppingCart className="me-1 inline size-4" aria-hidden="true" />

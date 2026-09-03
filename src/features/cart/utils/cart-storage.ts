@@ -1,5 +1,6 @@
-import { CART_STORAGE_KEY } from "@/features/cart/constants/cart-storage";
 import type { CartLineItem } from "@/features/cart/types/cart.types";
+import { CART_STORAGE_KEY } from "@/features/cart/constants/cart-storage";
+import { cartLineHasValidVariant } from "@/features/cart/utils/cart-variant";
 
 function isCartLineItem(value: unknown): value is CartLineItem {
   if (!value || typeof value !== "object") return false;
@@ -27,7 +28,7 @@ export function readCartFromStorage(): CartLineItem[] {
     const parsed = JSON.parse(raw) as unknown;
     if (!Array.isArray(parsed)) return [];
 
-    return parsed.filter(isCartLineItem);
+    return parsed.filter(isCartLineItem).filter(cartLineHasValidVariant);
   } catch {
     return [];
   }

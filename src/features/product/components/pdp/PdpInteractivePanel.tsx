@@ -54,6 +54,8 @@ export function PdpInteractivePanel({ product }: PdpInteractivePanelProps) {
 
     addItem({
       productId: String(product.id),
+      productSizeId: variantSelection.cartVariation.productSizeId,
+      colorId: variantSelection.cartVariation.colorId,
       name: product.name,
       imageUrl: product.imageUrl,
       quantity,

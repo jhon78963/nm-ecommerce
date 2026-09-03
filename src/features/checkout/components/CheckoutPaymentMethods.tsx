@@ -40,10 +40,6 @@ export function CheckoutPaymentMethods({
           {selectedId === method.id && method.id === "bacs" ? (
             <p className="summary-option__hint">{CHECKOUT_COPY.bacsInstructions}</p>
           ) : null}
-
-          {selectedId === method.id && method.id === "cod" ? (
-            <p className="summary-option__hint">{method.description}</p>
-          ) : null}
         </div>
       ))}
     </div>
