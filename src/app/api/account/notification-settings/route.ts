@@ -1,0 +1,50 @@
+import { NextResponse } from "next/server";
+
+import { getCustomerAccessToken } from "@/features/customer-auth/utils/customer-auth-cookies";
+import { proxyEcommerceJson, readUpstreamError } from "@/lib/ecommerce-backend";
+
+async function proxyCustomerAccount(
+  path: string,
+  init: RequestInit,
+): Promise<NextResponse> {
+  const accessToken = await getCustomerAccessToken();
+  if (!accessToken) {
+    return NextResponse.json({ message: "Sesión no válida." }, { status: 401 });
+  }
+
+  const response = await proxyEcommerceJson(path, {
+    ...init,
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      ...init.headers,
+    },
+  });
+
+  const text = await response.text();
+  if (!response.ok) {
+    return NextResponse.json(
+      {
+        message: text
+          ? await readUpstreamError(new Response(text, { status: response.status }))
+          : "Error",
+      },
+      { status: response.status },
+    );
+  }
+
+  return new NextResponse(text, {
+    status: 200,
+    headers: { "Content-Type": "application/json" },
+  });
+}
+
+export async function GET() {
+  return proxyCustomerAccount("/ecommerce/customer/notification-settings", { method: "GET" });
+}
+
+export async function PATCH(request: Request) {
+  return proxyCustomerAccount("/ecommerce/customer/notification-settings", {
+    method: "PATCH",
+    body: await request.text(),
+  });
+}

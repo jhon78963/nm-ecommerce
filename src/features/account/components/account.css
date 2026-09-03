@@ -489,3 +489,222 @@
   color: #7a6522;
   line-height: 1.5;
 }
+
+.account-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #ddd;
+  background: #fff;
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #222;
+  cursor: pointer;
+}
+
+.account-btn--solid {
+  border-color: var(--theme-color);
+  background: var(--theme-color);
+  color: #fff;
+}
+
+.account-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.account-link-button {
+  border: 0;
+  background: none;
+  padding: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--theme-color);
+  cursor: pointer;
+}
+
+.account-link-button--danger {
+  color: #c62828;
+}
+
+.account-field-note {
+  display: inline-flex;
+  margin-top: 6px;
+  font-size: 12px;
+  color: #999;
+}
+
+.account-profile-actions {
+  margin-top: 16px;
+}
+
+.account-form {
+  display: grid;
+  gap: 14px;
+}
+
+.account-form-grid {
+  display: grid;
+  gap: 14px;
+}
+
+@media (min-width: 640px) {
+  .account-form-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.account-form-field {
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+  color: #444;
+}
+
+.account-form-field input,
+.account-form-field textarea,
+.account-form-field select {
+  width: 100%;
+  border: 1px solid #ddd;
+  padding: 10px 12px;
+  font-size: 14px;
+  color: #222;
+  background: #fff;
+}
+
+.account-form-field input:disabled {
+  background: #f5f5f5;
+  color: #777;
+}
+
+.account-form-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: #444;
+}
+
+.account-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.account-form-hint {
+  margin: 0;
+  font-size: 12px;
+  color: #777;
+}
+
+.account-form-message {
+  margin: 0;
+  font-size: 13px;
+}
+
+.account-form-message--error {
+  color: #c62828;
+}
+
+.account-form-message--success {
+  color: #2e7d32;
+}
+
+.account-address-actions {
+  display: flex;
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.account-address-default {
+  display: inline-flex;
+  margin-left: 8px;
+  border-radius: 999px;
+  background: #fff3e0;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #e65100;
+  vertical-align: middle;
+}
+
+.account-notification-settings {
+  margin-bottom: 20px;
+}
+
+.account-notification-settings .account-form-checkbox + .account-form-checkbox {
+  margin-top: 10px;
+}
+
+.account-notification-list li.is-unread {
+  background: #fff8f0;
+  margin-inline: -12px;
+  padding-inline: 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.account-notification-list p {
+  margin: 0 0 6px;
+  font-size: 14px;
+  color: #666;
+}
+
+.account-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.account-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.account-modal__panel {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 560px);
+  max-height: 90vh;
+  overflow: auto;
+  border: 1px solid #eee;
+  background: #fff;
+}
+
+.account-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 18px;
+  border-bottom: 1px solid #eee;
+}
+
+.account-modal__header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.account-modal__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: #f5f5f5;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+}
+
+.account-modal__body {
+  padding: 18px;
+}
