@@ -58,6 +58,7 @@ function mapSearchSizesToProductSizes(
       id: color.id,
       label: color.description,
       hex: "#CCCCCC",
+      stock: 0,
     })),
   }));
 }

@@ -2,6 +2,7 @@ export interface ProductColor {
   id: string;
   label: string;
   hex: string;
+  stock: number;
 }
 
 export interface ProductSize {

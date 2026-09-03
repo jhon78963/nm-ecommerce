@@ -10,16 +10,16 @@ import type {
  */
 
 const STUB_COLORS: ProductColor[] = [
-  { id: "c-negro", label: "Negro", hex: "#1a1a1a" },
-  { id: "c-blanco", label: "Blanco", hex: "#f0ede8" },
-  { id: "c-marino", label: "Azul Marino", hex: "#1a2a5e" },
-  { id: "c-rojo", label: "Rojo", hex: "#c62828" },
-  { id: "c-verde", label: "Verde Militar", hex: "#4a5e3a" },
-  { id: "c-gris", label: "Gris", hex: "#8a8a8a" },
-  { id: "c-beige", label: "Beige", hex: "#d4c5a9" },
-  { id: "c-mostaza", label: "Mostaza", hex: "#d4a430" },
-  { id: "c-celeste", label: "Celeste", hex: "#5eb8d4" },
-  { id: "c-rosado", label: "Rosado", hex: "#e07a99" },
+  { id: "c-negro", label: "Negro", hex: "#1a1a1a", stock: 10 },
+  { id: "c-blanco", label: "Blanco", hex: "#f0ede8", stock: 10 },
+  { id: "c-marino", label: "Azul Marino", hex: "#1a2a5e", stock: 10 },
+  { id: "c-rojo", label: "Rojo", hex: "#c62828", stock: 10 },
+  { id: "c-verde", label: "Verde Militar", hex: "#4a5e3a", stock: 10 },
+  { id: "c-gris", label: "Gris", hex: "#8a8a8a", stock: 10 },
+  { id: "c-beige", label: "Beige", hex: "#d4c5a9", stock: 10 },
+  { id: "c-mostaza", label: "Mostaza", hex: "#d4a430", stock: 10 },
+  { id: "c-celeste", label: "Celeste", hex: "#5eb8d4", stock: 10 },
+  { id: "c-rosado", label: "Rosado", hex: "#e07a99", stock: 10 },
 ];
 
 export const STUB_PRODUCT_SIZES: ProductSize[] = [

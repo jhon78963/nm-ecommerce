@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { ArrowLeftRight, Heart, Minus, Plus, RefreshCw, Share2, ShoppingCart, Star, Truck } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { useCart } from "@/features/cart/context/CartProvider";
 import { cartLineHasValidVariant } from "@/features/cart/utils/cart-variant";
@@ -12,6 +12,7 @@ import { ProductVariantSelectors } from "@/features/product/components/variants/
 import { useProductVariantSelection } from "@/features/product/hooks/use-product-variant-selection";
 import type { ProductBoxItem } from "@/features/product/types/product-box.types";
 import { enrichProductWithVariants } from "@/features/product/utils/enrich-product-variants";
+import { clampQuantity, getVariantStock } from "@/features/product/utils/get-variant-stock";
 import {
   formatProductBoxPrice,
   getProductBoxHref,
@@ -77,6 +78,22 @@ export function ProductQuickViewDetails({ product, onClose }: ProductQuickViewDe
   const href = getProductBoxHref(product);
   const isInStock = product.stockStatus === "in_stock";
   const isWishlisted = isInWishlist(String(product.id));
+
+  const availableStock = useMemo(
+    () => getVariantStock(variantSelection.selectedSize, variantSelection.selectedColor),
+    [variantSelection.selectedColor, variantSelection.selectedSize],
+  );
+
+  const maxQuantity = availableStock !== null && availableStock > 0 ? availableStock : 1;
+  const canIncreaseQuantity = quantity < maxQuantity;
+
+  useEffect(() => {
+    setQuantity((current) => clampQuantity(current, maxQuantity));
+  }, [
+    maxQuantity,
+    variantSelection.selectedColorId,
+    variantSelection.selectedSizeId,
+  ]);
   const canAddToCart =
     isInStock
     && (!variantSelection.hasSizes || Boolean(variantSelection.selectedSizeId))
@@ -85,11 +102,15 @@ export function ProductQuickViewDetails({ product, onClose }: ProductQuickViewDe
     );
 
   function updateQuantity(delta: number) {
-    setQuantity((current) => Math.max(1, current + delta));
+    setQuantity((current) => clampQuantity(current + delta, maxQuantity));
   }
 
   function handleAddToCart() {
     if (!isInStock || !variantSelection.validate()) {
+      return;
+    }
+
+    if (availableStock !== null && quantity > availableStock) {
       return;
     }
 
@@ -171,6 +192,7 @@ export function ProductQuickViewDetails({ product, onClose }: ProductQuickViewDe
                 type="button"
                 className="btn quantity-left-plus"
                 onClick={() => updateQuantity(1)}
+                disabled={!canIncreaseQuantity}
                 aria-label="Aumentar cantidad"
               >
                 <Plus className="size-4" />

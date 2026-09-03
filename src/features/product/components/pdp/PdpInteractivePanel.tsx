@@ -1,7 +1,7 @@
 "use client";
 
 import { Heart, Minus, Plus, RefreshCw, Share2, ShoppingCart } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { useCart } from "@/features/cart/context/CartProvider";
 import { ProductVariantSelectors } from "@/features/product/components/variants/ProductVariantSelectors";
@@ -10,6 +10,7 @@ import { useProductVariantSelection } from "@/features/product/hooks/use-product
 import type { ProductDetail } from "@/features/product/types/product-detail.types";
 import type { SearchProduct } from "@/features/search/types/search.types";
 import { enrichProductWithVariants } from "@/features/product/utils/enrich-product-variants";
+import { clampQuantity, getVariantStock } from "@/features/product/utils/get-variant-stock";
 import { useWishlist } from "@/features/wishlist/context/WishlistProvider";
 import { cn } from "@/lib/utils";
 
@@ -43,12 +44,32 @@ export function PdpInteractivePanel({ product }: PdpInteractivePanelProps) {
   const isInStock = product.stockStatus === "in_stock";
   const isWishlisted = isInWishlist(String(product.id));
 
+  const availableStock = useMemo(
+    () => getVariantStock(variantSelection.selectedSize, variantSelection.selectedColor),
+    [variantSelection.selectedColor, variantSelection.selectedSize],
+  );
+
+  const maxQuantity = availableStock !== null && availableStock > 0 ? availableStock : 1;
+  const canIncreaseQuantity = quantity < maxQuantity;
+
+  useEffect(() => {
+    setQuantity((current) => clampQuantity(current, maxQuantity));
+  }, [
+    maxQuantity,
+    variantSelection.selectedColorId,
+    variantSelection.selectedSizeId,
+  ]);
+
   function updateQuantity(delta: number) {
-    setQuantity((current) => Math.max(1, current + delta));
+    setQuantity((current) => clampQuantity(current + delta, maxQuantity));
   }
 
   function validateAndAddToCart(buyNow = false) {
     if (!variantSelection.validate()) {
+      return;
+    }
+
+    if (availableStock !== null && quantity > availableStock) {
       return;
     }
 
@@ -72,7 +93,7 @@ export function PdpInteractivePanel({ product }: PdpInteractivePanelProps) {
     openCart();
   }
 
-  const stockQty = variantSelection.selectedSize?.stock ?? null;
+  const stockQty = availableStock;
   const showStockAlert = stockQty !== null && stockQty <= 5 && stockQty > 0;
 
   return (
@@ -137,6 +158,7 @@ export function PdpInteractivePanel({ product }: PdpInteractivePanelProps) {
                 type="button"
                 className="btn quantity-left-plus"
                 onClick={() => updateQuantity(1)}
+                disabled={!canIncreaseQuantity}
                 aria-label="Aumentar cantidad"
               >
                 <Plus className="size-4" />

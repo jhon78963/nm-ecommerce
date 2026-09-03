@@ -29,6 +29,7 @@ function mapPublicSizes(sizes: PublicCatalogProductItem["sizes"]): ProductSize[]
       id: color.id,
       label: color.label,
       hex: color.hex,
+      stock: color.stock,
     })),
   }));
 }
