@@ -1,13 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useActionState, useEffect } from "react";
+import { useFormStatus } from "react-dom";
 
+import { registerCustomerAction } from "@/features/customer-auth/actions/customer-auth.actions";
 import { AuthSocialSection } from "@/features/auth/components/AuthSocialSection";
 import { AuthTitle } from "@/features/auth/components/AuthTitle";
 import type { AuthModalView } from "@/features/auth/types/auth.types";
 
 interface RegisterFormProps {
   onNavigate: (view: AuthModalView) => void;
+  onSuccess: () => void;
 }
 
 const inputClassName =
@@ -15,23 +18,25 @@ const inputClassName =
 
 const labelClassName = "form-label mb-1 block text-[15px] font-medium text-[#777]";
 
-export function RegisterForm({ onNavigate }: RegisterFormProps) {
-  const [error, setError] = useState<string | null>(null);
+export function RegisterForm({ onNavigate, onSuccess }: RegisterFormProps) {
+  const [state, formAction] = useActionState(registerCustomerAction, {
+    success: false,
+    error: null,
+  });
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setError("El registro en línea estará disponible próximamente. Contáctanos para crear tu cuenta.");
-  };
+  useEffect(() => {
+    if (state.success) onSuccess();
+  }, [onSuccess, state.success]);
 
   return (
     <>
       <AuthTitle title="Crear cuenta" />
 
-      {error ? (
-        <p className="mb-4 text-center text-sm font-medium text-amber-800">{error}</p>
+      {state.error ? (
+        <p className="mb-4 text-center text-sm font-medium text-red-600">{state.error}</p>
       ) : null}
 
-      <form onSubmit={handleSubmit} className="auth-form-box">
+      <form action={formAction} className="auth-form-box">
         <div className="auth-box form-box mb-3">
           <label htmlFor="name" className={labelClassName}>
             Nombre

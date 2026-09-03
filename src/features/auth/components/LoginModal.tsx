@@ -52,7 +52,9 @@ export function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps)
       {view === "forgot-password" ? (
         <ForgotPasswordForm onNavigate={setView} />
       ) : null}
-      {view === "register" ? <RegisterForm onNavigate={setView} /> : null}
+      {view === "register" ? (
+        <RegisterForm onNavigate={setView} onSuccess={handleLoginSuccess} />
+      ) : null}
     </AuthModalShell>
   );
 }

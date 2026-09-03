@@ -41,7 +41,7 @@ export interface PublicCatalogProductItem {
   salePrice: number;
   discount: number;
   stockStatus: "in_stock" | "out_of_stock";
-  ratingCount: null;
+  ratingCount: number | null;
   reviewsCount: number;
   shortDescription?: string | null;
   description?: string | null;

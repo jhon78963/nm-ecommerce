@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import { PDP_COPY } from "@/features/product/constants/pdp-copy";
+import { PdpReviews } from "@/features/product/components/pdp/PdpReviews";
 import type { ProductDetail } from "@/features/product/types/product-detail.types";
 import { cn } from "@/lib/utils";
 
@@ -58,16 +59,10 @@ function AdditionalInfoTab({ product }: { product: ProductDetail }) {
   );
 }
 
-function ReviewsTab({ reviewsCount }: { reviewsCount: number }) {
+function ReviewsTab({ product }: { product: ProductDetail }) {
   return (
     <div className="pdp-tab-content">
-      {reviewsCount === 0 ? (
-        <p className="pdp-no-content">{PDP_COPY.noReviews}</p>
-      ) : (
-        <p className="text-gray-500">
-          Este producto tiene {reviewsCount} reseñas. Integración con backend pendiente.
-        </p>
-      )}
+      <PdpReviews product={product} />
     </div>
   );
 }
@@ -105,7 +100,7 @@ export function PdpProductTabs({ product }: PdpProductTabsProps) {
           ) : activeTab === "info" ? (
             <AdditionalInfoTab product={product} />
           ) : (
-            <ReviewsTab reviewsCount={product.reviewsCount} />
+            <ReviewsTab product={product} />
           )}
         </div>
       </div>

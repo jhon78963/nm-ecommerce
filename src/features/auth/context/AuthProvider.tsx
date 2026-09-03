@@ -10,12 +10,12 @@ import {
   type ReactNode,
 } from "react";
 
-import { logoutAction } from "@/features/auth/actions/auth.actions";
+import { logoutCustomerAction } from "@/features/customer-auth/actions/customer-auth.actions";
+import type { CustomerUser } from "@/features/customer-auth/types/customer-auth.types";
 import { LoginModal } from "@/features/auth/components/LoginModal";
-import type { AuthUser } from "@/features/auth/types/auth.types";
 
 interface AuthContextValue {
-  user: AuthUser | null;
+  user: CustomerUser | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   isLoginOpen: boolean;
@@ -28,19 +28,19 @@ interface AuthContextValue {
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<AuthUser | null>(null);
+  const [user, setUser] = useState<CustomerUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
 
   const refreshUser = useCallback(async () => {
     try {
-      const response = await fetch("/api/auth/me");
+      const response = await fetch("/api/customer-auth/me");
       if (!response.ok) {
         setUser(null);
         return;
       }
 
-      const data = (await response.json()) as AuthUser;
+      const data = (await response.json()) as CustomerUser | null;
       setUser(data);
     } catch {
       setUser(null);
@@ -55,7 +55,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const closeLogin = useCallback(() => setIsLoginOpen(false), []);
 
   const logout = useCallback(async () => {
-    await logoutAction();
+    await logoutCustomerAction();
     setUser(null);
   }, []);
 

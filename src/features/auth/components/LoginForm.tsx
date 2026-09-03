@@ -3,7 +3,7 @@
 import { useActionState, useEffect } from "react";
 import { useFormStatus } from "react-dom";
 
-import { loginAction } from "@/features/auth/actions/auth.actions";
+import { loginCustomerAction } from "@/features/customer-auth/actions/customer-auth.actions";
 import { AuthSocialSection } from "@/features/auth/components/AuthSocialSection";
 import { AuthTitle } from "@/features/auth/components/AuthTitle";
 import type { AuthModalView, LoginActionState } from "@/features/auth/types/auth.types";
@@ -35,7 +35,7 @@ function SubmitButton() {
 }
 
 export function LoginForm({ onNavigate, onSuccess }: LoginFormProps) {
-  const [state, formAction] = useActionState(loginAction, initialState);
+  const [state, formAction] = useActionState(loginCustomerAction, initialState);
 
   useEffect(() => {
     if (state.success) onSuccess();
@@ -56,8 +56,8 @@ export function LoginForm({ onNavigate, onSuccess }: LoginFormProps) {
           </label>
           <input
             id="username"
-            name="username"
-            type="text"
+            name="email"
+            type="email"
             required
             autoComplete="username"
             placeholder="Correo electrónico"
