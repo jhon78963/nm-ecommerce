@@ -329,6 +329,42 @@
   opacity: 1;
 }
 
+.pdp-color-btn--soldout {
+  opacity: 0.45;
+  cursor: not-allowed;
+  border-style: dashed;
+}
+
+.pdp-color-btn--soldout:hover {
+  border-color: transparent;
+  transform: none;
+}
+
+.pdp-color-btn--soldout[aria-pressed="true"] {
+  border-color: #bbb;
+  transform: none;
+}
+
+.pdp-color-btn__strike {
+  position: absolute;
+  inset: 2px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.pdp-color-btn__strike::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 10%;
+  width: 80%;
+  height: 1.5px;
+  background: #666;
+  transform: translateY(-50%) rotate(-45deg);
+}
+
 /* Talla chips */
 .pdp-sizes-grid {
   display: flex;

@@ -19,28 +19,51 @@ interface ColorSwatchesProps {
   colors: ProductColor[];
   selectedColorId: string | null;
   onSelect: (id: string) => void;
+  compact?: boolean;
 }
 
-function ColorSwatches({ colors, selectedColorId, onSelect }: ColorSwatchesProps) {
-  if (colors.length === 0) {
-    return <p className="product-variant-selectors__hint">Sin colores para esta talla</p>;
+function ColorSwatches({
+  colors,
+  selectedColorId,
+  onSelect,
+  compact = false,
+}: ColorSwatchesProps) {
+  const visibleColors = compact ? colors.filter((color) => color.stock > 0) : colors;
+
+  if (visibleColors.length === 0) {
+    return (
+      <p className="product-variant-selectors__hint">
+        {colors.length > 0 ? PDP_COPY.agotadoParaTalla : "Sin colores para esta talla"}
+      </p>
+    );
   }
 
   return (
     <div className="pdp-colors-grid" role="group" aria-label="Seleccionar color">
-      {colors.map((color) => (
-        <button
-          key={color.id}
-          type="button"
-          className={cn("pdp-color-btn", isLightColor(color.hex) && "pdp-color-btn--light")}
-          style={{ "--swatch-color": color.hex } as React.CSSProperties}
-          aria-pressed={selectedColorId === color.id}
-          aria-label={color.label}
-          data-label={color.label}
-          onClick={() => onSelect(color.id)}
-          title={color.label}
-        />
-      ))}
+      {visibleColors.map((color) => {
+        const isSoldOut = color.stock === 0;
+
+        return (
+          <button
+            key={color.id}
+            type="button"
+            className={cn(
+              "pdp-color-btn",
+              isLightColor(color.hex) && "pdp-color-btn--light",
+              isSoldOut && "pdp-color-btn--soldout",
+            )}
+            style={{ "--swatch-color": color.hex } as React.CSSProperties}
+            aria-pressed={selectedColorId === color.id}
+            aria-label={isSoldOut ? `${color.label} — agotado` : color.label}
+            data-label={isSoldOut ? `${color.label} — agotado` : color.label}
+            disabled={isSoldOut}
+            onClick={() => !isSoldOut && onSelect(color.id)}
+            title={isSoldOut ? `${color.label} — agotado` : color.label}
+          >
+            {isSoldOut ? <span className="pdp-color-btn__strike" aria-hidden /> : null}
+          </button>
+        );
+      })}
     </div>
   );
 }
@@ -130,6 +153,7 @@ export function ProductVariantSelectors({
               colors={availableColors}
               selectedColorId={selectedColorId}
               onSelect={onColorSelect}
+              compact={compact}
             />
           ) : (
             <p className="product-variant-selectors__hint">Selecciona una talla primero</p>

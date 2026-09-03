@@ -8,6 +8,7 @@ import {
   getProductBoxHref,
 } from "@/features/product/utils/format-product-price";
 import { hasProductPromoPrice } from "@/features/product/utils/product-discount-badge";
+import { isStarFilled } from "@/features/product/utils/product-rating";
 import { cn } from "@/lib/utils";
 
 import "./product-box-horizontal.css";
@@ -18,12 +19,10 @@ interface ProductBoxHorizontalProps {
 }
 
 function ProductRating({ rating }: { rating: number | null }) {
-  const value = rating ?? 0;
-
   return (
     <div className="rating">
       {Array.from({ length: 5 }, (_, index) => {
-        const filled = value >= index + 1;
+        const filled = isStarFilled(rating ?? 0, index);
 
         return (
           <Star

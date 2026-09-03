@@ -36,7 +36,7 @@ interface ShopProductsApiResponse {
     salePrice: number;
     discount: number;
     stockStatus: "in_stock" | "out_of_stock";
-    ratingCount: null;
+    ratingCount: number | null;
     reviewsCount: number;
     sizes?: Array<{
       id: string;

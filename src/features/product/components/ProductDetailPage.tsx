@@ -11,6 +11,7 @@ import { PdpProductTabs } from "@/features/product/components/pdp/PdpProductTabs
 import { PdpSafeCheckout } from "@/features/product/components/pdp/PdpSafeCheckout";
 import type { ProductDetail } from "@/features/product/types/product-detail.types";
 import { enrichProductWithVariants } from "@/features/product/utils/enrich-product-variants";
+import { isStarFilled } from "@/features/product/utils/product-rating";
 import { cn } from "@/lib/utils";
 
 import "@/features/product/components/quick-view/product-quick-view.css";
@@ -21,8 +22,6 @@ interface ProductDetailPageProps {
 }
 
 function PdpRating({ rating, reviewsCount }: { rating: number | null; reviewsCount: number }) {
-  const value = rating ?? 0;
-
   return (
     <div className="product-rating">
       <div className="rating-list flex items-center gap-0.5">
@@ -31,7 +30,7 @@ function PdpRating({ rating, reviewsCount }: { rating: number | null; reviewsCou
             key={index}
             className={cn(
               "size-3.5",
-              value >= index + 1 ? "fill-[#ffbc37] text-[#ffbc37]" : "fill-[#ddd] text-[#ddd]",
+              isStarFilled(rating ?? 0, index) ? "fill-[#ffbc37] text-[#ffbc37]" : "fill-[#ddd] text-[#ddd]",
             )}
             aria-hidden="true"
           />

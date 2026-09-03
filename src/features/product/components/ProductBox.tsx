@@ -23,6 +23,7 @@ import {
   hasProductPromoPrice,
   resolveProductDiscountBadge,
 } from "@/features/product/utils/product-discount-badge";
+import { isStarFilled } from "@/features/product/utils/product-rating";
 import type { SearchProduct } from "@/features/search/types/search.types";
 import { useWishlist } from "@/features/wishlist/context/WishlistProvider";
 import { cn } from "@/lib/utils";
@@ -54,12 +55,10 @@ function toWishlistProduct(product: ProductBoxItem): SearchProduct {
 }
 
 function ProductRating({ rating }: { rating: number | null }) {
-  const value = rating ?? 0;
-
   return (
     <div className="flex items-center gap-0.5">
       {Array.from({ length: 5 }, (_, index) => {
-        const filled = value >= index + 1;
+        const filled = isStarFilled(rating ?? 0, index);
 
         return (
           <Star

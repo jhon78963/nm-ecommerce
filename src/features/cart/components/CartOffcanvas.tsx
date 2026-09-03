@@ -49,7 +49,7 @@ export function CartOffcanvas() {
         )}
         aria-hidden={!isOpen}
       >
-        <div className="cart-inner relative flex h-full flex-col bg-white">
+        <div className="cart-inner relative flex h-full min-h-0 flex-col bg-white">
         <div className="cart_top mb-4 flex items-center border-b border-[#eee] px-5 py-4">
           <h3 className="mb-0 text-lg font-bold text-[#222]">
             Mi carrito <span className="font-normal text-[#777]">({itemCount})</span>
@@ -109,7 +109,7 @@ export function CartOffcanvas() {
 
         <div
           className={cn(
-            "cart_media flex-1 overflow-y-auto px-5",
+            "cart_media min-h-0 flex-1 overflow-y-auto px-5",
             itemCount === 0 && "empty-cart flex items-center justify-center",
           )}
         >
@@ -207,9 +207,11 @@ export function CartOffcanvas() {
               ))
             )}
           </ul>
+        </div>
 
-          {itemCount > 0 ? (
-            <ul className="cart_total mt-4 border-t border-[#eee] pt-4">
+        {itemCount > 0 ? (
+          <div className="cart-footer shrink-0 border-t border-[#eee] bg-white px-5 pb-5 pt-4">
+            <ul className="cart_total">
               <li>
                 <div className="total py-2.5">
                   <h5 className="mb-0 flex items-center justify-between text-xl font-medium capitalize text-[#333]">
@@ -232,13 +234,13 @@ export function CartOffcanvas() {
                     onClick={closeCart}
                     className="checkout w-full border border-theme bg-theme px-4 py-3 text-center text-sm font-semibold capitalize text-white transition-colors hover:bg-white hover:text-theme"
                   >
-                    Checkout
+                    Finalizar compra
                   </Link>
                 </div>
               </li>
             </ul>
-          ) : null}
-        </div>
+          </div>
+        ) : null}
         </div>
       </aside>
     </>

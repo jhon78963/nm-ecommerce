@@ -18,6 +18,7 @@ import {
   getProductBoxHref,
 } from "@/features/product/utils/format-product-price";
 import { productBoxItemToCartLineItem } from "@/features/product/utils/to-cart-line-item";
+import { isStarFilled } from "@/features/product/utils/product-rating";
 import type { SearchProduct } from "@/features/search/types/search.types";
 import { useWishlist } from "@/features/wishlist/context/WishlistProvider";
 import { cn } from "@/lib/utils";
@@ -43,8 +44,6 @@ function toWishlistProduct(product: ProductBoxItem): SearchProduct {
 }
 
 function ProductRating({ rating, reviewsCount }: { rating: number | null; reviewsCount: number }) {
-  const value = rating ?? 0;
-
   return (
     <div className="product-rating">
       <div className="rating-list flex items-center gap-0.5">
@@ -53,7 +52,7 @@ function ProductRating({ rating, reviewsCount }: { rating: number | null; review
             key={index}
             className={cn(
               "size-4",
-              value >= index + 1 ? "fill-[#ffbc37] text-[#ffbc37]" : "fill-[#ddd] text-[#ddd]",
+              isStarFilled(rating ?? 0, index) ? "fill-[#ffbc37] text-[#ffbc37]" : "fill-[#ddd] text-[#ddd]",
             )}
             aria-hidden="true"
           />

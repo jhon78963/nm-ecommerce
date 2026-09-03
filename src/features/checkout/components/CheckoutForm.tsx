@@ -4,6 +4,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { useCart } from "@/features/cart/context/CartProvider";
+import { fetchCustomerAddresses } from "@/features/account/services/account-addresses.service";
+import { useAuth } from "@/features/auth/context/AuthProvider";
 import { cartLineHasValidVariant } from "@/features/cart/utils/cart-variant";
 import { CheckoutAddressFields } from "@/features/checkout/components/CheckoutAddressFields";
 import { CheckoutSummary } from "@/features/checkout/components/CheckoutSummary";
@@ -12,6 +14,11 @@ import { PAYMENT_METHODS } from "@/features/checkout/constants/payment-methods";
 import { isTrujilloZone, resolveShippingZone } from "@/features/checkout/constants/peru-departments";
 import type { CheckoutAddress } from "@/features/checkout/types/checkout.types";
 import { createEmptyAddress } from "@/features/checkout/utils/address";
+import {
+  addressPrefillChanged,
+  buildCheckoutPrefillFromCustomer,
+  mergeAddressPrefill,
+} from "@/features/checkout/utils/checkout-customer-prefill";
 import {
   calculateCheckoutTotals,
   getShippingMethodById,
@@ -56,6 +63,7 @@ function validateEmail(email: string): string | undefined {
 export function CheckoutForm() {
   const router = useRouter();
   const { items, isHydrated, clearCart } = useCart();
+  const { user, isAuthenticated, isLoading: isAuthLoading } = useAuth();
 
   const [billing, setBilling] = useState<CheckoutAddress>(createEmptyAddress);
   const [shipping, setShipping] = useState<CheckoutAddress>(createEmptyAddress);
@@ -72,7 +80,9 @@ export function CheckoutForm() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isFormHydrated, setIsFormHydrated] = useState(false);
+  const [prefilledFromAccount, setPrefilledFromAccount] = useState(false);
   const isCompletingOrderRef = useRef(false);
+  const customerPrefillAppliedRef = useRef(false);
 
   const shippingZone = resolveShippingZone(
     (sameAsBilling ? billing : shipping).postcode,
@@ -112,6 +122,61 @@ export function CheckoutForm() {
     }
     setIsFormHydrated(true);
   }, []);
+
+  useEffect(() => {
+    if (!isFormHydrated || isAuthLoading) return;
+
+    if (!isAuthenticated || !user) {
+      customerPrefillAppliedRef.current = false;
+      setPrefilledFromAccount(false);
+      return;
+    }
+
+    if (customerPrefillAppliedRef.current) return;
+
+    let cancelled = false;
+
+    (async () => {
+      let defaultAddress = null;
+
+      try {
+        const addresses = await fetchCustomerAddresses();
+        defaultAddress = addresses.find((address) => address.isDefault) ?? addresses[0] ?? null;
+      } catch {
+        defaultAddress = null;
+      }
+
+      if (cancelled) return;
+
+      const prefill = buildCheckoutPrefillFromCustomer(user.name, defaultAddress);
+      let didPrefill = false;
+
+      setEmail((current) => {
+        if (current.trim()) return current;
+        didPrefill = true;
+        return user.email;
+      });
+
+      setBilling((current) => {
+        const merged = mergeAddressPrefill(current, prefill);
+        if (addressPrefillChanged(current, merged)) didPrefill = true;
+        return merged;
+      });
+
+      setShipping((current) => {
+        const merged = mergeAddressPrefill(current, prefill);
+        if (addressPrefillChanged(current, merged)) didPrefill = true;
+        return merged;
+      });
+
+      customerPrefillAppliedRef.current = true;
+      setPrefilledFromAccount(didPrefill);
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isFormHydrated, isAuthLoading, isAuthenticated, user]);
 
   useEffect(() => {
     if (!isFormHydrated || isCompletingOrderRef.current) return;
@@ -311,6 +376,12 @@ export function CheckoutForm() {
                 </div>
 
                 <div className="checkout-form-section">
+                  {prefilledFromAccount ? (
+                    <p className="checkout-account-prefill mb-4 rounded border border-[#f0d9a8] bg-[#fffdf5] px-3 py-2.5 text-sm text-[#7a6522]">
+                      {CHECKOUT_COPY.accountPrefillNotice}
+                    </p>
+                  ) : null}
+
                   <div className="mb-4">
                     <label htmlFor="checkout-email" className="form-label mb-1 block text-sm font-medium text-[#777]">
                       {CHECKOUT_COPY.email} *

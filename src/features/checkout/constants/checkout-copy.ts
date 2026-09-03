@@ -23,6 +23,8 @@ export const CHECKOUT_COPY = {
   postcode: "Código postal",
   orderNotes: "Notas del pedido (opcional)",
   sameAsBilling: "Usar los mismos datos de facturación",
+  accountPrefillNotice:
+    "Completamos tus datos con la información de tu cuenta. Puedes editarlos antes de pagar.",
 
   selectDepartment: "Selecciona un departamento",
   requiredField: "Este campo es obligatorio",

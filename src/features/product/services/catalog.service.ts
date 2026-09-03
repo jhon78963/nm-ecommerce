@@ -53,8 +53,8 @@ export async function getProductBySlug(slug: string): Promise<ProductDetail | nu
 
   const requestOptions = {
     params: { warehouseId },
-    revalidate: STORE_CONTENT_REVALIDATE_SECONDS,
-  } as const;
+    cache: "no-store" as const,
+  };
 
   // 1) Ruta pública ya permitida por el gateway: ?slug=
   try {

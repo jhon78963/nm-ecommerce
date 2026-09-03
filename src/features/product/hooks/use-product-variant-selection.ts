@@ -29,7 +29,7 @@ export function useProductVariantSelection(sizes: ProductSize[] = []) {
     setSelectedSizeId(onlySize.id);
 
     const colors = onlySize.colors ?? [];
-    if (colors.length === 1 && isUuid(colors[0].id)) {
+    if (colors.length === 1 && isUuid(colors[0].id) && colors[0].stock > 0) {
       setSelectedColorId(colors[0].id);
     }
   }, [sizes, selectedSizeId]);
@@ -66,9 +66,24 @@ export function useProductVariantSelection(sizes: ProductSize[] = []) {
       return false;
     }
 
-    if (selectedSize && selectedSize.colors.length > 0 && !selectedColorId) {
-      setValidationError(PDP_COPY.selectColorFirst);
-      return false;
+    if (selectedSize && selectedSize.colors.length > 0) {
+      const selectableColors = selectedSize.colors.filter((color) => color.stock > 0);
+
+      if (selectableColors.length === 0) {
+        setValidationError(PDP_COPY.agotadoParaTalla);
+        return false;
+      }
+
+      if (!selectedColorId) {
+        setValidationError(PDP_COPY.selectColorFirst);
+        return false;
+      }
+
+      const selectedColorStock = selectedSize.colors.find((color) => color.id === selectedColorId);
+      if (!selectedColorStock || selectedColorStock.stock === 0) {
+        setValidationError(PDP_COPY.agotadoParaTalla);
+        return false;
+      }
     }
 
     setValidationError(null);
