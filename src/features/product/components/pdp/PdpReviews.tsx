@@ -189,7 +189,7 @@ export function PdpReviews({ product }: PdpReviewsProps) {
             <div className="pdp-reviews__cta">
               <h4>{PDP_COPY.reviewThisProduct}</h4>
               <p>{PDP_COPY.loginToReview}</p>
-              <button type="button" className="pdp-reviews__write-btn" onClick={openLogin}>
+              <button type="button" className="pdp-reviews__write-btn" onClick={() => openLogin()}>
                 {PDP_COPY.loginToReviewButton}
               </button>
             </div>

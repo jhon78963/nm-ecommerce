@@ -23,7 +23,7 @@ export function HeaderUserMenu() {
   return (
     <button
       type="button"
-      onClick={openLogin}
+      onClick={() => openLogin()}
       className="inline-flex cursor-pointer items-center justify-center text-[#6a6a6a] transition-colors hover:text-theme"
       aria-label="Iniciar sesión"
     >

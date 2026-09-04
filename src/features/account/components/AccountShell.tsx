@@ -47,7 +47,7 @@ export function AccountShell({ children, title }: AccountShellProps) {
           <div className="account-guest-prompt">
             <h1>Inicia sesión para ver tu cuenta</h1>
             <p>Accede a tus pedidos, direcciones y preferencias.</p>
-            <button type="button" className="btn btn-solid" onClick={openLogin}>
+            <button type="button" className="btn btn-solid" onClick={() => openLogin()}>
               Iniciar sesión
             </button>
           </div>
