@@ -46,7 +46,7 @@
   position: absolute;
   top: 38%;
   z-index: 2;
-  display: none;
+  display: flex;
   height: 40px;
   width: 40px;
   align-items: center;
@@ -99,10 +99,6 @@
 
   .product-collection-slide {
     flex-basis: calc((100cqw - 32px) / 3);
-  }
-
-  .product-collection-nav {
-    display: flex;
   }
 
   .product-collection-nav--prev {

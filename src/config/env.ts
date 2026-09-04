@@ -25,7 +25,7 @@ export const env = {
     return readEnv("STORE_WAREHOUSE_ID");
   },
   get appUrl(): string {
-    return readEnv("NEXT_PUBLIC_APP_URL") ?? "http://localhost:3012";
+    return readEnv("NEXT_PUBLIC_APP_URL") ?? "http://localhost:3015";
   },
   get whatsappPhone(): string {
     const configured = readEnv("NEXT_PUBLIC_WHATSAPP_NUMBER");

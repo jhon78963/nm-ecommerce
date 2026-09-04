@@ -6,7 +6,7 @@ const STATE_COOKIE = "nm_google_oauth_state";
 const INTENT_COOKIE = "nm_google_oauth_intent";
 
 export function getGoogleRedirectUri() {
-  return `${process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3012"}/api/auth/google/callback`;
+  return `${process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3015"}/api/auth/google/callback`;
 }
 
 export function buildGoogleAuthUrl(state: string) {

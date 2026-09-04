@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 
 import "./product-collection.css";
 
-const CAROUSEL_THRESHOLD = 4;
+const CAROUSEL_THRESHOLD = 3;
 
 interface ProductCollectionLayoutProps {
   products: ProductBoxItem[];
