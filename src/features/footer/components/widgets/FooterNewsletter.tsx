@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 
+import { subscribeToNewsletter } from "@/features/footer/services/newsletter.service";
 import type { StoreFooterConfig } from "@/features/footer/types/footer.types";
 
 interface FooterNewsletterProps {
@@ -18,6 +19,7 @@ const NEWSLETTER_COPY = {
   success: "¡Gracias por suscribirte!",
   emailRequired: "El correo es obligatorio.",
   emailInvalid: "Correo electrónico inválido.",
+  submitError: "No pudimos completar tu suscripción. Intenta nuevamente.",
 } as const;
 
 export function FooterNewsletter({ title, subtitle }: FooterNewsletterProps) {
@@ -25,6 +27,7 @@ export function FooterNewsletter({ title, subtitle }: FooterNewsletterProps) {
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -46,9 +49,12 @@ export function FooterNewsletter({ title, subtitle }: FooterNewsletterProps) {
     setIsSubmitting(true);
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 400));
+      const response = await subscribeToNewsletter(trimmedEmail);
       setIsSubmitted(true);
+      setSuccessMessage(response.message);
       setEmail("");
+    } catch {
+      setError(NEWSLETTER_COPY.submitError);
     } finally {
       setIsSubmitting(false);
     }
@@ -64,8 +70,8 @@ export function FooterNewsletter({ title, subtitle }: FooterNewsletterProps) {
                 <div>
                   <h4>{title}</h4>
                   <p>{subtitle}</p>
-                  {isSubmitted ? (
-                    <p className="footer-newsletter-success">{NEWSLETTER_COPY.success}</p>
+                  {isSubmitted && successMessage ? (
+                    <p className="footer-newsletter-success">{successMessage}</p>
                   ) : null}
                 </div>
               </div>
@@ -87,6 +93,7 @@ export function FooterNewsletter({ title, subtitle }: FooterNewsletterProps) {
                         }
                         if (isSubmitted) {
                           setIsSubmitted(false);
+                          setSuccessMessage(null);
                         }
                       }}
                       aria-invalid={Boolean(error)}
