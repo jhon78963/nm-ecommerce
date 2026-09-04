@@ -5,6 +5,8 @@ import { usePathname } from "next/navigation";
 import { Heart, Home, Search, ShoppingBag, User } from "lucide-react";
 
 import { useCart } from "@/features/cart/context/CartProvider";
+import { useAuth } from "@/features/auth/context/AuthProvider";
+import { AuthOnlineBadge } from "@/features/navigation/components/AuthOnlineBadge";
 import { useWishlist } from "@/features/wishlist/context/WishlistProvider";
 import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
@@ -30,6 +32,7 @@ export function MobileBottomNav() {
   const pathname = usePathname();
   const { itemCount, openCart } = useCart();
   const { itemCount: wishlistCount } = useWishlist();
+  const { isAuthenticated } = useAuth();
 
   return (
     <nav
@@ -103,6 +106,7 @@ export function MobileBottomNav() {
                   "relative inline-flex w-full flex-col items-center gap-0.5 text-[#6a6a6a]",
                   isActive && "font-semibold text-[#222]",
                 )}
+                aria-label={item.id === "user" && isAuthenticated ? "Mi cuenta (sesión iniciada)" : item.label}
               >
                 {isActive ? (
                   <span
@@ -112,6 +116,9 @@ export function MobileBottomNav() {
                 ) : null}
                 <Icon className="mx-auto size-5" />
                 <span className="text-xs">{item.label}</span>
+                {item.id === "user" && isAuthenticated ? (
+                  <AuthOnlineBadge className="right-[calc(50%-18px)] top-0 size-2.5" />
+                ) : null}
               </Link>
             </li>
           );

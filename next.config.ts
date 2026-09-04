@@ -46,6 +46,7 @@ function buildStorageImagePatterns(): NonNullable<NextConfig["images"]>["remoteP
 }
 
 const nextConfig: NextConfig = {
+  output: "standalone",
   reactCompiler: true,
   images: {
     dangerouslyAllowLocalIP: process.env.NODE_ENV !== "production",

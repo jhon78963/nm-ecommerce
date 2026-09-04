@@ -48,3 +48,13 @@ export interface ForgotPasswordActionState {
   message: string | null;
   error: string | null;
 }
+
+export interface ResetPasswordPayload {
+  token: string;
+  password: string;
+}
+
+export interface ResetPasswordActionState {
+  success: boolean;
+  error: string | null;
+}

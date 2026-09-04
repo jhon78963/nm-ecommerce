@@ -5,11 +5,14 @@ import {
   loginUser,
   logoutUser,
   requestPasswordReset,
+  resetPassword,
 } from "@/features/auth/services/auth.service";
 import type {
   ForgotPasswordActionState,
   LoginActionState,
+  ResetPasswordActionState,
 } from "@/features/auth/types/auth.types";
+import { isValidPassword } from "@/features/auth/utils/password.validation";
 import {
   clearAuthCookies,
   getAccessToken,
@@ -67,6 +70,52 @@ export async function forgotPasswordAction(
       success: true,
       message: "Si el correo existe, recibirás un enlace de recuperación.",
       error: null,
+    };
+  }
+}
+
+export async function resetPasswordAction(
+  _prevState: ResetPasswordActionState,
+  formData: FormData,
+): Promise<ResetPasswordActionState> {
+  const token = String(formData.get("token") ?? "").trim();
+  const password = String(formData.get("password") ?? "");
+  const passwordConfirmation = String(formData.get("password_confirmation") ?? "");
+
+  if (!token) {
+    return { success: false, error: "El enlace de recuperación no es válido." };
+  }
+
+  if (!password || !passwordConfirmation) {
+    return { success: false, error: "Completa todos los campos." };
+  }
+
+  if (password !== passwordConfirmation) {
+    return { success: false, error: "Las contraseñas no coinciden." };
+  }
+
+  if (!isValidPassword(password)) {
+    return {
+      success: false,
+      error:
+        "La contraseña debe tener al menos 8 caracteres e incluir mayúscula, minúscula, número y carácter especial.",
+    };
+  }
+
+  try {
+    await resetPassword({ token, password });
+    return { success: true, error: null };
+  } catch (error) {
+    if (error instanceof HttpError) {
+      return {
+        success: false,
+        error: error.message || "No se pudo restablecer la contraseña. El enlace puede haber expirado.",
+      };
+    }
+
+    return {
+      success: false,
+      error: "No se pudo restablecer la contraseña. Intenta de nuevo.",
     };
   }
 }

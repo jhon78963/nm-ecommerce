@@ -6,6 +6,7 @@ import type {
   AuthUser,
   ForgotPasswordPayload,
   LoginCredentials,
+  ResetPasswordPayload,
 } from "@/features/auth/types/auth.types";
 
 export async function loginUser(credentials: LoginCredentials) {
@@ -22,6 +23,10 @@ export async function logoutUser(accessToken: string) {
 
 export async function requestPasswordReset(payload: ForgotPasswordPayload) {
   return apiPost<AuthMessageResponse>("auth/forgot-password", payload);
+}
+
+export async function resetPassword(payload: ResetPasswordPayload) {
+  return apiPost<void>("auth/reset-password", payload);
 }
 
 export async function loginWithGoogle(idToken: string) {
