@@ -339,6 +339,12 @@
   color: #2e7d32;
 }
 
+.checkout-section-2 .coupon-hint {
+  margin: 0 0 12px;
+  font-size: 12px;
+  color: #7a6522;
+}
+
 .checkout-section-2 .sub-total,
 .checkout-section-2 .total {
   list-style: none;

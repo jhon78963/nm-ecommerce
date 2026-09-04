@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { CheckCircle2, ChevronRight } from "lucide-react";
 
 import { CHECKOUT_COPY } from "@/features/checkout/constants/checkout-copy";
+import { PaymentStatusBadge } from "@/features/checkout/components/PaymentStatusBadge";
 import type { StoredOrder } from "@/features/checkout/types/order.types";
 import {
   fetchPublicOrder,
@@ -77,6 +78,11 @@ export function OrderConfirmationContent() {
       <div className="order-confirmation__number">
         <span>{CHECKOUT_COPY.confirmationOrderNumber}</span>
         <strong>#{order.orderNumber}</strong>
+      </div>
+
+      <div className="order-confirmation__status">
+        <span>{CHECKOUT_COPY.paymentStatus}</span>
+        <PaymentStatusBadge status={order.paymentStatus} label={order.paymentStatusLabel} />
       </div>
 
       <div className="order-confirmation__steps">

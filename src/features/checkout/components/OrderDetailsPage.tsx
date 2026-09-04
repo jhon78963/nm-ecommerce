@@ -7,7 +7,9 @@ import { ArrowLeft, ChevronRight } from "lucide-react";
 
 import { StoreImage } from "@/components/ui/StoreImage";
 import { formatPrice } from "@/features/cart/utils/format-price";
+import { OrderStatusSummary } from "@/features/checkout/components/OrderStatusSummary";
 import { OrderStatusTracker } from "@/features/checkout/components/OrderStatusTracker";
+import { PaymentStatusBadge } from "@/features/checkout/components/PaymentStatusBadge";
 import { CHECKOUT_COPY } from "@/features/checkout/constants/checkout-copy";
 import { getDepartmentName } from "@/features/checkout/constants/peru-departments";
 import type { StoredOrder } from "@/features/checkout/types/order.types";
@@ -81,6 +83,7 @@ export function OrderDetailsContent() {
         </h1>
       </div>
 
+      <OrderStatusSummary order={order} />
       <OrderStatusTracker order={order} />
 
       <div className="dashboard-table">
@@ -167,7 +170,12 @@ export function OrderDetailsContent() {
             </li>
             <li>
               <label>{CHECKOUT_COPY.paymentStatus}</label>
-              <p>{order.paymentStatus === "paid" ? "Pagado" : "Pendiente"}</p>
+              <p>
+                <PaymentStatusBadge
+                  status={order.paymentStatus}
+                  label={order.paymentStatusLabel}
+                />
+              </p>
             </li>
             {order.orderNotes ? (
               <li>

@@ -7,6 +7,7 @@ import { ArrowLeft } from "lucide-react";
 import { AccountEmptyState } from "@/features/account/components/AccountEmptyState";
 import { ACCOUNT_ROUTES } from "@/features/account/constants/account-nav";
 import { fetchCustomerOrder } from "@/features/account/services/account-orders.service";
+import { OrderStatusSummary } from "@/features/checkout/components/OrderStatusSummary";
 import { OrderStatusTracker } from "@/features/checkout/components/OrderStatusTracker";
 import { CHECKOUT_COPY } from "@/features/checkout/constants/checkout-copy";
 import { getDepartmentName } from "@/features/checkout/constants/peru-departments";
@@ -80,6 +81,7 @@ export function AccountOrderDetail({ orderNumber }: AccountOrderDetailProps) {
         </h2>
       </div>
 
+      <OrderStatusSummary order={order} />
       <OrderStatusTracker order={order} />
 
       <div className="dashboard-table" style={{ marginTop: 24 }}>

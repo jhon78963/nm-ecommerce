@@ -10,6 +10,14 @@ export interface CustomerAuthResponse {
   token_type: string;
   expires_in: number;
   customer: CustomerUser;
+  welcomeCoupon?: WelcomeCoupon | null;
+}
+
+export interface WelcomeCoupon {
+  code: string;
+  discountType: "percentage" | "fixed";
+  discountValue: number;
+  description?: string | null;
 }
 
 export interface ProductReviewItem {

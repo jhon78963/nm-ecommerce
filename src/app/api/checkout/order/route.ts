@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { getCustomerAccessToken } from "@/features/customer-auth/utils/customer-auth-cookies";
+import { getClientIp } from "@/lib/client-ip";
 import {
   getStoreWarehouseId,
   proxyEcommerceJson,
@@ -34,7 +35,7 @@ export async function POST(request: Request) {
 
   const response = await proxyEcommerceJson("/ecommerce/orders", {
     method: "POST",
-    body: JSON.stringify({ ...payload, warehouseId }),
+    body: JSON.stringify({ ...payload, warehouseId, clientIp: getClientIp(request) }),
     headers,
   });
 

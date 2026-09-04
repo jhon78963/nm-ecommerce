@@ -54,6 +54,9 @@ export const CHECKOUT_COPY = {
   removeCoupon: "Quitar",
   couponApplied: "Cupón aplicado",
   couponInvalid: "Cupón no válido",
+  couponRequiresAccount:
+    "Para usar cupones necesitas una cuenta. Inicia sesión o regístrate; tu carrito y los datos del checkout se mantendrán.",
+  couponAccountHint: "Inicia sesión o crea una cuenta para aplicar cupones.",
 
   culqiInfo: "Acepta pagos con tarjetas de débito y crédito, Yape.",
   privacyNotice:

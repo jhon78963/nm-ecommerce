@@ -14,6 +14,7 @@ export function OrderStatusTracker({ order }: OrderStatusTrackerProps) {
   if (order.status === "cancelled") {
     return (
       <div className="tracking-panel">
+        <p className="tracking-panel__title">Seguimiento del pedido</p>
         <ul>
           <li className="active cancelled-box">
             <div className="panel-content">
@@ -27,6 +28,7 @@ export function OrderStatusTracker({ order }: OrderStatusTrackerProps) {
 
   return (
     <div className="tracking-panel">
+      <p className="tracking-panel__title">Seguimiento del pedido</p>
       <ul>
         {ORDER_STATUSES.map((status) => (
           <li

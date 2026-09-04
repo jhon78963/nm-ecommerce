@@ -1,7 +1,7 @@
 import type { CartLineItem } from "@/features/cart/types/cart.types";
 import { resolveCartLineVariantIds } from "@/features/cart/utils/cart-variant";
 import type { CheckoutAddress } from "@/features/checkout/types/checkout.types";
-import type { OrderStatusSlug, StoredOrder } from "@/features/checkout/types/order.types";
+import type { OrderStatusSlug, PaymentStatusSlug, StoredOrder } from "@/features/checkout/types/order.types";
 
 interface ApiOrderItem {
   id: string;
@@ -21,7 +21,8 @@ interface ApiOrder {
   orderNumber: string;
   status: OrderStatusSlug;
   statusLabel?: string;
-  paymentStatus: "pending" | "paid";
+  paymentStatus: PaymentStatusSlug;
+  paymentStatusLabel?: string;
   createdAt: string;
   email: string;
   billing: CheckoutAddress;
@@ -75,6 +76,7 @@ function mapApiOrderToStoredOrder(order: ApiOrder): StoredOrder {
     id: order.id,
     orderNumber: order.orderNumber,
     status: order.status,
+    statusLabel: order.statusLabel,
     createdAt: order.createdAt,
     email: order.email,
     billing: order.billing,
@@ -97,6 +99,7 @@ function mapApiOrderToStoredOrder(order: ApiOrder): StoredOrder {
     paymentMethodId: order.paymentMethodId,
     paymentMethodTitle: order.paymentMethodTitle,
     paymentStatus: order.paymentStatus,
+    paymentStatusLabel: order.paymentStatusLabel,
     subtotal: order.subtotal,
     couponCode: order.couponCode ?? undefined,
     couponDiscount: order.couponDiscount,

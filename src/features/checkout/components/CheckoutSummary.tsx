@@ -28,6 +28,8 @@ interface CheckoutSummaryProps {
   couponCode: string;
   couponError: string | null;
   couponApplied: boolean;
+  isApplyingCoupon?: boolean;
+  isAuthenticated?: boolean;
   isSubmitting: boolean;
   onShippingMethodChange: (id: string) => void;
   onPaymentMethodChange: (id: string) => void;
@@ -49,6 +51,8 @@ export function CheckoutSummary({
   couponCode,
   couponError,
   couponApplied,
+  isApplyingCoupon = false,
+  isAuthenticated = false,
   isSubmitting,
   onShippingMethodChange,
   onPaymentMethodChange,
@@ -123,12 +127,20 @@ export function CheckoutSummary({
                 {CHECKOUT_COPY.removeCoupon}
               </button>
             ) : (
-              <button type="button" className="apply-button" onClick={onApplyCoupon}>
-                {CHECKOUT_COPY.applyCoupon}
+              <button
+                type="button"
+                className="apply-button"
+                onClick={onApplyCoupon}
+                disabled={isApplyingCoupon}
+              >
+                {isApplyingCoupon ? "Validando..." : CHECKOUT_COPY.applyCoupon}
               </button>
             )}
           </div>
           {couponError ? <p className="coupon-error">{couponError}</p> : null}
+          {!isAuthenticated && !couponApplied ? (
+            <p className="coupon-hint">{CHECKOUT_COPY.couponAccountHint}</p>
+          ) : null}
           {couponApplied ? <p className="coupon-success">{CHECKOUT_COPY.couponApplied}</p> : null}
         </div>
 

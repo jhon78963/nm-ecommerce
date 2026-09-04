@@ -13,13 +13,15 @@ import {
 import { logoutCustomerAction } from "@/features/customer-auth/actions/customer-auth.actions";
 import type { CustomerUser } from "@/features/customer-auth/types/customer-auth.types";
 import { LoginModal } from "@/features/auth/components/LoginModal";
+import type { AuthModalView, OpenLoginOptions } from "@/features/auth/types/auth.types";
 
 interface AuthContextValue {
   user: CustomerUser | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   isLoginOpen: boolean;
-  openLogin: () => void;
+  loginModalMessage: string | null;
+  openLogin: (options?: OpenLoginOptions) => void;
   closeLogin: () => void;
   refreshUser: () => Promise<void>;
   logout: () => Promise<void>;
@@ -31,6 +33,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<CustomerUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [loginModalMessage, setLoginModalMessage] = useState<string | null>(null);
+  const [loginModalInitialView, setLoginModalInitialView] = useState<AuthModalView>("login");
 
   const refreshUser = useCallback(async () => {
     try {
@@ -51,8 +55,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     refreshUser().finally(() => setIsLoading(false));
   }, [refreshUser]);
 
-  const openLogin = useCallback(() => setIsLoginOpen(true), []);
-  const closeLogin = useCallback(() => setIsLoginOpen(false), []);
+  const openLogin = useCallback((options?: OpenLoginOptions) => {
+    setLoginModalMessage(options?.message ?? null);
+    setLoginModalInitialView(options?.initialView ?? "login");
+    setIsLoginOpen(true);
+  }, []);
+
+  const closeLogin = useCallback(() => {
+    setIsLoginOpen(false);
+    setLoginModalMessage(null);
+    setLoginModalInitialView("login");
+  }, []);
+
+  const handleLoginSuccess = useCallback(async () => {
+    await refreshUser();
+    closeLogin();
+  }, [closeLogin, refreshUser]);
 
   const logout = useCallback(async () => {
     await logoutCustomerAction();
@@ -65,12 +83,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isAuthenticated: Boolean(user),
       isLoading,
       isLoginOpen,
+      loginModalMessage,
       openLogin,
       closeLogin,
       refreshUser,
       logout,
     }),
-    [user, isLoading, isLoginOpen, openLogin, closeLogin, refreshUser, logout],
+    [user, isLoading, isLoginOpen, loginModalMessage, openLogin, closeLogin, refreshUser, logout],
   );
 
   return (
@@ -78,8 +97,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       {children}
       <LoginModal
         isOpen={isLoginOpen}
+        message={loginModalMessage}
+        initialView={loginModalInitialView}
         onClose={closeLogin}
-        onLoginSuccess={refreshUser}
+        onLoginSuccess={handleLoginSuccess}
       />
     </AuthContext.Provider>
   );

@@ -9,6 +9,8 @@ export type OrderStatusSlug =
   | "delivered"
   | "cancelled";
 
+export type PaymentStatusSlug = "pending" | "paid" | "failed" | "reviewing" | "refunded";
+
 export interface OrderStatus {
   slug: OrderStatusSlug;
   name: string;
@@ -19,6 +21,7 @@ export interface StoredOrder {
   id: string;
   orderNumber: string;
   status: OrderStatusSlug;
+  statusLabel?: string;
   createdAt: string;
   email: string;
   billing: CheckoutAddress;
@@ -30,7 +33,8 @@ export interface StoredOrder {
   shippingTotal: number;
   paymentMethodId: string;
   paymentMethodTitle: string;
-  paymentStatus: "pending" | "paid";
+  paymentStatus: PaymentStatusSlug;
+  paymentStatusLabel?: string;
   subtotal: number;
   couponCode?: string;
   couponDiscount: number;

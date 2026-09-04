@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 
 import { useCart } from "@/features/cart/context/CartProvider";
@@ -23,8 +23,8 @@ import {
   calculateCheckoutTotals,
   getShippingMethodById,
   getShippingMethodsForZone,
-  validateCoupon,
 } from "@/features/checkout/utils/checkout-totals";
+import { validateCheckoutCoupon } from "@/features/checkout/services/coupon.service";
 import {
   buildCreateOrderPayload,
   createOrder,
@@ -63,7 +63,7 @@ function validateEmail(email: string): string | undefined {
 export function CheckoutForm() {
   const router = useRouter();
   const { items, isHydrated, clearCart } = useCart();
-  const { user, isAuthenticated, isLoading: isAuthLoading } = useAuth();
+  const { user, isAuthenticated, isLoading: isAuthLoading, isLoginOpen, openLogin } = useAuth();
 
   const [billing, setBilling] = useState<CheckoutAddress>(createEmptyAddress);
   const [shipping, setShipping] = useState<CheckoutAddress>(createEmptyAddress);
@@ -76,6 +76,7 @@ export function CheckoutForm() {
   const [appliedCouponCode, setAppliedCouponCode] = useState("");
   const [couponDiscount, setCouponDiscount] = useState(0);
   const [couponError, setCouponError] = useState<string | null>(null);
+  const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -83,6 +84,7 @@ export function CheckoutForm() {
   const [prefilledFromAccount, setPrefilledFromAccount] = useState(false);
   const isCompletingOrderRef = useRef(false);
   const customerPrefillAppliedRef = useRef(false);
+  const [pendingCouponCode, setPendingCouponCode] = useState<string | null>(null);
 
   const shippingZone = resolveShippingZone(
     (sameAsBilling ? billing : shipping).postcode,
@@ -256,18 +258,82 @@ export function CheckoutForm() {
     }
   };
 
-  const handleApplyCoupon = () => {
-    const discount = validateCoupon(couponCode);
-    if (discount < 0) {
+  const applyCoupon = useCallback(
+    async (code: string, customerId: string) => {
+      const normalizedCode = code.trim();
+      if (!normalizedCode) {
+        setCouponError(CHECKOUT_COPY.couponInvalid);
+        setAppliedCouponCode("");
+        setCouponDiscount(0);
+        return false;
+      }
+
+      setIsApplyingCoupon(true);
+      setCouponError(null);
+
+      try {
+        const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+        const validated = await validateCheckoutCoupon({
+          code: normalizedCode,
+          subtotal,
+          customerId,
+        });
+
+        setAppliedCouponCode(validated.code);
+        setCouponCode(validated.code);
+        setCouponDiscount(validated.discountAmount);
+        setCouponError(null);
+        setPendingCouponCode(null);
+        return true;
+      } catch (error) {
+        setCouponError(
+          error instanceof Error && error.message ? error.message : CHECKOUT_COPY.couponInvalid,
+        );
+        setAppliedCouponCode("");
+        setCouponDiscount(0);
+        setPendingCouponCode(null);
+        return false;
+      } finally {
+        setIsApplyingCoupon(false);
+      }
+    },
+    [items],
+  );
+
+  useEffect(() => {
+    if (!isLoginOpen && !isAuthenticated && pendingCouponCode) {
+      setPendingCouponCode(null);
+    }
+  }, [isLoginOpen, isAuthenticated, pendingCouponCode]);
+
+  useEffect(() => {
+    if (!pendingCouponCode || !isAuthenticated || !user || isAuthLoading) {
+      return;
+    }
+
+    void applyCoupon(pendingCouponCode, user.id);
+  }, [pendingCouponCode, isAuthenticated, user, isAuthLoading, applyCoupon]);
+
+  const handleApplyCoupon = async () => {
+    const normalizedCode = couponCode.trim();
+    if (!normalizedCode) {
       setCouponError(CHECKOUT_COPY.couponInvalid);
       setAppliedCouponCode("");
       setCouponDiscount(0);
       return;
     }
 
-    setCouponError(null);
-    setAppliedCouponCode(couponCode.trim().toUpperCase());
-    setCouponDiscount(discount);
+    if (!isAuthenticated || !user) {
+      setPendingCouponCode(normalizedCode);
+      setCouponError(null);
+      openLogin({
+        message: CHECKOUT_COPY.couponRequiresAccount,
+        initialView: "login",
+      });
+      return;
+    }
+
+    await applyCoupon(normalizedCode, user.id);
   };
 
   const handleRemoveCoupon = () => {
@@ -469,6 +535,8 @@ export function CheckoutForm() {
             couponCode={couponCode}
             couponError={couponError}
             couponApplied={Boolean(appliedCouponCode)}
+            isApplyingCoupon={isApplyingCoupon}
+            isAuthenticated={isAuthenticated}
             isSubmitting={isSubmitting}
             onShippingMethodChange={setShippingMethodId}
             onPaymentMethodChange={setPaymentMethodId}

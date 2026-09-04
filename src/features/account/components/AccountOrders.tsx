@@ -9,14 +9,8 @@ import { ACCOUNT_ROUTES } from "@/features/account/constants/account-nav";
 import { fetchCustomerOrders } from "@/features/account/services/account-orders.service";
 import type { CustomerOrderSummary } from "@/features/account/types/account.types";
 import { formatPrice } from "@/features/cart/utils/format-price";
+import { PaymentStatusBadge } from "@/features/checkout/components/PaymentStatusBadge";
 import { ROUTES } from "@/lib/routes";
-
-function paymentBadgeClass(status: string) {
-  const normalized = status.toLowerCase();
-  if (normalized === "paid") return "account-badge--paid";
-  if (normalized === "failed") return "account-badge--failed";
-  return "account-badge--pending";
-}
 
 export function AccountOrders() {
   const [orders, setOrders] = useState<CustomerOrderSummary[]>([]);
@@ -110,9 +104,10 @@ export function AccountOrders() {
                       </td>
                       <td>{formatPrice(order.total)}</td>
                       <td>
-                        <span className={`account-badge ${paymentBadgeClass(order.paymentStatus)}`}>
-                          {order.paymentStatus}
-                        </span>
+                        <PaymentStatusBadge
+                          status={order.paymentStatus}
+                          label={order.paymentStatusLabel}
+                        />
                       </td>
                       <td>{order.paymentMethodTitle}</td>
                       <td>{order.statusLabel}</td>

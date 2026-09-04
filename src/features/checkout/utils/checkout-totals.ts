@@ -7,11 +7,6 @@ import {
   TRUJILLO_SHIPPING_METHODS,
 } from "@/features/checkout/constants/shipping-methods";
 
-const VALID_COUPONS: Record<string, number> = {
-  BIENVENIDO10: 10,
-  MARITEX5: 5,
-};
-
 export function getShippingMethodsForZone(zone: ShippingZone) {
   switch (zone) {
     case "trujillo":
@@ -25,12 +20,6 @@ export function getShippingMethodsForZone(zone: ShippingZone) {
 
 export function getShippingMethodById(id: string, zone: ShippingZone) {
   return getShippingMethodsForZone(zone).find((method) => method.id === id);
-}
-
-export function validateCoupon(code: string): number {
-  const normalized = code.trim().toUpperCase();
-  if (!normalized) return 0;
-  return VALID_COUPONS[normalized] ?? -1;
 }
 
 export function calculateCheckoutTotals(

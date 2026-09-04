@@ -10,12 +10,26 @@ import type { AuthModalView } from "@/features/auth/types/auth.types";
 
 interface LoginModalProps {
   isOpen: boolean;
+  message?: string | null;
+  initialView?: AuthModalView;
   onClose: () => void;
-  onLoginSuccess: () => void;
+  onLoginSuccess: () => void | Promise<void>;
 }
 
-export function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps) {
-  const [view, setView] = useState<AuthModalView>("login");
+export function LoginModal({
+  isOpen,
+  message,
+  initialView = "login",
+  onClose,
+  onLoginSuccess,
+}: LoginModalProps) {
+  const [view, setView] = useState<AuthModalView>(initialView);
+
+  useEffect(() => {
+    if (isOpen) {
+      setView(initialView);
+    }
+  }, [isOpen, initialView]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -38,14 +52,19 @@ export function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps)
   }, [isOpen, onClose]);
 
   const handleLoginSuccess = useCallback(() => {
-    onLoginSuccess();
-    onClose();
-  }, [onClose, onLoginSuccess]);
+    void Promise.resolve(onLoginSuccess());
+  }, [onLoginSuccess]);
 
   if (!isOpen) return null;
 
   return (
     <AuthModalShell onClose={onClose}>
+      {message ? (
+        <p className="mb-4 rounded border border-[#f0d9a8] bg-[#fffdf5] px-3 py-2.5 text-center text-sm text-[#7a6522]">
+          {message}
+        </p>
+      ) : null}
+
       {view === "login" ? (
         <LoginForm onNavigate={setView} onSuccess={handleLoginSuccess} />
       ) : null}

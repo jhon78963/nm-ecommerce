@@ -115,6 +115,15 @@
   color: #222;
 }
 
+.tracking-panel__title {
+  margin: 0 0 10px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #777;
+}
+
 .tracking-panel ul {
   display: flex;
   flex-wrap: wrap;
@@ -327,6 +336,46 @@
 .order-confirmation__number strong {
   font-size: 22px;
   color: var(--theme-color);
+}
+
+.order-confirmation__status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: -8px 0 24px;
+  font-size: 14px;
+  color: #555;
+}
+
+.order-status-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 20px;
+  padding: 16px 18px;
+  border: 1px solid #eee;
+  background: #fafafa;
+}
+
+.order-status-summary__item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.order-status-summary__label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #777;
+}
+
+.order-status-summary__value {
+  font-size: 15px;
+  color: #222;
 }
 
 .order-confirmation__steps {

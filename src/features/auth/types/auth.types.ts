@@ -33,6 +33,11 @@ export interface AuthMessageResponse {
 
 export type AuthModalView = "login" | "forgot-password" | "register";
 
+export interface OpenLoginOptions {
+  message?: string;
+  initialView?: AuthModalView;
+}
+
 export interface LoginActionState {
   success: boolean;
   error: string | null;

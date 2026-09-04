@@ -5,7 +5,7 @@ import {
   getCustomerAccessToken,
   setCustomerAuthTokens,
 } from "@/features/customer-auth/utils/customer-auth-cookies";
-import type { CustomerUser } from "@/features/customer-auth/types/customer-auth.types";
+import type { CustomerUser, WelcomeCoupon } from "@/features/customer-auth/types/customer-auth.types";
 import {
   getAuthErrorMessage,
   getCustomerProfile,
@@ -14,7 +14,11 @@ import {
 } from "@/features/customer-auth/services/customer-auth.service";
 
 export async function registerCustomerAction(
-  _prevState: { success: boolean; error: string | null },
+  _prevState: {
+    success: boolean;
+    error: string | null;
+    welcomeCoupon?: WelcomeCoupon | null;
+  },
   formData: FormData,
 ) {
   const name = String(formData.get("name") ?? "").trim();
@@ -37,7 +41,7 @@ export async function registerCustomerAction(
   try {
     const data = await registerCustomer({ name, email, password });
     await setCustomerAuthTokens(data.access_token, data.refresh_token);
-    return { success: true, error: null };
+    return { success: true, error: null, welcomeCoupon: data.welcomeCoupon ?? null };
   } catch (error) {
     return {
       success: false,

@@ -4,6 +4,7 @@ export interface CustomerOrderSummary {
   status: string;
   statusLabel: string;
   paymentStatus: string;
+  paymentStatusLabel?: string;
   paymentMethodTitle: string;
   total: number;
   createdAt: string;
