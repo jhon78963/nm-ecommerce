@@ -21,6 +21,8 @@ export interface ProductBoxItem {
   isNew?: boolean;
   cashDiscount?: number;
   percentageDiscount?: number;
+  /** Código de barras / SKU del producto cuando el catálogo lo expone. */
+  sku?: string;
   /** Backend-pending: tallas y colores disponibles para el producto. */
   sizes?: ProductSize[];
 }

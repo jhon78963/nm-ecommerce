@@ -19,8 +19,7 @@ export const PDP_COPY = {
   outOfStock: "Agotado",
   addToWishlist: "Agregar a favoritos",
   removeFromWishlist: "En favoritos",
-  share: "Compartir",
-  compare: "Comparar",
+  whatsappInquiry: "Consultar por WhatsApp",
 
   selectSizeFirst: "Selecciona una talla",
   selectColorFirst: "Selecciona un color",

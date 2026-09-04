@@ -64,6 +64,7 @@ export function mapPublicProductToProductBoxItem(
     percentageDiscount: product.percentageDiscount
       ? Number(product.percentageDiscount) || undefined
       : undefined,
+    sku: product.barcode ?? undefined,
     sizes: mapPublicSizes(product.sizes),
   };
 }

@@ -1,13 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeftRight, Heart, Minus, Plus, RefreshCw, Share2, ShoppingCart, Star, Truck } from "lucide-react";
+import { ArrowLeftRight, Heart, Minus, Plus, ShoppingCart, Star, Truck } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 import { useCart } from "@/features/cart/context/CartProvider";
 import { cartLineHasValidVariant } from "@/features/cart/utils/cart-variant";
 import { PRODUCT_COPY } from "@/features/product/constants/product-copy";
 import { QUICK_VIEW_COPY } from "@/features/product/constants/quick-view-copy";
+import { ProductWhatsAppInquiryLink } from "@/features/product/components/ProductWhatsAppInquiryLink";
 import { ProductVariantSelectors } from "@/features/product/components/variants/ProductVariantSelectors";
 import {
   useProductVariantSelection,
@@ -228,14 +229,18 @@ export function ProductQuickViewDetails({
           <Heart className={cn("size-4", isWishlisted && "fill-theme text-theme")} />
           <span>{PRODUCT_COPY.addToWishlist}</span>
         </button>
-        <button type="button" className="quick-view-action-link" onClick={(event) => event.preventDefault()}>
-          <RefreshCw className="size-4" />
-          <span>{PRODUCT_COPY.compare}</span>
-        </button>
-        <button type="button" className="quick-view-action-link" onClick={(event) => event.preventDefault()}>
-          <Share2 className="size-4" />
-          <span>Compartir</span>
-        </button>
+        <ProductWhatsAppInquiryLink
+          label={QUICK_VIEW_COPY.whatsappInquiry}
+          productName={product.name}
+          sizeLabel={variantSelection.hasSizes ? variantSelection.selectedSize?.label ?? null : undefined}
+          colorLabel={
+            variantSelection.hasSizes && variantSelection.selectedSize
+              ? variantSelection.selectedColor?.label ?? null
+              : undefined
+          }
+          barcode={product.sku}
+          productPath={href}
+        />
       </div>
 
       <div className="bordered-box">

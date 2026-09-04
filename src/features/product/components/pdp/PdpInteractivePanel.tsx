@@ -1,17 +1,19 @@
 "use client";
 
-import { Heart, Minus, Plus, RefreshCw, Share2, ShoppingCart } from "lucide-react";
+import { Heart, Minus, Plus, ShoppingCart } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 import { useCart } from "@/features/cart/context/CartProvider";
+import { ProductWhatsAppInquiryLink } from "@/features/product/components/ProductWhatsAppInquiryLink";
 import { ProductVariantSelectors } from "@/features/product/components/variants/ProductVariantSelectors";
 import { PDP_COPY } from "@/features/product/constants/pdp-copy";
 import { useProductVariantSelection } from "@/features/product/hooks/use-product-variant-selection";
 import type { ProductDetail } from "@/features/product/types/product-detail.types";
 import { enrichProductWithVariants } from "@/features/product/utils/enrich-product-variants";
+import { getProductBoxHref } from "@/features/product/utils/format-product-price";
 import { clampQuantity, getVariantStock } from "@/features/product/utils/get-variant-stock";
-import { parseVariantSearchParams } from "@/features/product/utils/product-variant-url";
+import { buildProductHrefWithVariants, parseVariantSearchParams } from "@/features/product/utils/product-variant-url";
 import { useWishlist } from "@/features/wishlist/context/WishlistProvider";
 import { cn } from "@/lib/utils";
 
@@ -86,6 +88,10 @@ export function PdpInteractivePanel({ product }: PdpInteractivePanelProps) {
 
   const stockQty = availableStock;
   const showStockAlert = stockQty !== null && stockQty <= 5 && stockQty > 0;
+  const productPath = buildProductHrefWithVariants(getProductBoxHref(product), {
+    sizeId: variantSelection.selectedSizeId,
+    colorId: variantSelection.selectedColorId,
+  });
 
   return (
     <div>
@@ -193,23 +199,18 @@ export function PdpInteractivePanel({ product }: PdpInteractivePanelProps) {
           <span>{isWishlisted ? PDP_COPY.removeFromWishlist : PDP_COPY.addToWishlist}</span>
         </button>
 
-        <button
-          type="button"
-          className="quick-view-action-link"
-          onClick={(e) => e.preventDefault()}
-        >
-          <RefreshCw className="size-4" aria-hidden="true" />
-          <span>{PDP_COPY.compare}</span>
-        </button>
-
-        <button
-          type="button"
-          className="quick-view-action-link"
-          onClick={(e) => e.preventDefault()}
-        >
-          <Share2 className="size-4" aria-hidden="true" />
-          <span>{PDP_COPY.share}</span>
-        </button>
+        <ProductWhatsAppInquiryLink
+          label={PDP_COPY.whatsappInquiry}
+          productName={product.name}
+          sizeLabel={variantSelection.hasSizes ? variantSelection.selectedSize?.label ?? null : undefined}
+          colorLabel={
+            variantSelection.hasSizes && variantSelection.selectedSize
+              ? variantSelection.selectedColor?.label ?? null
+              : undefined
+          }
+          barcode={product.sku}
+          productPath={productPath}
+        />
       </div>
     </div>
   );

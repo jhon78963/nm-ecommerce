@@ -2,7 +2,7 @@
 
 import type { MouseEvent } from "react";
 import { useMemo } from "react";
-import { Heart, RefreshCw, Star } from "lucide-react";
+import { Heart, Star } from "lucide-react";
 import { StoreImage } from "@/components/ui/StoreImage";
 import Link from "next/link";
 
@@ -98,10 +98,6 @@ export function ProductBox({ product, fullHeight = false, featured = false }: Pr
   });
   const isOutOfStock = product.stockStatus === "out_of_stock";
 
-  const preventDefault = (event: MouseEvent<HTMLAnchorElement>) => {
-    event.preventDefault();
-  };
-
   const hoverActionClass = cn(
     actionButtonClass,
     "opacity-0 transition-opacity duration-300 group-hover:opacity-100 max-md:opacity-100",
@@ -160,11 +156,6 @@ export function ProductBox({ product, fullHeight = false, featured = false }: Pr
                 selectedSizeId={variantSelection.selectedSizeId}
                 selectedColorId={variantSelection.selectedColorId}
               />
-            </li>
-            <li>
-              <a href="#" title={PRODUCT_COPY.compare} className={hoverActionClass} onClick={preventDefault}>
-                <RefreshCw />
-              </a>
             </li>
           </ul>
         </div>
