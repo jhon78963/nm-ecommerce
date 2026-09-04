@@ -2,6 +2,15 @@ import type { ShopCollection } from "../types/shop.types";
 
 export const SHOP_PER_PAGE = 12;
 
+/** Colección virtual global — siempre disponible, no requiere configuración en admin. */
+export const SEARCH_COLLECTION_SLUG = "search";
+
+export const SEARCH_COLLECTION: ShopCollection = {
+  slug: SEARCH_COLLECTION_SLUG,
+  label: "Búsqueda",
+  description: "Resultados de búsqueda en toda la tienda",
+};
+
 export const SHOP_SORT_OPTIONS = [
   { value: "featured", label: "Relevancia" },
   { value: "price_asc", label: "Precio: menor a mayor" },

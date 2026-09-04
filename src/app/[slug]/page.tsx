@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 import { InstitutionalPageContent } from "@/features/institutional/components/InstitutionalPageContent";
 import {
@@ -8,6 +8,7 @@ import {
   isInstitutionalSlug,
 } from "@/features/institutional/constants/institutional-pages";
 import { ShopPage } from "@/features/shop/components/ShopPage";
+import { SEARCH_COLLECTION_SLUG } from "@/features/shop/constants/shop.constants";
 import {
   getShopCollectionBySlug,
   getShopCollectionProducts,
@@ -57,6 +58,25 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function SlugRoute({ params, searchParams }: PageProps) {
   const { slug } = await params;
+
+  if (slug === SEARCH_COLLECTION_SLUG) {
+    const rawParams = await searchParams;
+    const query = new URLSearchParams();
+
+    for (const [key, value] of Object.entries(rawParams)) {
+      if (Array.isArray(value)) {
+        value.forEach((item) => query.append(key, item));
+        continue;
+      }
+
+      if (value) {
+        query.set(key, value);
+      }
+    }
+
+    const suffix = query.toString();
+    redirect(suffix ? `/search?${suffix}` : "/search");
+  }
 
   if (isInstitutionalSlug(slug)) {
     return <InstitutionalPageContent slug={slug} />;

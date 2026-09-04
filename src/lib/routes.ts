@@ -18,7 +18,7 @@ export const ROUTES = {
     refunds: "/micuenta/reembolsos",
     favorites: "/micuenta/favoritos",
   },
-  search: "/buscar",
+  search: "/search",
   product: (slugOrId: string | number) => `/producto/${slugOrId}`,
   institutional: {
     nuestraEmpresa: "/nuestra-empresa",

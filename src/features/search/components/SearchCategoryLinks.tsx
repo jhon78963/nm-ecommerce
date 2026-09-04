@@ -5,7 +5,7 @@ import type { SearchCollection } from "@/features/search/types/search.types";
 
 interface SearchCategoryLinksProps {
   collections: SearchCollection[];
-  onNavigate: () => void;
+  onNavigate?: () => void;
 }
 
 export function SearchCategoryLinks({ collections, onNavigate }: SearchCategoryLinksProps) {
@@ -19,7 +19,7 @@ export function SearchCategoryLinks({ collections, onNavigate }: SearchCategoryL
           <li key={collection.id}>
             <Link
               href={ROUTES.collection(collection.slug)}
-              onClick={onNavigate}
+              onClick={() => onNavigate?.()}
               className="font-medium text-theme hover:underline"
             >
               {collection.label}

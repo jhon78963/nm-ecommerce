@@ -20,18 +20,34 @@ function resolveFacetLabel(
   return UUID_PATTERN.test(id) ? genericLabel : id;
 }
 
+function parseBooleanParam(value: string | undefined): boolean {
+  if (!value) return false;
+  return value === "true" || value === "1";
+}
+
+function normalizeSort(value: string | undefined): ShopSortOption {
+  if (!value) return "featured";
+  if (value === "new") return "newest";
+  if (value === "featured" || value === "price_asc" || value === "price_desc" || value === "newest") {
+    return value;
+  }
+  return "featured";
+}
+
 export function parseSearchParams(
   params: Record<string, string | string[] | undefined>,
 ): ParsedShopFilters {
   const raw = (key: string) => (Array.isArray(params[key]) ? params[key][0] : params[key]);
 
   return {
-    sort: (raw("sort") as ShopSortOption) ?? "featured",
+    sort: normalizeSort(raw("sort")),
     page: Math.max(1, Number(raw("page") ?? 1)),
     minPrice: raw("minPrice") ? Number(raw("minPrice")) : undefined,
     maxPrice: raw("maxPrice") ? Number(raw("maxPrice")) : undefined,
     tallas: raw("tallas") ? raw("tallas")!.split(",").filter(Boolean) : [],
     colores: raw("colores") ? raw("colores")!.split(",").filter(Boolean) : [],
+    q: raw("q")?.trim() ?? "",
+    onSale: parseBooleanParam(raw("onSale")),
   };
 }
 
@@ -81,6 +97,15 @@ export function getActiveFilters(
       label: resolveFacetLabel(colorId, facets.colors, "Color"),
       value: colorId,
     });
+  }
+
+  const query = searchParams.get("q")?.trim();
+  if (query) {
+    filters.push({ key: "q", label: `Búsqueda: ${query}`, value: query });
+  }
+
+  if (searchParams.get("onSale") === "true" || searchParams.get("onSale") === "1") {
+    filters.push({ key: "onSale", label: "En oferta", value: "true" });
   }
 
   return filters;

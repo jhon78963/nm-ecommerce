@@ -9,7 +9,7 @@ import type {
   ShopProductsFacets,
   ShopProductsResult,
 } from "../types/shop.types";
-import { FALLBACK_SHOP_COLLECTIONS, SHOP_PER_PAGE } from "../constants/shop.constants";
+import { FALLBACK_SHOP_COLLECTIONS, SEARCH_COLLECTION_SLUG, SHOP_PER_PAGE } from "../constants/shop.constants";
 
 interface ShopCollectionApiItem {
   id: string;
@@ -95,13 +95,18 @@ export async function getShopCollectionProducts(
   filters: ParsedShopFilters,
 ): Promise<ShopProductsResult> {
   const warehouseId = env.storeWarehouseId;
+  const emptyResult: ShopProductsResult = {
+    products: [],
+    totalCount: 0,
+    facets: { sizes: [], colors: [] },
+  };
+
+  if (collectionSlug === SEARCH_COLLECTION_SLUG && !filters.q) {
+    return emptyResult;
+  }
 
   if (!warehouseId) {
-    return {
-      products: [],
-      totalCount: 0,
-      facets: { sizes: [], colors: [] },
-    };
+    return emptyResult;
   }
 
   try {
@@ -116,6 +121,8 @@ export async function getShopCollectionProducts(
         sort: filters.sort,
         page: filters.page,
         perPage: SHOP_PER_PAGE,
+        q: filters.q || undefined,
+        onSale: filters.onSale ? true : undefined,
       },
       cache: "no-store",
     });

@@ -28,6 +28,8 @@ export interface ParsedShopFilters {
   maxPrice: number | undefined;
   tallas: string[];
   colores: string[];
+  q: string;
+  onSale: boolean;
 }
 
 export interface ShopProductsFacets {

@@ -20,7 +20,7 @@ interface MobileNavItem {
 
 const NAV_ITEMS: MobileNavItem[] = [
   { id: "home", label: "Inicio", href: "/", icon: Home },
-  { id: "search", label: "Buscar", href: "/buscar", icon: Search },
+  { id: "search", label: "Buscar", href: ROUTES.search, icon: Search },
   { id: "cart", label: "Carrito", href: ROUTES.cart, icon: ShoppingBag, isCart: true },
   { id: "wishlist", label: "Favoritos", href: "/favoritos", icon: Heart, isWishlist: true },
   { id: "user", label: "Cuenta", href: "/micuenta/miperfil", icon: User },
@@ -42,7 +42,7 @@ export function MobileBottomNav() {
             item.id === "home"
               ? pathname === "/"
               : item.id === "search"
-                ? pathname.startsWith("/buscar")
+                ? pathname.startsWith(ROUTES.search)
                 : pathname.startsWith(item.href);
 
           const Icon = item.icon;

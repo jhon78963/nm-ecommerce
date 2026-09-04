@@ -2,6 +2,7 @@
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { X } from "lucide-react";
+import { ROUTES } from "@/lib/routes";
 import { buildFilterUrl, getActiveFilters } from "../utils/shop-url.utils";
 import type { ShopActiveFilter, ShopProductsFacets } from "../types/shop.types";
 
@@ -23,6 +24,24 @@ export function ShopActiveFilters({ facets }: ShopActiveFiltersProps) {
       router.push(
         buildFilterUrl(pathname, searchParams, { minPrice: undefined, maxPrice: undefined }),
       );
+      return;
+    }
+    if (key === "q") {
+      const nextParams = new URLSearchParams(searchParams.toString());
+      nextParams.delete("q");
+      nextParams.delete("page");
+
+      if (pathname === ROUTES.search) {
+        const suffix = nextParams.toString();
+        router.push(suffix ? `${ROUTES.search}?${suffix}` : ROUTES.search);
+        return;
+      }
+
+      router.push(buildFilterUrl(pathname, searchParams, { q: undefined }));
+      return;
+    }
+    if (key === "onSale") {
+      router.push(buildFilterUrl(pathname, searchParams, { onSale: undefined }));
       return;
     }
     const current = (searchParams.get(key) ?? "").split(",").filter(Boolean);
@@ -55,7 +74,7 @@ export function ShopActiveFilters({ facets }: ShopActiveFiltersProps) {
 
       <button
         type="button"
-        onClick={() => router.push(pathname)}
+        onClick={() => router.push(pathname === ROUTES.search ? ROUTES.search : pathname)}
         className="text-[12px] text-theme underline underline-offset-2 hover:no-underline"
       >
         Limpiar todo

@@ -13,6 +13,7 @@ import {
 import { ProductBox } from "@/features/product/components/ProductBox";
 import { useSearchModalData } from "@/features/search/hooks/use-search-modal-data";
 import { useTypewriterPlaceholder } from "@/features/search/hooks/use-typewriter-placeholder";
+import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 
 interface SearchModalProps {
@@ -60,7 +61,7 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
       if (!trimmed) return;
 
       onClose();
-      router.push(`/buscar?q=${encodeURIComponent(trimmed)}`);
+      router.push(`${ROUTES.search}?q=${encodeURIComponent(trimmed)}`);
     },
     [onClose, query, router],
   );
