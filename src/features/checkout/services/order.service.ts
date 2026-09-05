@@ -2,6 +2,8 @@ import type { CartLineItem } from "@/features/cart/types/cart.types";
 import { resolveCartLineVariantIds } from "@/features/cart/utils/cart-variant";
 import type { CheckoutAddress } from "@/features/checkout/types/checkout.types";
 import type { OrderStatusSlug, PaymentStatusSlug, StoredOrder } from "@/features/checkout/types/order.types";
+import { normalizeOrderNumberForLookup } from "@/features/checkout/utils/order-number";
+import { saveOrder } from "@/features/checkout/utils/order-storage";
 
 interface ApiOrderItem {
   id: string;
@@ -183,10 +185,16 @@ export async function createOrder(payload: CreateOrderPayload): Promise<StoredOr
 }
 
 export async function trackOrder(orderNumber: string, contact: string): Promise<StoredOrder> {
-  const params = new URLSearchParams({ orderNumber, contact });
+  const params = new URLSearchParams({
+    orderNumber: normalizeOrderNumberForLookup(orderNumber),
+    contact,
+  });
   const response = await requestCheckoutApi<ApiOrder>(`/api/checkout/track?${params.toString()}`);
 
-  return mapApiOrderToStoredOrder(response);
+  const order = mapApiOrderToStoredOrder(response);
+  saveOrder(order);
+
+  return order;
 }
 
 export async function fetchPublicOrder(
@@ -195,7 +203,7 @@ export async function fetchPublicOrder(
 ): Promise<StoredOrder> {
   const params = new URLSearchParams({ email });
   const response = await requestCheckoutApi<ApiOrder>(
-    `/api/checkout/order/${encodeURIComponent(orderNumber)}?${params.toString()}`,
+    `/api/checkout/order/${encodeURIComponent(normalizeOrderNumberForLookup(orderNumber))}?${params.toString()}`,
   );
 
   return mapApiOrderToStoredOrder(response);

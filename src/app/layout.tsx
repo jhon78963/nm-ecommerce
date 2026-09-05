@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Montserrat } from "next/font/google";
+import { Suspense } from "react";
 
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
@@ -34,9 +35,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <WishlistProvider>
             <CartProvider>
               <QuickViewProvider>
-                <Header />
+                <Suspense fallback={<header className="h-20 w-full bg-white shadow-sm" aria-hidden />}>
+                  <Header />
+                </Suspense>
                 <main className="flex flex-1 flex-col">{children}</main>
-                <Footer />
+                <Suspense fallback={<footer className="h-40 w-full bg-[#f8f8f8]" aria-hidden />}>
+                  <Footer />
+                </Suspense>
               </QuickViewProvider>
             </CartProvider>
           </WishlistProvider>

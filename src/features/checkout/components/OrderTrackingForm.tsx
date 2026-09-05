@@ -8,6 +8,7 @@ import {
   getOrderApiErrorMessage,
   trackOrder,
 } from "@/features/checkout/services/order.service";
+import { saveOrder } from "@/features/checkout/utils/order-storage";
 import { ROUTES } from "@/lib/routes";
 
 import "./order.css";
@@ -32,6 +33,7 @@ export function OrderTrackingForm() {
 
     try {
       const order = await trackOrder(orderNumber, emailOrPhone);
+      saveOrder(order);
       router.push(
         `${ROUTES.orderDetails}?order_number=${encodeURIComponent(order.orderNumber)}&email_or_phone=${encodeURIComponent(emailOrPhone)}`,
       );

@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { CheckCircle2, ChevronRight } from "lucide-react";
 
@@ -11,38 +10,47 @@ import type { StoredOrder } from "@/features/checkout/types/order.types";
 import {
   fetchPublicOrder,
 } from "@/features/checkout/services/order.service";
+import { useOrderLookupParams } from "@/features/checkout/utils/order-lookup-params";
+import { findOrder, saveOrder } from "@/features/checkout/utils/order-storage";
 import { ROUTES } from "@/lib/routes";
 
 import "./order.css";
 
 export function OrderConfirmationContent() {
-  const searchParams = useSearchParams();
+  const { orderNumber, email } = useOrderLookupParams();
   const [order, setOrder] = useState<StoredOrder | null>(null);
-  const [isHydrated, setIsHydrated] = useState(false);
-
-  const orderNumber = searchParams.get("order_number") ?? "";
-  const email = searchParams.get("email") ?? "";
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (!orderNumber || !email) {
       setOrder(null);
-      setIsHydrated(true);
+      setIsLoading(false);
       return;
     }
 
+    const cachedOrder = findOrder(orderNumber, email);
+    if (cachedOrder) {
+      setOrder(cachedOrder);
+    }
+
     let cancelled = false;
+    setIsLoading(true);
 
     fetchPublicOrder(orderNumber, email)
       .then((result) => {
         if (!cancelled) {
           setOrder(result);
-          setIsHydrated(true);
+          saveOrder(result);
         }
       })
       .catch(() => {
-        if (!cancelled) {
+        if (!cancelled && !cachedOrder) {
           setOrder(null);
-          setIsHydrated(true);
+        }
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setIsLoading(false);
         }
       });
 
@@ -51,8 +59,12 @@ export function OrderConfirmationContent() {
     };
   }, [email, orderNumber]);
 
-  if (!isHydrated) {
-    return null;
+  if (isLoading && !order) {
+    return (
+      <div className="order-empty-state" aria-busy="true">
+        <p>Cargando confirmación del pedido...</p>
+      </div>
+    );
   }
 
   if (!order) {

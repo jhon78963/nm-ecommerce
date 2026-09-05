@@ -35,6 +35,7 @@ import {
   readCheckoutDraftFromStorage,
   writeCheckoutDraftToStorage,
 } from "@/features/checkout/utils/checkout-storage";
+import { saveOrder } from "@/features/checkout/utils/order-storage";
 import { ROUTES } from "@/lib/routes";
 
 import "./checkout.css";
@@ -391,6 +392,7 @@ export function CheckoutForm() {
       );
 
       const order = await createOrder(payload);
+      saveOrder(order);
 
       clearCheckoutDraftFromStorage();
       clearCart();

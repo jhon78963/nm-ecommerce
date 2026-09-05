@@ -69,8 +69,9 @@ async function resolveLeftPanel(
 async function resolveRightPanel(
   config: HomeCategoryProductSectionConfig,
 ): Promise<HomeCategoryProductSectionView["rightPanel"]> {
-  const productCategory = config.rightPanel.productCategory;
-  const tabsConfig = productCategory.tabs ?? [];
+  const rightPanel = config.rightPanel;
+  const productCategory = rightPanel?.productCategory;
+  const tabsConfig = productCategory?.tabs ?? [];
   const tabs = tabsConfig.map((tab) => ({
     id: tab.id,
     name: tab.name,
@@ -79,7 +80,7 @@ async function resolveRightPanel(
 
   const productsByCategoryId: Record<string, ProductBoxItem[]> = {};
 
-  if (productCategory.status !== false) {
+  if (productCategory?.status !== false) {
     await Promise.all(
       tabs.map(async (tab) => {
         const tabConfig = tabsConfig.find((item) => item.id === tab.id);
@@ -98,17 +99,17 @@ async function resolveRightPanel(
   const activeTabs = tabs.filter((tab) => (productsByCategoryId[tab.id]?.length ?? 0) > 0);
 
   const banner =
-    config.rightPanel.productBanner?.status !== false && config.rightPanel.productBanner?.imageUrl
+    rightPanel?.productBanner?.status !== false && rightPanel?.productBanner?.imageUrl
       ? {
-          ...config.rightPanel.productBanner,
-          imageUrl: resolveStoreMediaUrl(config.rightPanel.productBanner.imageUrl),
+          ...rightPanel.productBanner,
+          imageUrl: resolveStoreMediaUrl(rightPanel.productBanner.imageUrl),
         }
       : null;
 
   return {
     productCategory: {
-      title: productCategory.title,
-      status: productCategory.status !== false && activeTabs.length > 0,
+      title: productCategory?.title ?? "",
+      status: productCategory?.status !== false && activeTabs.length > 0,
       tabs: activeTabs,
       productsByCategoryId,
     },

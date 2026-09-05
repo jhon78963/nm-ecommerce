@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ArrowLeft, ChevronRight } from "lucide-react";
 
@@ -14,39 +13,47 @@ import { CHECKOUT_COPY } from "@/features/checkout/constants/checkout-copy";
 import { getDepartmentName } from "@/features/checkout/constants/peru-departments";
 import type { StoredOrder } from "@/features/checkout/types/order.types";
 import { formatAddress, formatFullName } from "@/features/checkout/utils/address";
+import { useOrderLookupParams } from "@/features/checkout/utils/order-lookup-params";
+import { findOrder } from "@/features/checkout/utils/order-storage";
 import { trackOrder } from "@/features/checkout/services/order.service";
 import { ROUTES } from "@/lib/routes";
 
 import "./order.css";
 
 export function OrderDetailsContent() {
-  const searchParams = useSearchParams();
+  const { orderNumber, emailOrPhone } = useOrderLookupParams();
   const [order, setOrder] = useState<StoredOrder | null>(null);
-  const [isHydrated, setIsHydrated] = useState(false);
-
-  const orderNumber = searchParams.get("order_number") ?? "";
-  const emailOrPhone = searchParams.get("email_or_phone") ?? "";
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (!orderNumber || !emailOrPhone) {
       setOrder(null);
-      setIsHydrated(true);
+      setIsLoading(false);
       return;
     }
 
+    const cachedOrder = findOrder(orderNumber, emailOrPhone);
+    if (cachedOrder) {
+      setOrder(cachedOrder);
+    }
+
     let cancelled = false;
+    setIsLoading(true);
 
     trackOrder(orderNumber, emailOrPhone)
       .then((result) => {
         if (!cancelled) {
           setOrder(result);
-          setIsHydrated(true);
         }
       })
       .catch(() => {
-        if (!cancelled) {
+        if (!cancelled && !cachedOrder) {
           setOrder(null);
-          setIsHydrated(true);
+        }
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setIsLoading(false);
         }
       });
 
@@ -55,8 +62,12 @@ export function OrderDetailsContent() {
     };
   }, [emailOrPhone, orderNumber]);
 
-  if (!isHydrated) {
-    return null;
+  if (isLoading && !order) {
+    return (
+      <div className="order-empty-state" aria-busy="true">
+        <p>Cargando detalle del pedido...</p>
+      </div>
+    );
   }
 
   if (!order) {

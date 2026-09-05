@@ -24,7 +24,7 @@ export async function getHomeServices(): Promise<HomeServiceItem[]> {
 }
 
 function filterActiveServices(config: HomeServicesConfig): HomeServiceItem[] {
-  return config.services
+  return (config.services ?? [])
     .filter((service) => service.status !== false && service.title)
     .map((service) => ({
       ...service,

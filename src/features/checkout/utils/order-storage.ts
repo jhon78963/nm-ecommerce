@@ -1,5 +1,6 @@
 import { ORDER_STORAGE_KEY } from "@/features/checkout/constants/order-storage";
 import type { StoredOrder } from "@/features/checkout/types/order.types";
+import { normalizeOrderNumberForLookup } from "@/features/checkout/utils/order-number";
 
 function isStoredOrder(value: unknown): value is StoredOrder {
   if (!value || typeof value !== "object") return false;
@@ -41,7 +42,7 @@ export function saveOrder(order: StoredOrder) {
 }
 
 export function findOrder(orderNumber: string, emailOrPhone: string): StoredOrder | null {
-  const normalizedOrderNumber = orderNumber.trim().toUpperCase();
+  const normalizedOrderNumber = normalizeOrderNumberForLookup(orderNumber);
   const normalizedContact = emailOrPhone.trim().toLowerCase();
 
   return (
@@ -58,7 +59,7 @@ export function findOrder(orderNumber: string, emailOrPhone: string): StoredOrde
 }
 
 export function getOrderByNumber(orderNumber: string): StoredOrder | null {
-  const normalized = orderNumber.trim().toUpperCase();
+  const normalized = normalizeOrderNumberForLookup(orderNumber);
   return (
     readOrdersFromStorage().find((order) => order.orderNumber.toUpperCase() === normalized) ?? null
   );
