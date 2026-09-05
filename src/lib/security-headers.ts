@@ -3,28 +3,49 @@ function readEnv(name: string): string | undefined {
   return value || undefined;
 }
 
-function getApiOrigin(): string | undefined {
-  const apiBase =
-    readEnv("API_BASE_URL") ??
-    readEnv("NEXT_PUBLIC_API_BASE_URL") ??
-    "http://localhost:3000/api/v1";
+function getPublicAppOrigin(): string | undefined {
+  const appUrl = readEnv("NEXT_PUBLIC_APP_URL");
+  if (!appUrl) {
+    return undefined;
+  }
 
   try {
-    return new URL(apiBase).origin;
+    return new URL(appUrl).origin;
   } catch {
     return undefined;
   }
 }
 
-function buildContentSecurityPolicyReportOnly(): string {
-  const apiOrigin = getApiOrigin();
-  const connectSrc = ["'self'", "https://www.google.com", "https://www.gstatic.com"];
+/** Orígenes que el navegador puede usar (no URLs internas Docker como gateway:3000). */
+function getBrowserConnectOrigins(): string[] {
+  const origins = new Set<string>(["'self'"]);
 
-  if (apiOrigin) {
-    connectSrc.push(apiOrigin);
+  const appOrigin = getPublicAppOrigin();
+  if (appOrigin) {
+    origins.add(appOrigin);
   }
 
-  return [
+  const publicApiBase = readEnv("NEXT_PUBLIC_API_BASE_URL");
+  if (publicApiBase) {
+    try {
+      origins.add(new URL(publicApiBase).origin);
+    } catch {
+      // Ignore invalid public API URL.
+    }
+  }
+
+  // reCAPTCHA v3
+  origins.add("https://www.google.com");
+  origins.add("https://www.gstatic.com");
+
+  return [...origins];
+}
+
+function buildContentSecurityPolicy(): string {
+  const connectSrc = getBrowserConnectOrigins();
+  const isProduction = process.env.NODE_ENV === "production";
+
+  const directives = [
     "default-src 'self'",
     "script-src 'self' 'unsafe-inline' https://www.google.com https://www.gstatic.com",
     "style-src 'self' 'unsafe-inline'",
@@ -36,15 +57,27 @@ function buildContentSecurityPolicyReportOnly(): string {
     "base-uri 'self'",
     "form-action 'self'",
     "frame-ancestors 'self'",
-  ].join("; ");
+  ];
+
+  if (isProduction) {
+    directives.push("upgrade-insecure-requests");
+  }
+
+  return directives.join("; ");
 }
 
 export function buildSecurityHeaders(): Record<string, string> {
+  const csp = buildContentSecurityPolicy();
+  const enforceCsp =
+    process.env.CSP_ENFORCE !== "false" && process.env.NODE_ENV === "production";
+
   return {
     "X-Frame-Options": "SAMEORIGIN",
     "X-Content-Type-Options": "nosniff",
     "Referrer-Policy": "strict-origin-when-cross-origin",
     "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
-    "Content-Security-Policy-Report-Only": buildContentSecurityPolicyReportOnly(),
+    ...(enforceCsp
+      ? { "Content-Security-Policy": csp }
+      : { "Content-Security-Policy-Report-Only": csp }),
   };
 }
