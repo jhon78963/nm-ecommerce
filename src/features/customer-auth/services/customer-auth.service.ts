@@ -22,6 +22,10 @@ export async function loginCustomer(payload: {
   return apiPost<CustomerAuthResponse>("auth/customer/login", payload);
 }
 
+export async function loginCustomerWithGoogle(idToken: string) {
+  return apiPost<CustomerAuthResponse>("auth/customer/google", { id_token: idToken });
+}
+
 export async function getCustomerProfile(accessToken: string) {
   return apiGet<CustomerUser>("auth/customer/me", { token: accessToken });
 }

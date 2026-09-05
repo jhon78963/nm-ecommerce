@@ -15,6 +15,7 @@ import {
   getShopCollections,
 } from "@/features/shop/services/shop.service";
 import { parseSearchParams } from "@/features/shop/utils/shop-url.utils";
+import { getSiteUrl } from "@/features/seo/constants/site-meta";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -34,22 +35,41 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
+  const siteUrl = getSiteUrl();
+  const canonical = `${siteUrl}/${slug}`;
 
   const institutionalMeta = getInstitutionalPageMeta(slug);
   if (institutionalMeta) {
+    const title = `${institutionalMeta.title} | Novedades Maritex`;
+
     return {
-      title: `${institutionalMeta.title} | Novedades Maritex`,
+      title,
       description: institutionalMeta.description,
+      alternates: { canonical },
+      openGraph: {
+        title,
+        description: institutionalMeta.description,
+        url: canonical,
+      },
     };
   }
 
   const collection = await getShopCollectionBySlug(slug);
   if (collection) {
+    const title = `${collection.label} — Novedades Maritex`;
+    const description =
+      collection.description ??
+      `Explora nuestra colección de ${collection.label.toLowerCase()}.`;
+
     return {
-      title: `${collection.label} — Novedades Maritex`,
-      description:
-        collection.description ??
-        `Explora nuestra colección de ${collection.label.toLowerCase()}.`,
+      title,
+      description,
+      alternates: { canonical },
+      openGraph: {
+        title,
+        description,
+        url: canonical,
+      },
     };
   }
 

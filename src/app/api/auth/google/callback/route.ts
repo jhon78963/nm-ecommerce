@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 
-import { loginWithGoogle } from "@/features/auth/services/auth.service";
-import { setAuthCookies } from "@/features/auth/utils/auth-cookies";
+import { loginCustomerWithGoogle } from "@/features/customer-auth/services/customer-auth.service";
+import {
+  setCustomerAuthTokens,
+} from "@/features/customer-auth/utils/customer-auth-cookies";
 import {
   clearGoogleOAuthCookies,
   exchangeGoogleCode,
@@ -38,8 +40,8 @@ export async function GET(request: Request) {
 
   try {
     const googleTokens = await exchangeGoogleCode(code);
-    const session = await loginWithGoogle(googleTokens.id_token);
-    await setAuthCookies(session.access_token, session.refresh_token);
+    const session = await loginCustomerWithGoogle(googleTokens.id_token);
+    await setCustomerAuthTokens(session.access_token, session.refresh_token);
 
     if (stored.intent === "register") {
       redirectUrl.searchParams.set("auth_success", "registered");

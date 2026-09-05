@@ -2,6 +2,7 @@
 
 import {
   createContext,
+  Suspense,
   useCallback,
   useContext,
   useEffect,
@@ -12,6 +13,7 @@ import {
 
 import { logoutCustomerAction } from "@/features/customer-auth/actions/customer-auth.actions";
 import type { CustomerUser } from "@/features/customer-auth/types/customer-auth.types";
+import { AuthQueryHandler } from "@/features/auth/components/AuthQueryHandler";
 import { LoginModal } from "@/features/auth/components/LoginModal";
 import type { AuthModalView, OpenLoginOptions } from "@/features/auth/types/auth.types";
 
@@ -94,6 +96,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AuthContext.Provider value={value}>
+      <Suspense fallback={null}>
+        <AuthQueryHandler />
+      </Suspense>
       {children}
       <LoginModal
         isOpen={isLoginOpen}

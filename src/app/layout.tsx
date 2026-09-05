@@ -8,7 +8,13 @@ import { AuthProvider } from "@/features/auth/context/AuthProvider";
 import { CartProvider } from "@/features/cart/context/CartProvider";
 import { QuickViewProvider } from "@/features/product/context/QuickViewProvider";
 import { ExitTagline } from "@/features/seo/components/ExitTagline";
-import { getDefaultDocumentTitle, SITE_META } from "@/features/seo/constants/site-meta";
+import {
+  buildDefaultOpenGraph,
+  buildDefaultTwitter,
+  getDefaultDocumentTitle,
+  getSiteUrl,
+  SITE_META,
+} from "@/features/seo/constants/site-meta";
 import { WishlistProvider } from "@/features/wishlist/context/WishlistProvider";
 
 import "./globals.css";
@@ -22,8 +28,14 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: getDefaultDocumentTitle(),
+  metadataBase: new URL(getSiteUrl()),
+  title: {
+    default: getDefaultDocumentTitle(),
+    template: "%s | Novedades Maritex",
+  },
   description: SITE_META.description,
+  openGraph: buildDefaultOpenGraph(),
+  twitter: buildDefaultTwitter(),
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

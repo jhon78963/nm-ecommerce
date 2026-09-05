@@ -1,5 +1,7 @@
 import type { NextConfig } from "next";
 
+import { buildSecurityHeaders } from "./src/lib/security-headers";
+
 function getApiBaseUrl(): string {
   return (
     process.env.API_BASE_URL ??
@@ -59,6 +61,16 @@ const nextConfig: NextConfig = {
       {
         source: "/store-media/:path*",
         destination: `${apiBase}/storage/files/:path*`,
+      },
+    ];
+  },
+  async headers() {
+    const securityHeaders = buildSecurityHeaders();
+
+    return [
+      {
+        source: "/:path*",
+        headers: Object.entries(securityHeaders).map(([key, value]) => ({ key, value })),
       },
     ];
   },
