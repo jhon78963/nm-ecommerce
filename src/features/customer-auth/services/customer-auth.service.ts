@@ -9,11 +9,16 @@ export async function registerCustomer(payload: {
   name: string;
   email: string;
   password: string;
+  captchaToken?: string;
 }) {
   return apiPost<CustomerAuthResponse>("auth/customer/register", payload);
 }
 
-export async function loginCustomer(payload: { email: string; password: string }) {
+export async function loginCustomer(payload: {
+  email: string;
+  password: string;
+  captchaToken?: string;
+}) {
   return apiPost<CustomerAuthResponse>("auth/customer/login", payload);
 }
 

@@ -25,6 +25,7 @@ export async function registerCustomerAction(
   const email = String(formData.get("email") ?? "").trim();
   const password = String(formData.get("password") ?? "");
   const passwordConfirmation = String(formData.get("password_confirmation") ?? "");
+  const captchaToken = String(formData.get("captchaToken") ?? "").trim() || undefined;
 
   if (!name || !email || !password) {
     return { success: false, error: "Completa todos los campos obligatorios." };
@@ -39,7 +40,7 @@ export async function registerCustomerAction(
   }
 
   try {
-    const data = await registerCustomer({ name, email, password });
+    const data = await registerCustomer({ name, email, password, captchaToken });
     await setCustomerAuthTokens(data.access_token, data.refresh_token);
     return { success: true, error: null, welcomeCoupon: data.welcomeCoupon ?? null };
   } catch (error) {
@@ -56,13 +57,14 @@ export async function loginCustomerAction(
 ) {
   const email = String(formData.get("email") ?? formData.get("username") ?? "").trim();
   const password = String(formData.get("password") ?? "");
+  const captchaToken = String(formData.get("captchaToken") ?? "").trim() || undefined;
 
   if (!email || !password) {
     return { success: false, error: "Correo y contraseña son obligatorios." };
   }
 
   try {
-    const data = await loginCustomer({ email, password });
+    const data = await loginCustomer({ email, password, captchaToken });
     await setCustomerAuthTokens(data.access_token, data.refresh_token);
     return { success: true, error: null };
   } catch (error) {

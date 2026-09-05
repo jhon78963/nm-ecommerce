@@ -1,12 +1,14 @@
 "use client";
 
-import { useActionState, useEffect } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { useFormStatus } from "react-dom";
 
 import { loginCustomerAction } from "@/features/customer-auth/actions/customer-auth.actions";
 import { AuthSocialSection } from "@/features/auth/components/AuthSocialSection";
 import { AuthTitle } from "@/features/auth/components/AuthTitle";
 import type { AuthModalView, LoginActionState } from "@/features/auth/types/auth.types";
+import { RECAPTCHA_ACTIONS } from "@/lib/recaptcha/constants";
+import { handleFormWithRecaptcha } from "@/lib/recaptcha/form";
 
 interface LoginFormProps {
   onNavigate: (view: AuthModalView) => void;
@@ -36,6 +38,7 @@ function SubmitButton() {
 
 export function LoginForm({ onNavigate, onSuccess }: LoginFormProps) {
   const [state, formAction] = useActionState(loginCustomerAction, initialState);
+  const [captchaError, setCaptchaError] = useState<string | null>(null);
 
   useEffect(() => {
     if (state.success) onSuccess();
@@ -45,11 +48,23 @@ export function LoginForm({ onNavigate, onSuccess }: LoginFormProps) {
     <>
       <AuthTitle title="Ingresar" />
 
-      {state.error ? (
-        <p className="mb-4 text-center text-sm font-medium text-red-600">{state.error}</p>
+      {state.error || captchaError ? (
+        <p className="mb-4 text-center text-sm font-medium text-red-600">
+          {state.error ?? captchaError}
+        </p>
       ) : null}
 
-      <form action={formAction} className="auth-form-box">
+      <form
+        className="auth-form-box"
+        onSubmit={(event) =>
+          handleFormWithRecaptcha(
+            event,
+            RECAPTCHA_ACTIONS.customerLogin,
+            formAction,
+            (message) => setCaptchaError(message),
+          )
+        }
+      >
         <div className="auth-box mb-3">
           <label htmlFor="username" className={labelClassName}>
             Correo electrónico

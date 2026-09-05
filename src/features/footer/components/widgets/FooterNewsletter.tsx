@@ -4,6 +4,8 @@ import { useState, type FormEvent } from "react";
 
 import { subscribeToNewsletter } from "@/features/footer/services/newsletter.service";
 import type { StoreFooterConfig } from "@/features/footer/types/footer.types";
+import { RECAPTCHA_ACTIONS } from "@/lib/recaptcha/constants";
+import { executeRecaptcha } from "@/lib/recaptcha/client";
 
 interface FooterNewsletterProps {
   title: StoreFooterConfig["newsletterTitle"];
@@ -49,7 +51,15 @@ export function FooterNewsletter({ title, subtitle }: FooterNewsletterProps) {
     setIsSubmitting(true);
 
     try {
-      const response = await subscribeToNewsletter(trimmedEmail);
+      let captchaToken: string | undefined;
+      try {
+        captchaToken = await executeRecaptcha(RECAPTCHA_ACTIONS.newsletterSubscribe);
+      } catch {
+        setError("No pudimos verificar la seguridad del formulario. Intenta de nuevo.");
+        return;
+      }
+
+      const response = await subscribeToNewsletter(trimmedEmail, captchaToken);
       setIsSubmitted(true);
       setSuccessMessage(response.message);
       setEmail("");

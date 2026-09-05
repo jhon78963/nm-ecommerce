@@ -51,6 +51,7 @@ export interface CreateOrderPayload {
   shippingMethodId: string;
   paymentMethodId: string;
   couponCode?: string;
+  captchaToken?: string;
   items: Array<{
     productId: string;
     productSizeId: string;

@@ -8,6 +8,8 @@ import { AuthSocialSection } from "@/features/auth/components/AuthSocialSection"
 import { AuthTitle } from "@/features/auth/components/AuthTitle";
 import type { AuthModalView } from "@/features/auth/types/auth.types";
 import { formatCouponDiscount } from "@/features/checkout/types/coupon.types";
+import { RECAPTCHA_ACTIONS } from "@/lib/recaptcha/constants";
+import { handleFormWithRecaptcha } from "@/lib/recaptcha/form";
 
 interface RegisterFormProps {
   onNavigate: (view: AuthModalView) => void;
@@ -26,6 +28,7 @@ export function RegisterForm({ onNavigate, onSuccess }: RegisterFormProps) {
     welcomeCoupon: null,
   });
   const [welcomeDismissed, setWelcomeDismissed] = useState(false);
+  const [captchaError, setCaptchaError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!state.success) return;
@@ -62,11 +65,23 @@ export function RegisterForm({ onNavigate, onSuccess }: RegisterFormProps) {
     <>
       <AuthTitle title="Crear cuenta" />
 
-      {state.error ? (
-        <p className="mb-4 text-center text-sm font-medium text-red-600">{state.error}</p>
+      {state.error || captchaError ? (
+        <p className="mb-4 text-center text-sm font-medium text-red-600">
+          {state.error ?? captchaError}
+        </p>
       ) : null}
 
-      <form action={formAction} className="auth-form-box">
+      <form
+        className="auth-form-box"
+        onSubmit={(event) =>
+          handleFormWithRecaptcha(
+            event,
+            RECAPTCHA_ACTIONS.customerRegister,
+            formAction,
+            (message) => setCaptchaError(message),
+          )
+        }
+      >
         <div className="auth-box form-box mb-3">
           <label htmlFor="name" className={labelClassName}>
             Nombre

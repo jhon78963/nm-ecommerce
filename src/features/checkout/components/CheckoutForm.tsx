@@ -37,6 +37,8 @@ import {
 } from "@/features/checkout/utils/checkout-storage";
 import { saveOrder } from "@/features/checkout/utils/order-storage";
 import { ROUTES } from "@/lib/routes";
+import { RECAPTCHA_ACTIONS } from "@/lib/recaptcha/constants";
+import { executeRecaptcha } from "@/lib/recaptcha/client";
 
 import "./checkout.css";
 
@@ -391,7 +393,17 @@ export function CheckoutForm() {
         items,
       );
 
-      const order = await createOrder(payload);
+      let captchaToken: string | undefined;
+      try {
+        captchaToken = await executeRecaptcha(RECAPTCHA_ACTIONS.checkoutOrder);
+      } catch {
+        isCompletingOrderRef.current = false;
+        setIsSubmitting(false);
+        setSubmitError("No pudimos verificar la seguridad del formulario. Intenta de nuevo.");
+        return;
+      }
+
+      const order = await createOrder({ ...payload, captchaToken });
       saveOrder(order);
 
       clearCheckoutDraftFromStorage();

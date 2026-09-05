@@ -6,9 +6,13 @@ export interface SubscribeNewsletterResponse {
   message: string;
 }
 
-export async function subscribeToNewsletter(email: string): Promise<SubscribeNewsletterResponse> {
+export async function subscribeToNewsletter(
+  email: string,
+  captchaToken?: string,
+): Promise<SubscribeNewsletterResponse> {
   return apiPost<SubscribeNewsletterResponse>("ecommerce/newsletter/subscribe", {
     email,
     source: "footer",
+    ...(captchaToken ? { captchaToken } : {}),
   });
 }
