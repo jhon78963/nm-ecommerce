@@ -41,4 +41,7 @@ export const env = {
   get googleClientSecret(): string | undefined {
     return readEnv("GOOGLE_CLIENT_SECRET");
   },
+  get recaptchaSiteKey(): string | undefined {
+    return readEnv("NEXT_PUBLIC_RECAPTCHA_SITE_KEY");
+  },
 } as const;

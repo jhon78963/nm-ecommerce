@@ -5,6 +5,7 @@ interface RequestOptions {
   cache?: RequestCache;
   token?: string;
   revalidate?: number | false;
+  tags?: string[];
   timeoutMs?: number;
 }
 
@@ -64,14 +65,16 @@ function buildUrl(path: string, params?: RequestOptions["params"]) {
 }
 
 export async function apiGet<T>(path: string, options: RequestOptions = {}): Promise<T> {
-  const { revalidate, cache, timeoutMs = DEFAULT_TIMEOUT_MS, ...rest } = options;
+  const { revalidate, cache, tags, timeoutMs = DEFAULT_TIMEOUT_MS, ...rest } = options;
 
   try {
     const response = await fetch(buildUrl(path, rest.params), {
       method: "GET",
       headers: getHeaders(rest.token),
       cache: cache ?? (revalidate !== undefined ? "force-cache" : "no-store"),
-      ...(revalidate !== undefined ? { next: { revalidate } } : {}),
+      ...(revalidate !== undefined || tags?.length
+        ? { next: { ...(revalidate !== undefined ? { revalidate } : {}), ...(tags?.length ? { tags } : {}) } }
+        : {}),
       signal: AbortSignal.timeout(timeoutMs),
     });
 

@@ -16,6 +16,8 @@ import { formatAddress, formatFullName } from "@/features/checkout/utils/address
 import { useOrderLookupParams } from "@/features/checkout/utils/order-lookup-params";
 import { findOrder } from "@/features/checkout/utils/order-storage";
 import { trackOrder } from "@/features/checkout/services/order.service";
+import { RECAPTCHA_ACTIONS } from "@/lib/recaptcha/constants";
+import { executeRecaptcha } from "@/lib/recaptcha/client";
 import { ROUTES } from "@/lib/routes";
 
 import "./order.css";
@@ -40,7 +42,8 @@ export function OrderDetailsContent() {
     let cancelled = false;
     setIsLoading(true);
 
-    trackOrder(orderNumber, emailOrPhone)
+    executeRecaptcha(RECAPTCHA_ACTIONS.orderTrack)
+      .then((captchaToken) => trackOrder(orderNumber, emailOrPhone, captchaToken))
       .then((result) => {
         if (!cancelled) {
           setOrder(result);

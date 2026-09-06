@@ -9,6 +9,8 @@ import {
   trackOrder,
 } from "@/features/checkout/services/order.service";
 import { saveOrder } from "@/features/checkout/utils/order-storage";
+import { RECAPTCHA_ACTIONS } from "@/lib/recaptcha/constants";
+import { executeRecaptcha } from "@/lib/recaptcha/client";
 import { ROUTES } from "@/lib/routes";
 
 import "./order.css";
@@ -32,7 +34,16 @@ export function OrderTrackingForm() {
     setError(null);
 
     try {
-      const order = await trackOrder(orderNumber, emailOrPhone);
+      let captchaToken: string | undefined;
+      try {
+        captchaToken = await executeRecaptcha(RECAPTCHA_ACTIONS.orderTrack);
+      } catch {
+        setError("No pudimos verificar la seguridad del formulario. Intenta de nuevo.");
+        setIsSubmitting(false);
+        return;
+      }
+
+      const order = await trackOrder(orderNumber, emailOrPhone, captchaToken);
       saveOrder(order);
       router.push(
         `${ROUTES.orderDetails}?order_number=${encodeURIComponent(order.orderNumber)}&email_or_phone=${encodeURIComponent(emailOrPhone)}`,

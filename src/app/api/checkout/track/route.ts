@@ -2,10 +2,24 @@ import { NextResponse } from "next/server";
 
 import { proxyEcommerceJson, readUpstreamError } from "@/lib/ecommerce-backend";
 
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const orderNumber = searchParams.get("orderNumber")?.trim();
-  const contact = searchParams.get("contact")?.trim();
+interface TrackOrderBody {
+  orderNumber?: string;
+  contact?: string;
+  captchaToken?: string;
+}
+
+export async function POST(request: Request) {
+  let body: TrackOrderBody;
+
+  try {
+    body = (await request.json()) as TrackOrderBody;
+  } catch {
+    return NextResponse.json({ message: "Solicitud inválida." }, { status: 400 });
+  }
+
+  const orderNumber = body.orderNumber?.trim();
+  const contact = body.contact?.trim();
+  const captchaToken = body.captchaToken?.trim();
 
   if (!orderNumber || !contact) {
     return NextResponse.json(
@@ -14,8 +28,14 @@ export async function GET(request: Request) {
     );
   }
 
-  const query = new URLSearchParams({ orderNumber, contact });
-  const response = await proxyEcommerceJson(`/ecommerce/orders/track?${query.toString()}`);
+  const response = await proxyEcommerceJson("/ecommerce/orders/track", {
+    method: "POST",
+    body: JSON.stringify({
+      orderNumber,
+      contact,
+      ...(captchaToken ? { captchaToken } : {}),
+    }),
+  });
 
   const text = await response.text();
 

@@ -185,12 +185,19 @@ export async function createOrder(payload: CreateOrderPayload): Promise<StoredOr
   return mapApiOrderToStoredOrder(response);
 }
 
-export async function trackOrder(orderNumber: string, contact: string): Promise<StoredOrder> {
-  const params = new URLSearchParams({
-    orderNumber: normalizeOrderNumberForLookup(orderNumber),
-    contact,
+export async function trackOrder(
+  orderNumber: string,
+  contact: string,
+  captchaToken?: string,
+): Promise<StoredOrder> {
+  const response = await requestCheckoutApi<ApiOrder>("/api/checkout/track", {
+    method: "POST",
+    body: JSON.stringify({
+      orderNumber: normalizeOrderNumberForLookup(orderNumber),
+      contact,
+      ...(captchaToken ? { captchaToken } : {}),
+    }),
   });
-  const response = await requestCheckoutApi<ApiOrder>(`/api/checkout/track?${params.toString()}`);
 
   const order = mapApiOrderToStoredOrder(response);
   saveOrder(order);
