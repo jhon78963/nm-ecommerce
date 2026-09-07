@@ -100,6 +100,20 @@ function getPublicKey(): string {
   return publicKey;
 }
 
+function resolveCulqiLogoUrl(): string {
+  const configured = process.env.NEXT_PUBLIC_CULQI_LOGO_URL?.trim();
+  if (configured) {
+    return configured;
+  }
+
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL?.trim().replace(/\/$/, "");
+  if (appUrl) {
+    return `${appUrl}/logo.png`;
+  }
+
+  return "https://novedadesmaritex.net.pe/logo.png";
+}
+
 function loadScript(id: string, src: string): Promise<void> {
   const existing = document.getElementById(id);
   if (existing) {
@@ -202,6 +216,9 @@ export async function openCulqiCheckout(params: OpenCulqiCheckoutParams): Promis
         bancaMovil: false,
         agente: false,
         cuotealo: false,
+      },
+      style: {
+        logo: resolveCulqiLogoUrl(),
       },
     });
 
