@@ -1,15 +1,28 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { AccountEmptyState } from "@/features/account/components/AccountEmptyState";
 import { AccountModal } from "@/features/account/components/AccountModal";
+import { fetchCustomerOrders } from "@/features/account/services/account-orders.service";
 import {
   createRefundRequest,
   fetchCustomerRefunds,
 } from "@/features/account/services/account-refunds.service";
-import type { CustomerRefund } from "@/features/account/types/account.types";
+import type { CustomerOrderSummary, CustomerRefund } from "@/features/account/types/account.types";
 import { formatPrice } from "@/features/cart/utils/format-price";
+import { normalizeOrderNumberForLookup } from "@/features/checkout/utils/order-number";
+
+const REFUND_ELIGIBLE_ORDER_STATUSES = new Set([
+  "processing",
+  "shipped",
+  "out-for-delivery",
+  "delivered",
+]);
+
+function isRefundEligible(order: CustomerOrderSummary): boolean {
+  return order.paymentStatus === "paid" && REFUND_ELIGIBLE_ORDER_STATUSES.has(order.status);
+}
 
 function refundBadgeClass(status: string) {
   const normalized = status.toLowerCase();
@@ -41,6 +54,13 @@ export function AccountRefunds() {
   const [orderNumber, setOrderNumber] = useState("");
   const [reason, setReason] = useState("");
   const [saving, setSaving] = useState(false);
+  const [eligibleOrders, setEligibleOrders] = useState<CustomerOrderSummary[]>([]);
+  const [loadingEligibleOrders, setLoadingEligibleOrders] = useState(false);
+
+  const selectedEligibleOrder = useMemo(
+    () => eligibleOrders.find((order) => order.orderNumber === orderNumber) ?? null,
+    [eligibleOrders, orderNumber],
+  );
 
   const loadRefunds = () => {
     setLoading(true);
@@ -59,14 +79,46 @@ export function AccountRefunds() {
     loadRefunds();
   }, []);
 
+  useEffect(() => {
+    if (!modalOpen) {
+      return;
+    }
+
+    let cancelled = false;
+    setLoadingEligibleOrders(true);
+
+    fetchCustomerOrders(1, 50)
+      .then((response) => {
+        if (cancelled) return;
+        setEligibleOrders(response.orders.filter(isRefundEligible));
+      })
+      .catch(() => {
+        if (!cancelled) setEligibleOrders([]);
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingEligibleOrders(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [modalOpen]);
+
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setSaving(true);
     setError(null);
 
+    const normalizedOrderNumber = normalizeOrderNumberForLookup(orderNumber);
+    if (!normalizedOrderNumber) {
+      setError("Ingresa un número de pedido válido.");
+      setSaving(false);
+      return;
+    }
+
     try {
       await createRefundRequest({
-        orderNumber: orderNumber.trim(),
+        orderNumber: normalizedOrderNumber,
         reason: reason.trim(),
       });
       setModalOpen(false);
@@ -139,16 +191,57 @@ export function AccountRefunds() {
 
       <AccountModal title="Solicitar reembolso" isOpen={modalOpen} onClose={() => setModalOpen(false)}>
         <form className="account-form" onSubmit={handleSubmit}>
-          <label className="account-form-field">
-            <span>Número de pedido</span>
-            <input
-              type="text"
-              value={orderNumber}
-              onChange={(event) => setOrderNumber(event.target.value)}
-              placeholder="Ej: NM-2026-000123"
-              required
-            />
-          </label>
+          <p className="account-form-hint">
+            Solo puedes solicitar reembolso de pedidos <strong>pagados</strong> que ya estén en preparación,
+            envío o entregados. Si el pago sigue pendiente, espera a que lo confirmemos.
+          </p>
+
+          {loadingEligibleOrders ? (
+            <p className="account-loading">Cargando pedidos elegibles…</p>
+          ) : null}
+
+          {!loadingEligibleOrders && eligibleOrders.length > 0 ? (
+            <label className="account-form-field">
+              <span>Selecciona tu pedido</span>
+              <select
+                value={orderNumber}
+                onChange={(event) => setOrderNumber(event.target.value)}
+                required
+              >
+                <option value="">Elige un pedido</option>
+                {eligibleOrders.map((order) => (
+                  <option key={order.id} value={order.orderNumber}>
+                    #{order.orderNumber} — {formatPrice(order.total)} ({order.statusLabel})
+                  </option>
+                ))}
+              </select>
+            </label>
+          ) : (
+            <label className="account-form-field">
+              <span>Número de pedido</span>
+              <input
+                type="text"
+                value={orderNumber}
+                onChange={(event) => setOrderNumber(event.target.value)}
+                placeholder="Ej: NM-20260906-0006"
+                required
+              />
+            </label>
+          )}
+
+          {!loadingEligibleOrders && eligibleOrders.length === 0 ? (
+            <p className="account-form-message">
+              No encontramos pedidos pagados elegibles en tu cuenta. Si el pago aún está pendiente, no
+              podrás solicitar reembolso hasta confirmarlo.
+            </p>
+          ) : null}
+
+          {selectedEligibleOrder ? (
+            <p className="account-form-hint">
+              Pedido #{selectedEligibleOrder.orderNumber} ·{" "}
+              {selectedEligibleOrder.paymentStatusLabel ?? "Pagado"}
+            </p>
+          ) : null}
           <label className="account-form-field">
             <span>Motivo de la solicitud</span>
             <textarea

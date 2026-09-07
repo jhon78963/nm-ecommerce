@@ -1,4 +1,5 @@
 import type { CustomerRefund } from "@/features/account/types/account.types";
+import { normalizeOrderNumberForLookup } from "@/features/checkout/utils/order-number";
 
 async function parseError(response: Response, fallback: string) {
   try {
@@ -22,7 +23,10 @@ export async function createRefundRequest(payload: { orderNumber: string; reason
   const response = await fetch("/api/account/refunds", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
+    body: JSON.stringify({
+      orderNumber: normalizeOrderNumberForLookup(payload.orderNumber),
+      reason: payload.reason.trim(),
+    }),
   });
 
   if (!response.ok) {
