@@ -161,7 +161,7 @@ export function useLiveOrderSync({
       return;
     }
 
-    if (order.paymentMethodId !== "culqi" || order.paymentStatus !== "pending") {
+    if (order.paymentStatus !== "pending") {
       return;
     }
 
@@ -193,7 +193,7 @@ export function useLiveOrderSync({
       cancelled = true;
       clearInterval(interval);
     };
-  }, [contact, enabled, order, orderNumber]);
+  }, [contact, enabled, order?.paymentStatus, orderNumber]);
 
   const lookupEmail = order?.email || (isEmailContact(contact) ? contact : "");
   const isAwaitingPayment =
