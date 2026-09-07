@@ -28,6 +28,65 @@ export interface OpenCulqiCheckoutParams {
   title?: string;
 }
 
+export class CulqiCheckoutCancelledError extends Error {
+  constructor(
+    message = "Cancelaste el pago. Tu pedido fue anulado y puedes intentarlo de nuevo.",
+  ) {
+    super(message);
+    this.name = "CulqiCheckoutCancelledError";
+  }
+}
+
+function isCulqiModalOpen(): boolean {
+  const overlay = document.getElementById("culqi-js");
+  if (overlay) {
+    const style = window.getComputedStyle(overlay);
+    if (style.display !== "none" && style.visibility !== "hidden") {
+      return true;
+    }
+  }
+
+  const checkout = document.querySelector(".culqi_checkout");
+  if (!checkout) {
+    return false;
+  }
+
+  const style = window.getComputedStyle(checkout);
+  return style.display !== "none" && style.visibility !== "hidden";
+}
+
+function watchCulqiModalDismiss(onDismiss: () => void): () => void {
+  let modalWasOpen = false;
+
+  const check = () => {
+    if (isCulqiModalOpen()) {
+      modalWasOpen = true;
+      return;
+    }
+
+    if (modalWasOpen) {
+      cleanup();
+      onDismiss();
+    }
+  };
+
+  const intervalId = window.setInterval(check, 250);
+  const observer = new MutationObserver(check);
+  observer.observe(document.documentElement, {
+    childList: true,
+    subtree: true,
+    attributes: true,
+    attributeFilter: ["style", "class", "hidden"],
+  });
+
+  const cleanup = () => {
+    window.clearInterval(intervalId);
+    observer.disconnect();
+  };
+
+  return cleanup;
+}
+
 export function isCulqiConfigured(): boolean {
   return Boolean(process.env.NEXT_PUBLIC_CULQI_PUBLIC_KEY?.trim());
 }
@@ -93,10 +152,25 @@ export async function openCulqiCheckout(params: OpenCulqiCheckoutParams): Promis
       return;
     }
 
+    let settled = false;
+    let stopWatching: (() => void) | null = null;
+
+    const settle = (handler: () => void) => {
+      if (settled) return;
+      settled = true;
+      stopWatching?.();
+      handler();
+    };
+
+    stopWatching = watchCulqiModalDismiss(() => {
+      settle(() => reject(new CulqiCheckoutCancelledError()));
+    });
+
     window.culqi = () => {
-      if (window.Culqi?.token?.id) {
-        window.Culqi.close();
-        resolve(window.Culqi.token.id);
+      const tokenId = window.Culqi?.token?.id;
+      if (tokenId) {
+        window.Culqi?.close?.();
+        settle(() => resolve(tokenId));
         return;
       }
 
@@ -105,7 +179,7 @@ export async function openCulqiCheckout(params: OpenCulqiCheckoutParams): Promis
         window.Culqi?.error?.user_message ??
         window.Culqi?.error?.merchant_message ??
         "No pudimos procesar el pago.";
-      reject(new Error(message));
+      settle(() => reject(new Error(message)));
     };
 
     window.Culqi.publicKey = publicKey;
