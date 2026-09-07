@@ -1,69 +1,32 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { ArrowLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, ChevronRight, Loader2 } from "lucide-react";
 
 import { StoreImage } from "@/components/ui/StoreImage";
 import { formatPrice } from "@/features/cart/utils/format-price";
+import { BacsPaymentInstructions } from "@/features/checkout/components/BacsPaymentInstructions";
 import { OrderStatusSummary } from "@/features/checkout/components/OrderStatusSummary";
 import { OrderStatusTracker } from "@/features/checkout/components/OrderStatusTracker";
 import { PaymentStatusBadge } from "@/features/checkout/components/PaymentStatusBadge";
 import { CHECKOUT_COPY } from "@/features/checkout/constants/checkout-copy";
 import { getDepartmentName } from "@/features/checkout/constants/peru-departments";
-import type { StoredOrder } from "@/features/checkout/types/order.types";
+import { useLiveOrderSync } from "@/features/checkout/hooks/use-live-order-sync";
 import { formatAddress, formatFullName } from "@/features/checkout/utils/address";
 import { useOrderLookupParams } from "@/features/checkout/utils/order-lookup-params";
-import { findOrder } from "@/features/checkout/utils/order-storage";
-import { trackOrder } from "@/features/checkout/services/order.service";
-import { RECAPTCHA_ACTIONS } from "@/lib/recaptcha/constants";
-import { executeRecaptcha } from "@/lib/recaptcha/client";
 import { ROUTES } from "@/lib/routes";
 
 import "./order.css";
 
 export function OrderDetailsContent() {
-  const { orderNumber, emailOrPhone } = useOrderLookupParams();
-  const [order, setOrder] = useState<StoredOrder | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    if (!orderNumber || !emailOrPhone) {
-      setOrder(null);
-      setIsLoading(false);
-      return;
-    }
-
-    const cachedOrder = findOrder(orderNumber, emailOrPhone);
-    if (cachedOrder) {
-      setOrder(cachedOrder);
-    }
-
-    let cancelled = false;
-    setIsLoading(true);
-
-    executeRecaptcha(RECAPTCHA_ACTIONS.orderTrack)
-      .then((captchaToken) => trackOrder(orderNumber, emailOrPhone, captchaToken))
-      .then((result) => {
-        if (!cancelled) {
-          setOrder(result);
-        }
-      })
-      .catch(() => {
-        if (!cancelled && !cachedOrder) {
-          setOrder(null);
-        }
-      })
-      .finally(() => {
-        if (!cancelled) {
-          setIsLoading(false);
-        }
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [emailOrPhone, orderNumber]);
+  const { orderNumber, emailOrPhone, email } = useOrderLookupParams();
+  const contact = emailOrPhone || email;
+  const { order, isLoading, isAwaitingPayment, paymentError } = useLiveOrderSync({
+    orderNumber,
+    contact,
+    enabled: Boolean(orderNumber && contact),
+    processPendingCharge: false,
+  });
 
   if (isLoading && !order) {
     return (
@@ -97,8 +60,27 @@ export function OrderDetailsContent() {
         </h1>
       </div>
 
+      {isAwaitingPayment ? (
+        <p className="order-confirmation__processing">
+          <Loader2 className="mr-2 inline size-4 animate-spin" aria-hidden="true" />
+          {CHECKOUT_COPY.confirmationPaymentProcessing}
+        </p>
+      ) : null}
+
+      {paymentError ? (
+        <p className="order-confirmation__error" role="alert">
+          {paymentError || CHECKOUT_COPY.confirmationPaymentFailed}
+        </p>
+      ) : null}
+
       <OrderStatusSummary order={order} />
       <OrderStatusTracker order={order} />
+
+      {order.paymentMethodId === "bacs" && order.paymentStatus === "pending" ? (
+        <div className="order-details__bacs-payment">
+          <BacsPaymentInstructions orderNumber={order.orderNumber} total={order.total} />
+        </div>
+      ) : null}
 
       <div className="dashboard-table">
         <table className="order-table">

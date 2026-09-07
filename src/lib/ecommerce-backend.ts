@@ -27,13 +27,21 @@ export async function proxyEcommerceJson(
   const baseUrl = getEcommerceServiceBaseUrl();
   const normalizedPath = path.startsWith("/") ? path : `/${path}`;
 
+  const hasBody = init?.body !== undefined && init?.body !== null && init.body !== "";
+  const headers = new Headers(init?.headers);
+  headers.set("Accept", "application/json");
+
+  if (hasBody) {
+    if (!headers.has("Content-Type")) {
+      headers.set("Content-Type", "application/json");
+    }
+  } else {
+    headers.delete("Content-Type");
+  }
+
   return fetch(`${baseUrl}${normalizedPath}`, {
     ...init,
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-      ...init?.headers,
-    },
+    headers,
     cache: "no-store",
   });
 }

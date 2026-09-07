@@ -44,4 +44,19 @@ export const env = {
   get recaptchaSiteKey(): string | undefined {
     return readEnv("NEXT_PUBLIC_RECAPTCHA_SITE_KEY");
   },
+  get culqiPublicKey(): string | undefined {
+    return readEnv("NEXT_PUBLIC_CULQI_PUBLIC_KEY");
+  },
+  /** Número Yape para pagos manuales (solo dígitos). Por defecto usa WhatsApp de atención. */
+  get yapePhone(): string {
+    return readEnv("NEXT_PUBLIC_YAPE_PHONE") ?? this.whatsappPhone;
+  },
+  /** Imagen QR Yape (ruta en /public o URL absoluta). */
+  get yapeQrImageUrl(): string {
+    return readEnv("NEXT_PUBLIC_YAPE_QR_IMAGE_URL") ?? "/payments/yape-qr.png";
+  },
+  /** Nombre enmascarado del titular Yape (como aparece al escanear). */
+  get yapeMerchantName(): string {
+    return readEnv("NEXT_PUBLIC_YAPE_MERCHANT_NAME") ?? "Maria Cer*";
+  },
 } as const;

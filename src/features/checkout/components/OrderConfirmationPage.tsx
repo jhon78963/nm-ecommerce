@@ -1,63 +1,26 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { CheckCircle2, ChevronRight } from "lucide-react";
+import { CheckCircle2, ChevronRight, Loader2 } from "lucide-react";
 
 import { CHECKOUT_COPY } from "@/features/checkout/constants/checkout-copy";
+import { BacsPaymentInstructions } from "@/features/checkout/components/BacsPaymentInstructions";
 import { PaymentStatusBadge } from "@/features/checkout/components/PaymentStatusBadge";
-import type { StoredOrder } from "@/features/checkout/types/order.types";
-import {
-  fetchPublicOrder,
-} from "@/features/checkout/services/order.service";
+import { useLiveOrderSync } from "@/features/checkout/hooks/use-live-order-sync";
 import { useOrderLookupParams } from "@/features/checkout/utils/order-lookup-params";
-import { findOrder, saveOrder } from "@/features/checkout/utils/order-storage";
 import { ROUTES } from "@/lib/routes";
 
 import "./order.css";
 
 export function OrderConfirmationContent() {
-  const { orderNumber, email } = useOrderLookupParams();
-  const [order, setOrder] = useState<StoredOrder | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    if (!orderNumber || !email) {
-      setOrder(null);
-      setIsLoading(false);
-      return;
-    }
-
-    const cachedOrder = findOrder(orderNumber, email);
-    if (cachedOrder) {
-      setOrder(cachedOrder);
-    }
-
-    let cancelled = false;
-    setIsLoading(true);
-
-    fetchPublicOrder(orderNumber, email)
-      .then((result) => {
-        if (!cancelled) {
-          setOrder(result);
-          saveOrder(result);
-        }
-      })
-      .catch(() => {
-        if (!cancelled && !cachedOrder) {
-          setOrder(null);
-        }
-      })
-      .finally(() => {
-        if (!cancelled) {
-          setIsLoading(false);
-        }
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [email, orderNumber]);
+  const { orderNumber, email, emailOrPhone } = useOrderLookupParams();
+  const contact = email || emailOrPhone;
+  const { order, isLoading, isAwaitingPayment, paymentError } = useLiveOrderSync({
+    orderNumber,
+    contact,
+    enabled: Boolean(orderNumber && contact),
+    processPendingCharge: true,
+  });
 
   if (isLoading && !order) {
     return (
@@ -82,10 +45,24 @@ export function OrderConfirmationContent() {
   return (
     <div className="order-confirmation">
       <div className="order-confirmation__icon">
-        <CheckCircle2 className="size-16 text-theme" />
+        {isAwaitingPayment ? (
+          <Loader2 className="size-16 animate-spin text-theme" aria-hidden="true" />
+        ) : (
+          <CheckCircle2 className="size-16 text-theme" />
+        )}
       </div>
       <h1>{CHECKOUT_COPY.confirmationTitle}</h1>
       <p>{CHECKOUT_COPY.confirmationDescription}</p>
+
+      {isAwaitingPayment ? (
+        <p className="order-confirmation__processing">{CHECKOUT_COPY.confirmationPaymentProcessing}</p>
+      ) : null}
+
+      {paymentError ? (
+        <p className="order-confirmation__error" role="alert">
+          {paymentError || CHECKOUT_COPY.confirmationPaymentFailed}
+        </p>
+      ) : null}
 
       <div className="order-confirmation__number">
         <span>{CHECKOUT_COPY.confirmationOrderNumber}</span>
@@ -99,7 +76,12 @@ export function OrderConfirmationContent() {
 
       <div className="order-confirmation__steps">
         <h3>{CHECKOUT_COPY.confirmationNextSteps}</h3>
-        {order.paymentMethodId === "bacs" ? <p>{CHECKOUT_COPY.confirmationBacs}</p> : null}
+        {order.paymentMethodId === "bacs" && order.paymentStatus === "pending" ? (
+          <>
+            <p>{CHECKOUT_COPY.confirmationBacs}</p>
+            <BacsPaymentInstructions orderNumber={order.orderNumber} total={order.total} />
+          </>
+        ) : null}
         <p>
           Puedes hacer seguimiento de tu pedido con tu número de orden y correo o teléfono.
         </p>

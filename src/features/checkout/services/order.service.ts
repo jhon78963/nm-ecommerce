@@ -185,6 +185,45 @@ export async function createOrder(payload: CreateOrderPayload): Promise<StoredOr
   return mapApiOrderToStoredOrder(response);
 }
 
+export async function chargeCulqiOrder(params: {
+  orderNumber: string;
+  email: string;
+  culqiToken: string;
+  captchaToken?: string;
+}): Promise<{ orderNumber: string; paymentStatus: PaymentStatusSlug; culqiChargeId?: string | null }> {
+  return requestCheckoutApi("/api/checkout/payments/culqi/charge", {
+    method: "POST",
+    body: JSON.stringify(params),
+  });
+}
+
+export async function prepareCulqiCheckout(params: {
+  orderNumber: string;
+  email: string;
+  captchaToken?: string;
+}): Promise<{
+  culqiOrderId: string;
+  amountInCentimos: number;
+  rsaId: string;
+  rsaPublicKey: string;
+}> {
+  return requestCheckoutApi("/api/checkout/payments/culqi/prepare", {
+    method: "POST",
+    body: JSON.stringify(params),
+  });
+}
+
+export async function cancelCheckoutOrder(params: {
+  orderNumber: string;
+  email: string;
+  captchaToken?: string;
+}): Promise<{ orderNumber: string; status: OrderStatusSlug; paymentStatus: PaymentStatusSlug }> {
+  return requestCheckoutApi("/api/checkout/order/cancel", {
+    method: "POST",
+    body: JSON.stringify(params),
+  });
+}
+
 export async function trackOrder(
   orderNumber: string,
   contact: string,

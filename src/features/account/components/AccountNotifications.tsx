@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { AccountEmptyState } from "@/features/account/components/AccountEmptyState";
@@ -14,12 +15,26 @@ import type {
   CustomerNotification,
   CustomerNotificationSettings,
 } from "@/features/account/types/account.types";
+import { ROUTES } from "@/lib/routes";
 
 function formatDate(value: string) {
   return new Intl.DateTimeFormat("es-PE", {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(new Date(value));
+}
+
+function getNotificationHref(notification: CustomerNotification): string | null {
+  const orderNumber = notification.metadata?.orderNumber?.trim();
+  if (notification.type === "order" && orderNumber) {
+    return ROUTES.account.orderDetail(orderNumber);
+  }
+
+  if (notification.type === "refund") {
+    return ROUTES.account.refunds;
+  }
+
+  return null;
 }
 
 export function AccountNotifications() {
@@ -60,6 +75,8 @@ export function AccountNotifications() {
     try {
       const updated = await updateNotificationSettings({ [key]: nextValue });
       setSettings(updated);
+      const items = await fetchCustomerNotifications();
+      setNotifications(items);
     } catch (err) {
       setError(err instanceof Error ? err.message : "No se pudieron guardar las preferencias.");
     } finally {
@@ -150,7 +167,10 @@ export function AccountNotifications() {
 
         {!loading && notifications.length > 0 ? (
           <ul className="account-notification-list">
-            {notifications.map((notification) => (
+            {notifications.map((notification) => {
+              const href = getNotificationHref(notification);
+
+              return (
               <li
                 key={notification.id}
                 className={notification.readAt ? "" : "is-unread"}
@@ -166,9 +186,19 @@ export function AccountNotifications() {
               >
                 <h4>{notification.title}</h4>
                 <p>{notification.message}</p>
+                {href ? (
+                  <Link
+                    href={href}
+                    className="account-link-button"
+                    onClick={(event) => event.stopPropagation()}
+                  >
+                    Ver detalle
+                  </Link>
+                ) : null}
                 <time dateTime={notification.createdAt}>{formatDate(notification.createdAt)}</time>
               </li>
-            ))}
+              );
+            })}
           </ul>
         ) : null}
       </div>

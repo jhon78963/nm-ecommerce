@@ -1,0 +1,44 @@
+.payment-status-badge,
+.account-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 2px;
+  padding: 4px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+
+.payment-status-badge--pending,
+.payment-status-badge--processing,
+.account-badge--pending,
+.account-badge--processing {
+  background: #fff3e0;
+  color: #e65100;
+}
+
+.payment-status-badge--paid,
+.payment-status-badge--delivered,
+.account-badge--paid,
+.account-badge--delivered {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.payment-status-badge--cancelled,
+.payment-status-badge--failed,
+.account-badge--cancelled,
+.account-badge--failed {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.payment-status-badge--shipped,
+.payment-status-badge--out-for-delivery,
+.account-badge--shipped,
+.account-badge--out-for-delivery {
+  background: #e3f2fd;
+  color: #1565c0;
+}

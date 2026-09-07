@@ -3,6 +3,8 @@ import {
   paymentStatusBadgeClass,
 } from "@/features/checkout/constants/payment-statuses";
 
+import "./payment-status-badge.css";
+
 interface PaymentStatusBadgeProps {
   status?: string | null;
   label?: string | null;
@@ -14,7 +16,7 @@ export function PaymentStatusBadge({ status, label, className = "" }: PaymentSta
   const resolvedLabel = label?.trim() || formatPaymentStatus(resolvedStatus);
 
   return (
-    <span className={`account-badge ${paymentStatusBadgeClass(resolvedStatus)} ${className}`.trim()}>
+    <span className={`payment-status-badge ${paymentStatusBadgeClass(resolvedStatus)} ${className}`.trim()}>
       {resolvedLabel}
     </span>
   );

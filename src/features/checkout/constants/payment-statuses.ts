@@ -19,10 +19,10 @@ export function formatPaymentStatus(status?: string | null): string {
 export function paymentStatusBadgeClass(status?: string | null): string {
   const normalized = (status ?? "pending").toLowerCase();
 
-  if (normalized === "paid") return "account-badge--paid";
-  if (normalized === "failed") return "account-badge--failed";
-  if (normalized === "reviewing") return "account-badge--processing";
-  if (normalized === "refunded") return "account-badge--cancelled";
+  if (normalized === "paid") return "payment-status-badge--paid";
+  if (normalized === "failed") return "payment-status-badge--failed";
+  if (normalized === "reviewing") return "payment-status-badge--processing";
+  if (normalized === "refunded") return "payment-status-badge--cancelled";
 
-  return "account-badge--pending";
+  return "payment-status-badge--pending";
 }

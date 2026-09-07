@@ -13,6 +13,7 @@ import { CHECKOUT_COPY } from "@/features/checkout/constants/checkout-copy";
 import { PAYMENT_METHODS } from "@/features/checkout/constants/payment-methods";
 import { isTrujilloZone, resolveShippingZone } from "@/features/checkout/constants/peru-departments";
 import type { CheckoutAddress } from "@/features/checkout/types/checkout.types";
+import type { StoredOrder } from "@/features/checkout/types/order.types";
 import { createEmptyAddress } from "@/features/checkout/utils/address";
 import {
   addressPrefillChanged,
@@ -27,18 +28,25 @@ import {
 import { validateCheckoutCoupon } from "@/features/checkout/services/coupon.service";
 import {
   buildCreateOrderPayload,
+  cancelCheckoutOrder,
   createOrder,
   getOrderApiErrorMessage,
+  prepareCulqiCheckout,
 } from "@/features/checkout/services/order.service";
 import {
   clearCheckoutDraftFromStorage,
   readCheckoutDraftFromStorage,
   writeCheckoutDraftToStorage,
 } from "@/features/checkout/utils/checkout-storage";
+import {
+  clearCulqiPendingCharge,
+  storeCulqiPendingCharge,
+} from "@/features/checkout/utils/culqi-pending-charge";
 import { saveOrder } from "@/features/checkout/utils/order-storage";
 import { ROUTES } from "@/lib/routes";
 import { RECAPTCHA_ACTIONS } from "@/lib/recaptcha/constants";
 import { executeRecaptcha } from "@/lib/recaptcha/client";
+import { isCulqiConfigured, openCulqiCheckout } from "@/lib/culqi/client";
 
 import "./checkout.css";
 
@@ -404,6 +412,59 @@ export function CheckoutForm() {
       }
 
       const order = await createOrder({ ...payload, captchaToken });
+      let culqiOrderPendingRollback: StoredOrder | null =
+        paymentMethod.id === "culqi" ? order : null;
+
+      if (paymentMethod.id === "culqi") {
+        if (!isCulqiConfigured()) {
+          throw new Error("Los pagos con tarjeta o Yape no están disponibles en este momento.");
+        }
+
+        try {
+          const prepareCaptchaToken = await executeRecaptcha(RECAPTCHA_ACTIONS.checkoutOrder);
+          const culqiSession = await prepareCulqiCheckout({
+            orderNumber: order.orderNumber,
+            email: order.email,
+            captchaToken: prepareCaptchaToken,
+          });
+
+          const culqiToken = await openCulqiCheckout({
+            amountInCentimos: culqiSession.amountInCentimos,
+            email: order.email,
+            culqiOrderId: culqiSession.culqiOrderId,
+            rsaId: culqiSession.rsaId,
+            rsaPublicKey: culqiSession.rsaPublicKey,
+            title: `Pedido ${order.orderNumber}`,
+          });
+
+          storeCulqiPendingCharge({
+            orderNumber: order.orderNumber,
+            email: order.email,
+            culqiToken,
+          });
+          culqiOrderPendingRollback = null;
+        } catch (culqiError) {
+          if (culqiOrderPendingRollback) {
+            clearCulqiPendingCharge(
+              culqiOrderPendingRollback.orderNumber,
+              culqiOrderPendingRollback.email,
+            );
+            try {
+              const cancelCaptchaToken = await executeRecaptcha(RECAPTCHA_ACTIONS.checkoutOrder);
+              await cancelCheckoutOrder({
+                orderNumber: culqiOrderPendingRollback.orderNumber,
+                email: culqiOrderPendingRollback.email,
+                captchaToken: cancelCaptchaToken,
+              });
+            } catch {
+              // El backend también intenta revertir si el cargo falla.
+            }
+          }
+
+          throw culqiError;
+        }
+      }
+
       saveOrder(order);
 
       clearCheckoutDraftFromStorage();

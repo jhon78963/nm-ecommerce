@@ -348,6 +348,24 @@
   color: #555;
 }
 
+.order-confirmation__processing,
+.order-confirmation__error {
+  margin: -8px 0 20px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-size: 0.95rem;
+}
+
+.order-confirmation__processing {
+  background: #fff8eb;
+  color: #8a6116;
+}
+
+.order-confirmation__error {
+  background: #fff1f1;
+  color: #b42318;
+}
+
 .order-status-summary {
   display: flex;
   flex-wrap: wrap;
@@ -402,6 +420,170 @@
 
 .order-confirmation__steps p:last-child {
   margin-bottom: 0;
+}
+
+.bacs-payment {
+  margin-top: 16px;
+  padding: 20px;
+  border: 1px solid #eee;
+  background: #fff7f2;
+  text-align: left;
+}
+
+.bacs-payment__intro {
+  margin: 0 0 16px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #555;
+}
+
+.bacs-payment__amount,
+.bacs-payment__reference {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
+  padding: 12px 14px;
+  background: #fff;
+  border: 1px solid #eee;
+}
+
+.bacs-payment__amount span,
+.bacs-payment__reference span,
+.bacs-payment__yape-number > span {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #777;
+}
+
+.bacs-payment__amount strong {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--theme-color);
+}
+
+.bacs-payment__reference strong {
+  font-size: 18px;
+  color: #222;
+}
+
+.bacs-payment__qr {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin: 16px 0;
+  padding: 16px;
+  background: #fff;
+  border: 1px solid #eee;
+}
+
+.bacs-payment__qr-image {
+  width: min(260px, 100%);
+  height: auto;
+  object-fit: contain;
+  border-radius: 12px;
+}
+
+.bacs-payment__merchant-name {
+  margin: 4px 0 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: #742384;
+  letter-spacing: 0.01em;
+}
+
+.bacs-payment__qr-caption,
+.bacs-payment__qr-fallback,
+.bacs-payment__note {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #666;
+  text-align: center;
+}
+
+.bacs-payment__qr-fallback {
+  margin: 12px 0;
+  padding: 12px;
+  background: #fff;
+  border: 1px dashed #ddd;
+}
+
+.bacs-payment__yape-number {
+  margin-bottom: 16px;
+}
+
+.bacs-payment__yape-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.bacs-payment__yape-row strong {
+  font-size: 18px;
+  color: #222;
+}
+
+.bacs-payment__copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #ddd;
+  background: #fff;
+  color: #444;
+  padding: 6px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.bacs-payment__copy-btn:hover {
+  border-color: var(--theme-color);
+  color: var(--theme-color);
+}
+
+.bacs-payment__steps {
+  margin: 0 0 16px;
+  padding-left: 20px;
+  color: #555;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.bacs-payment__steps li + li {
+  margin-top: 6px;
+}
+
+.bacs-payment__whatsapp-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 14px 18px;
+  border: 1px solid #128c7e;
+  background: #25d366;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.bacs-payment__whatsapp-btn:hover {
+  background: #1fb855;
+}
+
+.bacs-payment__note {
+  margin-top: 12px;
+}
+
+.order-details__bacs-payment {
+  margin-bottom: 24px;
 }
 
 .order-confirmation__actions {

@@ -65,12 +65,24 @@ const nextConfig: NextConfig = {
     ];
   },
   async headers() {
-    const securityHeaders = buildSecurityHeaders();
+    const defaultSecurityHeaders = buildSecurityHeaders();
+    const checkoutSecurityHeaders = buildSecurityHeaders({ allowPaymentFrames: true });
+
+    const toHeaderEntries = (headers: Record<string, string>) =>
+      Object.entries(headers).map(([key, value]) => ({ key, value }));
 
     return [
       {
         source: "/:path*",
-        headers: Object.entries(securityHeaders).map(([key, value]) => ({ key, value })),
+        headers: toHeaderEntries(defaultSecurityHeaders),
+      },
+      {
+        source: "/checkout",
+        headers: toHeaderEntries(checkoutSecurityHeaders),
+      },
+      {
+        source: "/checkout/:path*",
+        headers: toHeaderEntries(checkoutSecurityHeaders),
       },
     ];
   },

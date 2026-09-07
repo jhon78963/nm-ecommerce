@@ -34,25 +34,56 @@ function getBrowserConnectOrigins(): string[] {
     }
   }
 
-  // reCAPTCHA v3
   origins.add("https://www.google.com");
   origins.add("https://www.gstatic.com");
+  origins.add("https://api.culqi.com");
+  origins.add("https://checkout.culqi.com");
+  origins.add("https://3ds.culqi.com");
+  origins.add("https://*.culqi.com");
 
   return [...origins];
 }
 
-function buildContentSecurityPolicy(): string {
+const CULQI_SCRIPT_SRC = [
+  "https://checkout.culqi.com",
+  "https://js.culqi.com",
+  "https://3ds.culqi.com",
+  "https://static.culqi.com",
+];
+
+const CULQI_FRAME_SRC = [
+  "https://checkout.culqi.com",
+  "https://3ds.culqi.com",
+  "https://js.culqi.com",
+  "https://static.culqi.com",
+  "https://*.culqi.com",
+  "https://*.cardinalcommerce.com",
+];
+
+interface BuildSecurityHeadersOptions {
+  /** Checkout/pago: permite iframes 3DS de bancos (URLs dinámicas). */
+  allowPaymentFrames?: boolean;
+}
+
+function buildContentSecurityPolicy(options: BuildSecurityHeadersOptions = {}): string {
   const connectSrc = getBrowserConnectOrigins();
   const isProduction = process.env.NODE_ENV === "production";
 
+  const frameSrc = [
+    "https://www.google.com",
+    "https://recaptcha.google.com",
+    ...CULQI_FRAME_SRC,
+    ...(options.allowPaymentFrames ? ["https:"] : []),
+  ];
+
   const directives = [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' https://www.google.com https://www.gstatic.com",
+    `script-src 'self' 'unsafe-inline' https://www.google.com https://www.gstatic.com ${CULQI_SCRIPT_SRC.join(" ")}`,
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: blob: https:",
     "font-src 'self' data:",
     `connect-src ${connectSrc.join(" ")}`,
-    "frame-src https://www.google.com https://recaptcha.google.com",
+    `frame-src ${frameSrc.join(" ")}`,
     "object-src 'none'",
     "base-uri 'self'",
     "form-action 'self'",
@@ -66,8 +97,10 @@ function buildContentSecurityPolicy(): string {
   return directives.join("; ");
 }
 
-export function buildSecurityHeaders(): Record<string, string> {
-  const csp = buildContentSecurityPolicy();
+export function buildSecurityHeaders(
+  options: BuildSecurityHeadersOptions = {},
+): Record<string, string> {
+  const csp = buildContentSecurityPolicy(options);
   const enforceCsp =
     process.env.CSP_ENFORCE !== "false" && process.env.NODE_ENV === "production";
 

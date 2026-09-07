@@ -58,7 +58,7 @@ export const CHECKOUT_COPY = {
     "Para usar cupones necesitas una cuenta. Inicia sesión o regístrate; tu carrito y los datos del checkout se mantendrán.",
   couponAccountHint: "Inicia sesión o crea una cuenta para aplicar cupones.",
 
-  culqiInfo: "Acepta pagos con tarjetas de débito y crédito, Yape.",
+  culqiInfo: "Acepta tarjetas de débito/crédito y Yape (código de 6 dígitos desde tu app).",
   privacyNotice:
     "Tus datos personales se utilizarán para procesar tu pedido, respaldar tu experiencia en este sitio web y para otros fines descritos en nuestra",
   privacyLink: "política de privacidad",
@@ -68,7 +68,26 @@ export const CHECKOUT_COPY = {
   continueShopping: "Seguir comprando",
 
   bacsInstructions:
-    "Realiza tu pago y envía el comprobante (captura) por WhatsApp o correo. Indica el número de pedido como referencia. Tu pedido se procesará al confirmar el pago.",
+    "Al confirmar tu pedido verás el QR de Yape, el monto exacto y un botón para enviar tu comprobante por WhatsApp. Tu pedido se preparará cuando confirmemos el pago.",
+  bacsPaymentIntro:
+    "Completa tu pago con Yape, Plin o transferencia y envíanos el comprobante por WhatsApp.",
+  bacsPaymentAmountLabel: "Monto a pagar",
+  bacsPaymentReferenceLabel: "Referencia (número de pedido)",
+  bacsPaymentQrAlt: "Código QR de Yape para pagar a Novedades Maritex",
+  bacsPaymentQrCaption: "Escanea con Yape y paga el monto exacto indicado arriba.",
+  bacsPaymentQrFallback:
+    "Si no ves el QR, escanea el número de Yape indicado abajo o escríbenos por WhatsApp.",
+  bacsPaymentYapeNumberLabel: "Número Yape",
+  bacsPaymentCopy: "Copiar",
+  bacsPaymentCopied: "Copiado",
+  bacsPaymentSteps: [
+    "Paga el monto exacto con Yape, Plin o transferencia bancaria.",
+    "Toma captura del comprobante.",
+    "Envíala por WhatsApp indicando tu número de pedido.",
+  ],
+  bacsPaymentWhatsAppButton: "Enviar comprobante por WhatsApp",
+  bacsPaymentPendingNote:
+    "Tu pago aparece como pendiente hasta que lo confirmemos. Te avisaremos cuando esté validado.",
 
   trackingPageTitle: "Seguimiento de pedido",
   trackingPageDescription:
@@ -100,7 +119,10 @@ export const CHECKOUT_COPY = {
   confirmationOrderNumber: "Número de pedido",
   confirmationNextSteps: "Próximos pasos",
   confirmationBacs:
-    "Para pagos con Yape, Plin o transferencia, envía tu comprobante con el número de pedido al WhatsApp +51 901259663 o a soporte@novedadesmaritex.net.pe.",
+    "Sigue las instrucciones de pago a continuación. Envía tu comprobante por WhatsApp para confirmar tu pedido.",
+  confirmationPaymentProcessing: "Estamos confirmando tu pago. Esta página se actualizará automáticamente.",
+  confirmationPaymentFailed:
+    "No pudimos confirmar el pago. Si el cargo se realizó en tu banco, contáctanos con tu número de pedido.",
   viewOrder: "Ver detalle del pedido",
   trackAnother: "Rastrear otro pedido",
 } as const;

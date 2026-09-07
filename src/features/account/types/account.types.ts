@@ -58,6 +58,14 @@ export interface CustomerNotification {
   message: string;
   readAt: string | null;
   createdAt: string;
+  metadata?: {
+    orderNumber?: string;
+    orderId?: string;
+    refundId?: string;
+    event?: string;
+    status?: string;
+    paymentStatus?: string;
+  } | null;
 }
 
 export interface CustomerNotificationSettings {
