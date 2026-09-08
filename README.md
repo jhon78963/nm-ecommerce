@@ -2,7 +2,7 @@
 
 Tienda en línea de **Novedades Maritex**, construida con Next.js 16 (App Router), React 19 y Tailwind CSS 4.
 
-Frontend del e-commerce orientado a features, integrado con el backend `nm-backend-v3` (NestJS).
+Frontend del e-commerce orientado a features, integrado con el backend `nm-backend` (NestJS).
 
 ## Stack
 

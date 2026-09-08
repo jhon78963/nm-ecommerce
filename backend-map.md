@@ -1,4 +1,4 @@
-# Backend API Map — nm-backend-v3
+# Backend API Map — nm-backend
 
 > **Base URL:** `http://localhost:3000`  
 > **Todos los endpoints de negocio se consumen vía:** `GET|POST|PATCH|DELETE /api/v1/<recurso>`  
