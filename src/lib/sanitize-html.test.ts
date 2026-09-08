@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   sanitizeInstitutionalHtml,
   sanitizeProductHtml,
-} from "@/lib/sanitize-html";
+} from "@/lib/sanitize-html-core";
 
 describe("sanitizeProductHtml", () => {
   it("removes script tags from product descriptions", () => {

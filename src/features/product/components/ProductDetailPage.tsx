@@ -12,6 +12,7 @@ import { PdpSafeCheckout } from "@/features/product/components/pdp/PdpSafeChecko
 import type { ProductDetail } from "@/features/product/types/product-detail.types";
 import { enrichProductWithVariants } from "@/features/product/utils/enrich-product-variants";
 import { isStarFilled } from "@/features/product/utils/product-rating";
+import { sanitizeProductHtml } from "@/lib/sanitize-html";
 import { cn } from "@/lib/utils";
 
 import "@/features/product/components/quick-view/product-quick-view.css";
@@ -72,7 +73,12 @@ function PdpPrice({
 }
 
 export function ProductDetailPage({ product }: ProductDetailPageProps) {
-  const enrichedProduct = enrichProductWithVariants(product);
+  const safeProduct: ProductDetail = {
+    ...product,
+    description: sanitizeProductHtml(product.description),
+    additionalInfo: sanitizeProductHtml(product.additionalInfo),
+  };
+  const enrichedProduct = enrichProductWithVariants(safeProduct);
 
   return (
     <>
