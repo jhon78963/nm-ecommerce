@@ -78,8 +78,10 @@ export function PdpReviews({ product }: PdpReviewsProps) {
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const loadReviews = useCallback(async () => {
-    setLoading(true);
+  const loadReviews = useCallback(async (refresh = false) => {
+    if (refresh) {
+      setLoading(true);
+    }
     setError(null);
 
     try {
@@ -98,8 +100,34 @@ export function PdpReviews({ product }: PdpReviewsProps) {
   }, [product.id]);
 
   useEffect(() => {
-    void loadReviews();
-  }, [loadReviews]);
+    let cancelled = false;
+
+    fetch(`/api/products/${product.id}/reviews`, { cache: "no-store" })
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error("No se pudieron cargar las reseñas.");
+        }
+
+        return (await response.json()) as ProductReviewsResponse;
+      })
+      .then((json) => {
+        if (!cancelled) {
+          setData(json);
+          setError(null);
+          setLoading(false);
+        }
+      })
+      .catch((loadError) => {
+        if (!cancelled) {
+          setError(loadError instanceof Error ? loadError.message : "Error al cargar reseñas.");
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [product.id]);
 
   const handleWriteReview = () => {
     if (!isAuthenticated) {
@@ -113,7 +141,7 @@ export function PdpReviews({ product }: PdpReviewsProps) {
   const handleReviewSubmitted = async () => {
     setIsModalOpen(false);
     await refreshUser();
-    await loadReviews();
+    await loadReviews(true);
   };
 
   if (loading) {

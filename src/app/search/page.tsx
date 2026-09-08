@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
-import { SearchLanding } from "@/features/search/components/SearchLanding";
-import { getSearchModalData } from "@/features/search/services/search.service";
+import { PRIVATE_PAGE_ROBOTS } from "@/features/seo/constants/site-meta";
+import { SearchLandingSection } from "@/features/search/components/SearchLandingSection";
 import { ShopPage } from "@/features/shop/components/ShopPage";
 import {
   getShopCollectionProducts,
@@ -28,6 +28,7 @@ export async function generateMetadata({ searchParams }: SearchPageProps): Promi
   return {
     title: `${title} | Novedades Maritex`,
     description: "Encuentra productos en Novedades Maritex.",
+    robots: PRIVATE_PAGE_ROBOTS,
   };
 }
 
@@ -36,12 +37,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const filters = parseSearchParams(rawParams);
 
   if (!filters.q) {
-    try {
-      const data = await getSearchModalData({ perPage: 4 });
-      return <SearchLanding data={data} />;
-    } catch {
-      return <SearchLanding data={{ products: [], collections: [], genders: [], query: "" }} />;
-    }
+    return <SearchLandingSection />;
   }
 
   const [collections, { products, totalCount, facets }] = await Promise.all([

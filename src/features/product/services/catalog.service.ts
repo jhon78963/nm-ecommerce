@@ -99,13 +99,10 @@ export async function getProductBySlug(slug: string): Promise<ProductDetail | nu
     return null;
   }
 
-  return findProductBySlugFromHomeCatalog(normalizedSlug, warehouseId);
+  return findProductBySlugFromHomeCatalog(normalizedSlug);
 }
 
-async function findProductBySlugFromHomeCatalog(
-  slug: string,
-  _warehouseId: string,
-): Promise<ProductDetail | null> {
+async function findProductBySlugFromHomeCatalog(slug: string): Promise<ProductDetail | null> {
   const idPrefix = extractProductIdPrefixFromSlug(slug);
   if (!idPrefix) {
     return null;

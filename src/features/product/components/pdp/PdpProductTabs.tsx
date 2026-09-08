@@ -5,6 +5,7 @@ import { useState } from "react";
 import { PDP_COPY } from "@/features/product/constants/pdp-copy";
 import { PdpReviews } from "@/features/product/components/pdp/PdpReviews";
 import type { ProductDetail } from "@/features/product/types/product-detail.types";
+import { sanitizeProductHtml } from "@/lib/sanitize-html";
 import { cn } from "@/lib/utils";
 
 interface PdpProductTabsProps {
@@ -27,7 +28,7 @@ function DescriptionTab({ description }: { description?: string }) {
   return (
     <div
       className="pdp-tab-content"
-      dangerouslySetInnerHTML={{ __html: description }}
+      dangerouslySetInnerHTML={{ __html: sanitizeProductHtml(description) }}
     />
   );
 }
@@ -42,7 +43,7 @@ function AdditionalInfoTab({ product }: { product: ProductDetail }) {
   return (
     <div className="pdp-tab-content space-y-4">
       {product.additionalInfo ? (
-        <div dangerouslySetInnerHTML={{ __html: product.additionalInfo }} />
+        <div dangerouslySetInnerHTML={{ __html: sanitizeProductHtml(product.additionalInfo) }} />
       ) : null}
 
       <table className="w-full text-sm">

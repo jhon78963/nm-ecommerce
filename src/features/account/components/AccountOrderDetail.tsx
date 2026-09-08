@@ -29,8 +29,6 @@ export function AccountOrderDetail({ orderNumber }: AccountOrderDetailProps) {
 
   useEffect(() => {
     let cancelled = false;
-    setLoading(true);
-    setError(null);
 
     fetchCustomerOrder(orderNumber)
       .then((result) => {

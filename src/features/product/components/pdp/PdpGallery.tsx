@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 import type { ProductDetail } from "@/features/product/types/product-detail.types";
 import { PDP_COPY } from "@/features/product/constants/pdp-copy";
@@ -17,11 +17,14 @@ export function PdpGallery({ product }: PdpGalleryProps) {
   }, [product.galleryImageUrls, product.imageUrl]);
 
   const [activeIndex, setActiveIndex] = useState(0);
-  const activeImage = images[activeIndex] ?? product.imageUrl;
+  const [trackedProductId, setTrackedProductId] = useState(product.id);
 
-  useEffect(() => {
+  if (product.id !== trackedProductId) {
+    setTrackedProductId(product.id);
     setActiveIndex(0);
-  }, [product.id]);
+  }
+
+  const activeImage = images[activeIndex] ?? product.imageUrl;
 
   return (
     <div className="pdp-gallery">
@@ -54,7 +57,7 @@ export function PdpGallery({ product }: PdpGalleryProps) {
               type="button"
               role="tab"
               className="pdp-thumb-btn"
-              aria-pressed={index === activeIndex}
+              aria-selected={index === activeIndex}
               aria-label={`Ver imagen ${index + 1}`}
               onClick={() => setActiveIndex(index)}
             >

@@ -15,28 +15,27 @@ import { ROUTES } from "@/lib/routes";
 export function AccountOrders() {
   const [orders, setOrders] = useState<CustomerOrderSummary[]>([]);
   const [page, setPage] = useState(1);
+  const [loadedPage, setLoadedPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const loading = loadedPage !== page;
 
   useEffect(() => {
     let cancelled = false;
-    setLoading(true);
-    setError(null);
 
     fetchCustomerOrders(page)
       .then((response) => {
         if (cancelled) return;
         setOrders(response.orders);
         setTotalPages(response.meta.totalPages);
+        setError(null);
+        setLoadedPage(page);
       })
       .catch((err: unknown) => {
         if (cancelled) return;
         setOrders([]);
         setError(err instanceof Error ? err.message : "No se pudieron cargar los pedidos.");
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
+        setLoadedPage(page);
       });
 
     return () => {

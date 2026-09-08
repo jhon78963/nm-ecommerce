@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 import { cn } from "@/lib/utils";
@@ -37,10 +38,13 @@ export function ImageLink({
       aria-label={alt}
     />
   ) : (
-    <img
+    <Image
       src={resolvedImageUrl}
       alt={alt}
+      width={1400}
+      height={700}
       className={cn("block h-auto w-full", imageClassName)}
+      unoptimized
     />
   );
 

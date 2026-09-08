@@ -69,23 +69,24 @@ export function useLiveOrderSync({
     }
   }, [contact, orderNumber]);
 
+  const isActive = enabled && Boolean(orderNumber) && Boolean(contact);
+
   useEffect(() => {
-    if (!enabled || !orderNumber || !contact) {
-      setOrder(null);
-      setIsLoading(false);
+    if (!isActive) {
       return;
     }
 
-    const cachedOrder = findOrder(orderNumber, contact);
-    if (cachedOrder) {
-      setOrder(cachedOrder);
-    }
-
     let cancelled = false;
-    setIsLoading(true);
-    setPaymentError(null);
 
     void (async () => {
+      setIsLoading(true);
+      setPaymentError(null);
+
+      const cachedOrder = findOrder(orderNumber, contact);
+      if (cachedOrder) {
+        setOrder(cachedOrder);
+      }
+
       const latestOrder = (await refreshOrder()) ?? cachedOrder;
       const lookupEmail = latestOrder?.email ?? (isEmailContact(contact) ? contact : "");
 
@@ -154,7 +155,7 @@ export function useLiveOrderSync({
     return () => {
       cancelled = true;
     };
-  }, [contact, enabled, orderNumber, processPendingCharge, refreshOrder]);
+  }, [contact, isActive, orderNumber, processPendingCharge, refreshOrder]);
 
   useEffect(() => {
     if (!enabled || !orderNumber || !contact || !order) {
@@ -193,7 +194,7 @@ export function useLiveOrderSync({
       cancelled = true;
       clearInterval(interval);
     };
-  }, [contact, enabled, order?.paymentStatus, orderNumber]);
+  }, [contact, enabled, order, orderNumber]);
 
   const lookupEmail = order?.email || (isEmailContact(contact) ? contact : "");
   const isAwaitingPayment =

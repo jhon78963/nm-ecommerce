@@ -39,7 +39,8 @@ function getBrowserConnectOrigins(): string[] {
   origins.add("https://api.culqi.com");
   origins.add("https://checkout.culqi.com");
   origins.add("https://3ds.culqi.com");
-  origins.add("https://*.culqi.com");
+  origins.add("https://js.culqi.com");
+  origins.add("https://static.culqi.com");
 
   return [...origins];
 }
@@ -56,8 +57,8 @@ const CULQI_FRAME_SRC = [
   "https://3ds.culqi.com",
   "https://js.culqi.com",
   "https://static.culqi.com",
-  "https://*.culqi.com",
-  "https://*.cardinalcommerce.com",
+  "*.culqi.com",
+  "*.cardinalcommerce.com",
 ];
 
 interface BuildSecurityHeadersOptions {

@@ -40,7 +40,7 @@ export function isTrujilloPostcode(postcode: string): boolean {
   return postcode.trim().startsWith("130");
 }
 
-export function isTrujilloZone(postcode: string, _state?: string): boolean {
+export function isTrujilloZone(postcode: string): boolean {
   return isTrujilloPostcode(postcode);
 }
 

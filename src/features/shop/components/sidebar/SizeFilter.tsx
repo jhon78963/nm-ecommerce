@@ -18,7 +18,11 @@ export function SizeFilter({ sizes }: SizeFilterProps) {
 
   const toggle = (sizeId: string) => {
     const next = new Set(active);
-    next.has(sizeId) ? next.delete(sizeId) : next.add(sizeId);
+    if (next.has(sizeId)) {
+      next.delete(sizeId);
+    } else {
+      next.add(sizeId);
+    }
     const value = [...next].join(",");
     router.push(buildFilterUrl(pathname, searchParams, { tallas: value || undefined }));
   };

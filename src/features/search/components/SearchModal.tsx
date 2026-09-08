@@ -22,37 +22,38 @@ interface SearchModalProps {
 }
 
 export function SearchModal({ isOpen, onClose }: SearchModalProps) {
+  if (!isOpen) {
+    return null;
+  }
+
+  return <SearchModalContent onClose={onClose} />;
+}
+
+function SearchModalContent({ onClose }: { onClose: () => void }) {
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState("");
-  const typedText = useTypewriterPlaceholder(isOpen);
-  const { data, isLoading } = useSearchModalData(query, isOpen);
+  const typedText = useTypewriterPlaceholder(true);
+  const { data, isLoading } = useSearchModalData(query, true);
 
   useEffect(() => {
-    if (!isOpen) {
-      setQuery("");
-      return;
-    }
-
     inputRef.current?.focus();
     document.body.style.overflow = "hidden";
 
     return () => {
       document.body.style.overflow = "";
     };
-  }, [isOpen]);
+  }, []);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") onClose();
     };
 
-    if (isOpen) {
-      window.addEventListener("keydown", handleKeyDown);
-    }
+    window.addEventListener("keydown", handleKeyDown);
 
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, onClose]);
+  }, [onClose]);
 
   const handleSubmit = useCallback(
     (event: React.FormEvent) => {
@@ -65,8 +66,6 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
     },
     [onClose, query, router],
   );
-
-  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-[70] flex items-start justify-center overflow-y-auto p-4 sm:items-center">

@@ -1,5 +1,3 @@
-import { MessageCircle } from "lucide-react";
-
 import { DEFAULT_TOP_BAR } from "@/features/navigation/constants/top-bar";
 import type { TopBarConfig } from "@/features/navigation/types/navigation.types";
 
@@ -11,7 +9,7 @@ function WhatsAppIcon({ className }: { className?: string }) {
   );
 }
 
-interface HeaderTopBarProps extends TopBarConfig {}
+type HeaderTopBarProps = TopBarConfig;
 
 export function HeaderTopBar({
   siteName = DEFAULT_TOP_BAR.siteName,

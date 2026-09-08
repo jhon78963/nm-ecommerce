@@ -1,6 +1,5 @@
 "use client";
 
-import type { MouseEvent } from "react";
 import { useMemo } from "react";
 import { Heart, Star } from "lucide-react";
 import { StoreImage } from "@/components/ui/StoreImage";

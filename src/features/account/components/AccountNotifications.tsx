@@ -44,10 +44,7 @@ export function AccountNotifications() {
   const [savingKey, setSavingKey] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const loadData = () => {
-    setLoading(true);
-    setError(null);
-
+  useEffect(() => {
     Promise.all([fetchCustomerNotifications(), fetchNotificationSettings()])
       .then(([items, prefs]) => {
         setNotifications(items);
@@ -57,10 +54,6 @@ export function AccountNotifications() {
         setError(err instanceof Error ? err.message : "No se pudieron cargar las notificaciones.");
       })
       .finally(() => setLoading(false));
-  };
-
-  useEffect(() => {
-    loadData();
   }, []);
 
   const toggleSetting = async (

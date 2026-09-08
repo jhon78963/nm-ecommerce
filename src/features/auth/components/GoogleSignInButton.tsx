@@ -22,7 +22,9 @@ export function GoogleSignInButton({ intent, className }: GoogleSignInButtonProp
 
   const handleClick = () => {
     setIsLoading(true);
-    window.location.href = `/api/auth/google?intent=${intent}`;
+    // OAuth requires a full-page GET to the API route; Next router does not apply here.
+    // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- external auth handoff
+    window.location.assign(`/api/auth/google?intent=${intent}`);
   };
 
   return (

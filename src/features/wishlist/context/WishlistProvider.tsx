@@ -4,9 +4,7 @@ import {
   createContext,
   useCallback,
   useContext,
-  useEffect,
   useMemo,
-  useState,
   type ReactNode,
 } from "react";
 
@@ -21,6 +19,13 @@ import {
   readWishlistFromStorage,
   writeWishlistToStorage,
 } from "@/features/wishlist/utils/wishlist-storage";
+import { createLocalStorageStore, useLocalStorageItems } from "@/hooks/use-local-storage-items";
+
+const wishlistStorage = createLocalStorageStore(
+  readWishlistFromStorage,
+  writeWishlistToStorage,
+  "nm-wishlist-change",
+);
 
 const WishlistContext = createContext<WishlistContextValue | null>(null);
 
@@ -51,18 +56,7 @@ function upsertWishlistItem(
 }
 
 export function WishlistProvider({ children }: WishlistProviderProps) {
-  const [items, setItems] = useState<WishlistStoredItem[]>([]);
-  const [isHydrated, setIsHydrated] = useState(false);
-
-  useEffect(() => {
-    setItems(readWishlistFromStorage());
-    setIsHydrated(true);
-  }, []);
-
-  useEffect(() => {
-    if (!isHydrated) return;
-    writeWishlistToStorage(items);
-  }, [items, isHydrated]);
+  const { items, isHydrated, setItems } = useLocalStorageItems(wishlistStorage);
 
   const isInWishlist = useCallback(
     (productId: string) => items.some((item) => item.productId === productId),
@@ -71,11 +65,11 @@ export function WishlistProvider({ children }: WishlistProviderProps) {
 
   const addItem = useCallback((product: WishlistProductInput, variant?: ProductCartVariation) => {
     setItems((current) => upsertWishlistItem(current, product, variant));
-  }, []);
+  }, [setItems]);
 
   const removeItem = useCallback((productId: string) => {
     setItems((current) => current.filter((item) => item.productId !== productId));
-  }, []);
+  }, [setItems]);
 
   const toggleItem = useCallback((product: WishlistProductInput, variant?: ProductCartVariation) => {
     setItems((current) => {
@@ -87,9 +81,9 @@ export function WishlistProvider({ children }: WishlistProviderProps) {
 
       return upsertWishlistItem(current, product, variant);
     });
-  }, []);
+  }, [setItems]);
 
-  const clearWishlist = useCallback(() => setItems([]), []);
+  const clearWishlist = useCallback(() => setItems([]), [setItems]);
 
   const value = useMemo<WishlistContextValue>(
     () => ({

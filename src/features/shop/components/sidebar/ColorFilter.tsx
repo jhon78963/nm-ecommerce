@@ -19,7 +19,11 @@ export function ColorFilter({ colors }: ColorFilterProps) {
 
   const toggle = (colorId: string) => {
     const next = new Set(active);
-    next.has(colorId) ? next.delete(colorId) : next.add(colorId);
+    if (next.has(colorId)) {
+      next.delete(colorId);
+    } else {
+      next.add(colorId);
+    }
     const value = [...next].join(",");
     router.push(buildFilterUrl(pathname, searchParams, { colores: value || undefined }));
   };

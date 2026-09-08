@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import Image from "next/image";
 
 import type { ProductBoxItem } from "@/features/product/types/product-box.types";
@@ -23,11 +23,14 @@ export function ProductQuickViewGallery({ product }: ProductQuickViewGalleryProp
   }, [product.galleryImageUrls, product.imageUrl]);
 
   const [activeIndex, setActiveIndex] = useState(0);
-  const activeImage = images[activeIndex] ?? product.imageUrl;
+  const [trackedProductId, setTrackedProductId] = useState(product.id);
 
-  useEffect(() => {
+  if (product.id !== trackedProductId) {
+    setTrackedProductId(product.id);
     setActiveIndex(0);
-  }, [product.id]);
+  }
+
+  const activeImage = images[activeIndex] ?? product.imageUrl;
 
   return (
     <div className="quick-view-gallery">

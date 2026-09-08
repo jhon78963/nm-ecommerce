@@ -33,7 +33,7 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<CustomerUser | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [authReady, setAuthReady] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [loginModalMessage, setLoginModalMessage] = useState<string | null>(null);
   const [loginModalInitialView, setLoginModalInitialView] = useState<AuthModalView>("login");
@@ -54,8 +54,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    refreshUser().finally(() => setIsLoading(false));
+    let cancelled = false;
+
+    void (async () => {
+      await refreshUser();
+      if (!cancelled) {
+        setAuthReady(true);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
   }, [refreshUser]);
+
+  const isLoading = !authReady;
 
   const openLogin = useCallback((options?: OpenLoginOptions) => {
     setLoginModalMessage(options?.message ?? null);

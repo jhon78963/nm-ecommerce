@@ -35,7 +35,6 @@ export function CartButton({
   text = PRODUCT_COPY.addToCart,
   className,
   mode = "cta",
-  enableModal: _enableModal = false,
   featured = false,
   pushToBottom = false,
   cartVariation,

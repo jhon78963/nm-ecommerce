@@ -1,8 +1,8 @@
 "use client";
 
 import { Heart, Minus, Plus, ShoppingCart } from "lucide-react";
-import { useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useMemo, useState } from "react";
 
 import { useCart } from "@/features/cart/context/CartProvider";
 import { ProductWhatsAppInquiryLink } from "@/features/product/components/ProductWhatsAppInquiryLink";
@@ -22,6 +22,7 @@ interface PdpInteractivePanelProps {
 }
 
 export function PdpInteractivePanel({ product }: PdpInteractivePanelProps) {
+  const router = useRouter();
   const { addItem, openCart } = useCart();
   const { isInWishlist, toggleItem } = useWishlist();
   const [quantity, setQuantity] = useState(1);
@@ -43,15 +44,8 @@ export function PdpInteractivePanel({ product }: PdpInteractivePanelProps) {
   );
 
   const maxQuantity = availableStock !== null && availableStock > 0 ? availableStock : 1;
-  const canIncreaseQuantity = quantity < maxQuantity;
-
-  useEffect(() => {
-    setQuantity((current) => clampQuantity(current, maxQuantity));
-  }, [
-    maxQuantity,
-    variantSelection.selectedColorId,
-    variantSelection.selectedSizeId,
-  ]);
+  const effectiveQuantity = clampQuantity(quantity, maxQuantity);
+  const canIncreaseQuantity = effectiveQuantity < maxQuantity;
 
   function updateQuantity(delta: number) {
     setQuantity((current) => clampQuantity(current + delta, maxQuantity));
@@ -62,7 +56,7 @@ export function PdpInteractivePanel({ product }: PdpInteractivePanelProps) {
       return;
     }
 
-    if (availableStock !== null && quantity > availableStock) {
+    if (availableStock !== null && effectiveQuantity > availableStock) {
       return;
     }
 
@@ -72,14 +66,14 @@ export function PdpInteractivePanel({ product }: PdpInteractivePanelProps) {
       colorId: variantSelection.cartVariation.colorId,
       name: product.name,
       imageUrl: product.imageUrl,
-      quantity,
+      quantity: effectiveQuantity,
       price: product.salePrice,
       variation: variantSelection.cartVariation.variation,
       variationId: variantSelection.cartVariation.variationId,
     });
 
     if (buyNow) {
-      window.location.href = "/checkout";
+      router.push("/checkout");
       return;
     }
 
@@ -147,7 +141,7 @@ export function PdpInteractivePanel({ product }: PdpInteractivePanelProps) {
                 type="text"
                 name="quantity"
                 className="form-control input-number"
-                value={quantity}
+                value={effectiveQuantity}
                 readOnly
                 aria-label="Cantidad"
               />

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, useCallback } from "react";
+import { useEffect, useMemo, useRef, useState, useCallback, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 
 import { useCart } from "@/features/cart/context/CartProvider";
@@ -71,27 +71,62 @@ function validateEmail(email: string): string | undefined {
   return undefined;
 }
 
+function buildInitialCheckoutState() {
+  const draft = readCheckoutDraftFromStorage();
+
+  return {
+    billing: draft?.billing ?? createEmptyAddress(),
+    shipping: draft?.shipping ?? createEmptyAddress(),
+    email: draft?.email ?? "",
+    orderNotes: draft?.orderNotes ?? "",
+    sameAsBilling: draft?.sameAsBilling ?? true,
+    shippingMethodId: draft?.shippingMethodId ?? "",
+    paymentMethodId: draft?.paymentMethodId ?? "bacs",
+    couponCode: draft?.couponCode ?? "",
+    appliedCouponCode: draft?.appliedCouponCode ?? "",
+    couponDiscount: draft?.couponDiscount ?? 0,
+  };
+}
+
 export function CheckoutForm() {
+  const isClient = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
+
+  if (!isClient) {
+    return (
+      <div className="checkout-page">
+        <div className="checkout-loading">Cargando checkout…</div>
+      </div>
+    );
+  }
+
+  return <CheckoutFormClient />;
+}
+
+function CheckoutFormClient() {
+  const initialState = useMemo(() => buildInitialCheckoutState(), []);
   const router = useRouter();
   const { items, isHydrated, clearCart } = useCart();
-  const { user, isAuthenticated, isLoading: isAuthLoading, isLoginOpen, openLogin } = useAuth();
+  const { user, isAuthenticated, isLoading: isAuthLoading, openLogin } = useAuth();
 
-  const [billing, setBilling] = useState<CheckoutAddress>(createEmptyAddress);
-  const [shipping, setShipping] = useState<CheckoutAddress>(createEmptyAddress);
-  const [email, setEmail] = useState("");
-  const [orderNotes, setOrderNotes] = useState("");
-  const [sameAsBilling, setSameAsBilling] = useState(true);
-  const [shippingMethodId, setShippingMethodId] = useState("");
-  const [paymentMethodId, setPaymentMethodId] = useState("bacs");
-  const [couponCode, setCouponCode] = useState("");
-  const [appliedCouponCode, setAppliedCouponCode] = useState("");
-  const [couponDiscount, setCouponDiscount] = useState(0);
+  const [billing, setBilling] = useState(initialState.billing);
+  const [shipping, setShipping] = useState(initialState.shipping);
+  const [email, setEmail] = useState(initialState.email);
+  const [orderNotes, setOrderNotes] = useState(initialState.orderNotes);
+  const [sameAsBilling, setSameAsBilling] = useState(initialState.sameAsBilling);
+  const [shippingMethodId, setShippingMethodId] = useState(initialState.shippingMethodId);
+  const [paymentMethodId, setPaymentMethodId] = useState(initialState.paymentMethodId);
+  const [couponCode, setCouponCode] = useState(initialState.couponCode);
+  const [appliedCouponCode, setAppliedCouponCode] = useState(initialState.appliedCouponCode);
+  const [couponDiscount, setCouponDiscount] = useState(initialState.couponDiscount);
   const [couponError, setCouponError] = useState<string | null>(null);
   const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isFormHydrated, setIsFormHydrated] = useState(false);
   const [prefilledFromAccount, setPrefilledFromAccount] = useState(false);
   const isCompletingOrderRef = useRef(false);
   const customerPrefillAppliedRef = useRef(false);
@@ -101,10 +136,7 @@ export function CheckoutForm() {
     (sameAsBilling ? billing : shipping).postcode,
     (sameAsBilling ? billing : shipping).state,
   );
-  const isTrujillo = isTrujilloZone(
-    (sameAsBilling ? billing : shipping).postcode,
-    (sameAsBilling ? billing : shipping).state,
-  );
+  const isTrujillo = isTrujilloZone((sameAsBilling ? billing : shipping).postcode);
   const shippingMethods = useMemo(
     () => getShippingMethodsForZone(shippingZone),
     [shippingZone],
@@ -114,34 +146,23 @@ export function CheckoutForm() {
     [isTrujillo],
   );
 
-  const selectedShipping = getShippingMethodById(shippingMethodId, shippingZone);
+  const effectiveShippingMethodId = shippingMethods.some((method) => method.id === shippingMethodId)
+    ? shippingMethodId
+    : (shippingMethods[0]?.id ?? "");
+  const effectivePaymentMethodId = paymentMethods.some((method) => method.id === paymentMethodId)
+    ? paymentMethodId
+    : (paymentMethods[0]?.id ?? "bacs");
+
+  const selectedShipping = getShippingMethodById(effectiveShippingMethodId, shippingZone);
   const shippingCost = selectedShipping?.cost ?? 0;
 
   const totals = calculateCheckoutTotals(items, shippingCost, couponDiscount);
 
   useEffect(() => {
-    const draft = readCheckoutDraftFromStorage();
-    if (draft) {
-      setBilling(draft.billing);
-      setShipping(draft.shipping);
-      setEmail(draft.email);
-      setOrderNotes(draft.orderNotes);
-      setSameAsBilling(draft.sameAsBilling);
-      setShippingMethodId(draft.shippingMethodId);
-      setPaymentMethodId(draft.paymentMethodId);
-      setCouponCode(draft.couponCode);
-      setAppliedCouponCode(draft.appliedCouponCode);
-      setCouponDiscount(draft.couponDiscount);
-    }
-    setIsFormHydrated(true);
-  }, []);
-
-  useEffect(() => {
-    if (!isFormHydrated || isAuthLoading) return;
+    if (isAuthLoading) return;
 
     if (!isAuthenticated || !user) {
       customerPrefillAppliedRef.current = false;
-      setPrefilledFromAccount(false);
       return;
     }
 
@@ -189,10 +210,10 @@ export function CheckoutForm() {
     return () => {
       cancelled = true;
     };
-  }, [isFormHydrated, isAuthLoading, isAuthenticated, user]);
+  }, [isAuthLoading, isAuthenticated, user]);
 
   useEffect(() => {
-    if (!isFormHydrated || isCompletingOrderRef.current) return;
+    if (isCompletingOrderRef.current) return;
 
     writeCheckoutDraftToStorage({
       billing,
@@ -200,8 +221,8 @@ export function CheckoutForm() {
       email,
       orderNotes,
       sameAsBilling,
-      shippingMethodId,
-      paymentMethodId,
+      shippingMethodId: effectiveShippingMethodId,
+      paymentMethodId: effectivePaymentMethodId,
       couponCode,
       appliedCouponCode,
       couponDiscount,
@@ -212,12 +233,11 @@ export function CheckoutForm() {
     email,
     orderNotes,
     sameAsBilling,
-    shippingMethodId,
-    paymentMethodId,
+    effectiveShippingMethodId,
+    effectivePaymentMethodId,
     couponCode,
     appliedCouponCode,
     couponDiscount,
-    isFormHydrated,
   ]);
 
   useEffect(() => {
@@ -226,18 +246,6 @@ export function CheckoutForm() {
       router.replace(ROUTES.cart);
     }
   }, [isHydrated, items.length, router]);
-
-  useEffect(() => {
-    if (!shippingMethods.some((method) => method.id === shippingMethodId)) {
-      setShippingMethodId(shippingMethods[0]?.id ?? "");
-    }
-  }, [shippingMethods, shippingMethodId]);
-
-  useEffect(() => {
-    if (!paymentMethods.some((method) => method.id === paymentMethodId)) {
-      setPaymentMethodId(paymentMethods[0]?.id ?? "bacs");
-    }
-  }, [paymentMethods, paymentMethodId]);
 
   const handleBillingChange = (field: keyof CheckoutAddress, value: string) => {
     setBilling((current) => {
@@ -271,6 +279,8 @@ export function CheckoutForm() {
 
   const applyCoupon = useCallback(
     async (code: string, customerId: string) => {
+      await Promise.resolve();
+
       const normalizedCode = code.trim();
       if (!normalizedCode) {
         setCouponError(CHECKOUT_COPY.couponInvalid);
@@ -312,17 +322,22 @@ export function CheckoutForm() {
   );
 
   useEffect(() => {
-    if (!isLoginOpen && !isAuthenticated && pendingCouponCode) {
-      setPendingCouponCode(null);
-    }
-  }, [isLoginOpen, isAuthenticated, pendingCouponCode]);
-
-  useEffect(() => {
     if (!pendingCouponCode || !isAuthenticated || !user || isAuthLoading) {
       return;
     }
 
-    void applyCoupon(pendingCouponCode, user.id);
+    let cancelled = false;
+
+    void (async () => {
+      await applyCoupon(pendingCouponCode, user.id);
+      if (cancelled) {
+        return;
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
   }, [pendingCouponCode, isAuthenticated, user, isAuthLoading, applyCoupon]);
 
   const handleApplyCoupon = async () => {
@@ -361,8 +376,8 @@ export function CheckoutForm() {
       email: validateEmail(email),
     };
 
-    if (!shippingMethodId) nextErrors.shippingMethod = CHECKOUT_COPY.requiredField;
-    if (!paymentMethodId) nextErrors.paymentMethod = CHECKOUT_COPY.requiredField;
+    if (!effectiveShippingMethodId) nextErrors.shippingMethod = CHECKOUT_COPY.requiredField;
+    if (!effectivePaymentMethodId) nextErrors.paymentMethod = CHECKOUT_COPY.requiredField;
 
     setErrors(nextErrors);
     return !Object.values(nextErrors).some(Boolean);
@@ -377,8 +392,8 @@ export function CheckoutForm() {
       return;
     }
 
-    const shippingMethod = getShippingMethodById(shippingMethodId, shippingZone);
-    const paymentMethod = paymentMethods.find((method) => method.id === paymentMethodId);
+    const shippingMethod = getShippingMethodById(effectiveShippingMethodId, shippingZone);
+    const paymentMethod = paymentMethods.find((method) => method.id === effectivePaymentMethodId);
 
     if (!shippingMethod || !paymentMethod) {
       return;
@@ -479,7 +494,7 @@ export function CheckoutForm() {
     }
   };
 
-  if (!isHydrated || !isFormHydrated) {
+  if (!isHydrated) {
     return null;
   }
 
@@ -517,7 +532,7 @@ export function CheckoutForm() {
                 </div>
 
                 <div className="checkout-form-section">
-                  {prefilledFromAccount ? (
+                  {isAuthenticated && prefilledFromAccount ? (
                     <p className="checkout-account-prefill mb-4 rounded border border-[#f0d9a8] bg-[#fffdf5] px-3 py-2.5 text-sm text-[#7a6522]">
                       {CHECKOUT_COPY.accountPrefillNotice}
                     </p>
@@ -605,8 +620,8 @@ export function CheckoutForm() {
             shippingZone={shippingZone}
             shippingPostcode={(sameAsBilling ? billing : shipping).postcode}
             paymentMethods={paymentMethods}
-            shippingMethodId={shippingMethodId}
-            paymentMethodId={paymentMethodId}
+            shippingMethodId={effectiveShippingMethodId}
+            paymentMethodId={effectivePaymentMethodId}
             couponCode={couponCode}
             couponError={couponError}
             couponApplied={Boolean(appliedCouponCode)}

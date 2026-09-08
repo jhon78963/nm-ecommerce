@@ -9,7 +9,6 @@ export function useTypewriterPlaceholder(active: boolean) {
 
   useEffect(() => {
     if (!active) {
-      setTypedText("");
       return;
     }
 
@@ -31,5 +30,5 @@ export function useTypewriterPlaceholder(active: boolean) {
     return () => window.clearInterval(interval);
   }, [active]);
 
-  return typedText;
+  return active ? typedText : "";
 }

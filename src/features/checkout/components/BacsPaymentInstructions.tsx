@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 import { Check, Copy } from "lucide-react";
 
@@ -52,12 +53,13 @@ export function BacsPaymentInstructions({ orderNumber, total }: BacsPaymentInstr
 
       {qrVisible ? (
         <div className="bacs-payment__qr">
-          <img
+          <Image
             src={env.yapeQrImageUrl}
             alt={CHECKOUT_COPY.bacsPaymentQrAlt}
             width={260}
             height={320}
             className="bacs-payment__qr-image"
+            unoptimized
             onError={() => setQrVisible(false)}
           />
           <p className="bacs-payment__merchant-name">{env.yapeMerchantName}</p>

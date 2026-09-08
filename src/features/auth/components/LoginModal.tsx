@@ -16,6 +16,44 @@ interface LoginModalProps {
   onLoginSuccess: () => void | Promise<void>;
 }
 
+interface LoginModalContentProps {
+  message?: string | null;
+  initialView: AuthModalView;
+  onLoginSuccess: () => void | Promise<void>;
+}
+
+function LoginModalContent({
+  message,
+  initialView,
+  onLoginSuccess,
+}: LoginModalContentProps) {
+  const [view, setView] = useState<AuthModalView>(initialView);
+
+  const handleLoginSuccess = useCallback(() => {
+    void Promise.resolve(onLoginSuccess());
+  }, [onLoginSuccess]);
+
+  return (
+    <>
+      {message ? (
+        <p className="mb-4 rounded border border-[#f0d9a8] bg-[#fffdf5] px-3 py-2.5 text-center text-sm text-[#7a6522]">
+          {message}
+        </p>
+      ) : null}
+
+      {view === "login" ? (
+        <LoginForm onNavigate={setView} onSuccess={handleLoginSuccess} />
+      ) : null}
+      {view === "forgot-password" ? (
+        <ForgotPasswordForm onNavigate={setView} />
+      ) : null}
+      {view === "register" ? (
+        <RegisterForm onNavigate={setView} onSuccess={handleLoginSuccess} />
+      ) : null}
+    </>
+  );
+}
+
 export function LoginModal({
   isOpen,
   message,
@@ -23,17 +61,8 @@ export function LoginModal({
   onClose,
   onLoginSuccess,
 }: LoginModalProps) {
-  const [view, setView] = useState<AuthModalView>(initialView);
-
-  useEffect(() => {
-    if (isOpen) {
-      setView(initialView);
-    }
-  }, [isOpen, initialView]);
-
   useEffect(() => {
     if (!isOpen) {
-      setView("login");
       return;
     }
 
@@ -51,29 +80,16 @@ export function LoginModal({
     };
   }, [isOpen, onClose]);
 
-  const handleLoginSuccess = useCallback(() => {
-    void Promise.resolve(onLoginSuccess());
-  }, [onLoginSuccess]);
-
   if (!isOpen) return null;
 
   return (
     <AuthModalShell onClose={onClose}>
-      {message ? (
-        <p className="mb-4 rounded border border-[#f0d9a8] bg-[#fffdf5] px-3 py-2.5 text-center text-sm text-[#7a6522]">
-          {message}
-        </p>
-      ) : null}
-
-      {view === "login" ? (
-        <LoginForm onNavigate={setView} onSuccess={handleLoginSuccess} />
-      ) : null}
-      {view === "forgot-password" ? (
-        <ForgotPasswordForm onNavigate={setView} />
-      ) : null}
-      {view === "register" ? (
-        <RegisterForm onNavigate={setView} onSuccess={handleLoginSuccess} />
-      ) : null}
+      <LoginModalContent
+        key={initialView}
+        message={message}
+        initialView={initialView}
+        onLoginSuccess={onLoginSuccess}
+      />
     </AuthModalShell>
   );
 }

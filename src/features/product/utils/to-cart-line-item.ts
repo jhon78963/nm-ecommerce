@@ -1,7 +1,6 @@
 import type { CartLineItem } from "@/features/cart/types/cart.types";
 import {
   isUuid,
-  resolveCartLineVariantIds,
   resolveCartVariationFromSizes,
 } from "@/features/cart/utils/cart-variant";
 import type { ProductBoxItem } from "@/features/product/types/product-box.types";

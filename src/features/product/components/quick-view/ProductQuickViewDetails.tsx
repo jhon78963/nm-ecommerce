@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { ArrowLeftRight, Heart, Minus, Plus, ShoppingCart, Star, Truck } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 import { useCart } from "@/features/cart/context/CartProvider";
 import { cartLineHasValidVariant } from "@/features/cart/utils/cart-variant";
@@ -84,15 +84,8 @@ export function ProductQuickViewDetails({
   );
 
   const maxQuantity = availableStock !== null && availableStock > 0 ? availableStock : 1;
-  const canIncreaseQuantity = quantity < maxQuantity;
-
-  useEffect(() => {
-    setQuantity((current) => clampQuantity(current, maxQuantity));
-  }, [
-    maxQuantity,
-    variantSelection.selectedColorId,
-    variantSelection.selectedSizeId,
-  ]);
+  const effectiveQuantity = clampQuantity(quantity, maxQuantity);
+  const canIncreaseQuantity = effectiveQuantity < maxQuantity;
   const canAddToCart =
     isInStock
     && (!variantSelection.hasSizes || Boolean(variantSelection.selectedSizeId))
@@ -109,11 +102,11 @@ export function ProductQuickViewDetails({
       return;
     }
 
-    if (availableStock !== null && quantity > availableStock) {
+    if (availableStock !== null && effectiveQuantity > availableStock) {
       return;
     }
 
-    const lineItem = productBoxItemToCartLineItem(product, quantity, variantSelection.cartVariation);
+    const lineItem = productBoxItemToCartLineItem(product, effectiveQuantity, variantSelection.cartVariation);
     if (!cartLineHasValidVariant(lineItem)) {
       return;
     }
@@ -183,7 +176,7 @@ export function ProductQuickViewDetails({
                 type="text"
                 name="quantity"
                 className="form-control input-number"
-                value={quantity}
+                value={effectiveQuantity}
                 readOnly
                 aria-label="Cantidad"
               />

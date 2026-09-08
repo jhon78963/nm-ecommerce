@@ -13,6 +13,13 @@ import {
 import type { CartContextValue, CartLineItem } from "@/features/cart/types/cart.types";
 import { readCartFromStorage, writeCartToStorage } from "@/features/cart/utils/cart-storage";
 import { resolveCartLineVariantIds } from "@/features/cart/utils/cart-variant";
+import { createLocalStorageStore, useLocalStorageItems } from "@/hooks/use-local-storage-items";
+
+const cartStorage = createLocalStorageStore(
+  readCartFromStorage,
+  writeCartToStorage,
+  "nm-cart-change",
+);
 
 const CartContext = createContext<CartContextValue | null>(null);
 
@@ -25,19 +32,8 @@ export function CartProvider({
   children,
   freeShippingThreshold = 200,
 }: CartProviderProps) {
-  const [items, setItems] = useState<CartLineItem[]>([]);
+  const { items, isHydrated, setItems } = useLocalStorageItems(cartStorage);
   const [isOpen, setIsOpen] = useState(false);
-  const [isHydrated, setIsHydrated] = useState(false);
-
-  useEffect(() => {
-    setItems(readCartFromStorage());
-    setIsHydrated(true);
-  }, []);
-
-  useEffect(() => {
-    if (!isHydrated) return;
-    writeCartToStorage(items);
-  }, [items, isHydrated]);
 
   const subtotal = useMemo(
     () => items.reduce((sum, item) => sum + item.price * item.quantity, 0),
@@ -48,7 +44,7 @@ export function CartProvider({
   const closeCart = useCallback(() => setIsOpen(false), []);
   const toggleCart = useCallback((open: boolean) => setIsOpen(open), []);
 
-  const clearCart = useCallback(() => setItems([]), []);
+  const clearCart = useCallback(() => setItems([]), [setItems]);
 
   const addItem = useCallback((item: Omit<CartLineItem, "id"> & { id?: string }) => {
     setItems((current) => {
@@ -86,11 +82,11 @@ export function CartProvider({
         },
       ];
     });
-  }, []);
+  }, [setItems]);
 
   const removeItem = useCallback((id: string) => {
     setItems((current) => current.filter((item) => item.id !== id));
-  }, []);
+  }, [setItems]);
 
   const updateQuantity = useCallback((id: string, quantity: number) => {
     if (quantity < 1) {
@@ -101,7 +97,7 @@ export function CartProvider({
     setItems((current) =>
       current.map((item) => (item.id === id ? { ...item, quantity } : item)),
     );
-  }, []);
+  }, [setItems]);
 
   useEffect(() => {
     document.body.style.overflow = isOpen ? "hidden" : "";

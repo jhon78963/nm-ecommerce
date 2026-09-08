@@ -1,7 +1,6 @@
 import { STORE_CONTENT_REVALIDATE_SECONDS } from "@/config/store-content";
 import { env } from "@/config/env";
 import { mapPublicProductToProductBoxItem } from "@/features/product/utils/map-catalog-product";
-import type { ProductBoxItem } from "@/features/product/types/product-box.types";
 import { apiGet } from "@/services/http-client";
 import type {
   ParsedShopFilters,

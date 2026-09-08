@@ -55,8 +55,10 @@ export function AccountAddresses() {
   const [form, setForm] = useState<CustomerAddressInput>(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
 
-  const loadAddresses = () => {
-    setLoading(true);
+  const loadAddresses = (refresh = false) => {
+    if (refresh) {
+      setLoading(true);
+    }
     setError(null);
 
     fetchCustomerAddresses()
@@ -69,7 +71,13 @@ export function AccountAddresses() {
   };
 
   useEffect(() => {
-    loadAddresses();
+    fetchCustomerAddresses()
+      .then(setAddresses)
+      .catch((err: unknown) => {
+        setAddresses([]);
+        setError(err instanceof Error ? err.message : "No se pudieron cargar las direcciones.");
+      })
+      .finally(() => setLoading(false));
   }, []);
 
   const openCreate = () => {
@@ -103,7 +111,7 @@ export function AccountAddresses() {
       }
 
       setModalOpen(false);
-      loadAddresses();
+      loadAddresses(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : "No se pudo guardar la dirección.");
     } finally {
@@ -117,7 +125,7 @@ export function AccountAddresses() {
     setError(null);
     try {
       await deleteCustomerAddress(address.id);
-      loadAddresses();
+      loadAddresses(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : "No se pudo eliminar la dirección.");
     }

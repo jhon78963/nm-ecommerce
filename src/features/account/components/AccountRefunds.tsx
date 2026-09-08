@@ -55,15 +55,18 @@ export function AccountRefunds() {
   const [reason, setReason] = useState("");
   const [saving, setSaving] = useState(false);
   const [eligibleOrders, setEligibleOrders] = useState<CustomerOrderSummary[]>([]);
-  const [loadingEligibleOrders, setLoadingEligibleOrders] = useState(false);
+  const [eligibleLoadKey, setEligibleLoadKey] = useState("");
+  const loadingEligibleOrders = modalOpen && eligibleLoadKey !== "open";
 
   const selectedEligibleOrder = useMemo(
     () => eligibleOrders.find((order) => order.orderNumber === orderNumber) ?? null,
     [eligibleOrders, orderNumber],
   );
 
-  const loadRefunds = () => {
-    setLoading(true);
+  const loadRefunds = (refresh = false) => {
+    if (refresh) {
+      setLoading(true);
+    }
     setError(null);
 
     fetchCustomerRefunds()
@@ -76,7 +79,13 @@ export function AccountRefunds() {
   };
 
   useEffect(() => {
-    loadRefunds();
+    fetchCustomerRefunds()
+      .then(setRefunds)
+      .catch((err: unknown) => {
+        setRefunds([]);
+        setError(err instanceof Error ? err.message : "No se pudieron cargar los reembolsos.");
+      })
+      .finally(() => setLoading(false));
   }, []);
 
   useEffect(() => {
@@ -85,24 +94,34 @@ export function AccountRefunds() {
     }
 
     let cancelled = false;
-    setLoadingEligibleOrders(true);
 
     fetchCustomerOrders(1, 50)
       .then((response) => {
         if (cancelled) return;
         setEligibleOrders(response.orders.filter(isRefundEligible));
+        setEligibleLoadKey("open");
       })
       .catch(() => {
-        if (!cancelled) setEligibleOrders([]);
-      })
-      .finally(() => {
-        if (!cancelled) setLoadingEligibleOrders(false);
+        if (!cancelled) {
+          setEligibleOrders([]);
+          setEligibleLoadKey("open");
+        }
       });
 
     return () => {
       cancelled = true;
     };
   }, [modalOpen]);
+
+  const openRefundModal = () => {
+    setEligibleLoadKey("");
+    setModalOpen(true);
+  };
+
+  const closeRefundModal = () => {
+    setModalOpen(false);
+    setEligibleLoadKey("");
+  };
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -124,7 +143,7 @@ export function AccountRefunds() {
       setModalOpen(false);
       setOrderNumber("");
       setReason("");
-      loadRefunds();
+      loadRefunds(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : "No se pudo registrar la solicitud.");
     } finally {
@@ -137,7 +156,7 @@ export function AccountRefunds() {
       <div className="account-card__body">
         <div className="account-card__top">
           <h2>Historial de reembolsos</h2>
-          <button type="button" className="account-btn account-btn--solid" onClick={() => setModalOpen(true)}>
+          <button type="button" className="account-btn account-btn--solid" onClick={openRefundModal}>
             Solicitar reembolso
           </button>
         </div>
@@ -150,7 +169,7 @@ export function AccountRefunds() {
             title="Sin reembolsos"
             description="Cuando solicites una devolución o reembolso, el historial aparecerá en esta sección."
             action={
-              <button type="button" className="account-btn account-btn--solid" onClick={() => setModalOpen(true)}>
+              <button type="button" className="account-btn account-btn--solid" onClick={openRefundModal}>
                 Solicitar reembolso
               </button>
             }
@@ -189,7 +208,7 @@ export function AccountRefunds() {
         ) : null}
       </div>
 
-      <AccountModal title="Solicitar reembolso" isOpen={modalOpen} onClose={() => setModalOpen(false)}>
+      <AccountModal title="Solicitar reembolso" isOpen={modalOpen} onClose={closeRefundModal}>
         <form className="account-form" onSubmit={handleSubmit}>
           <p className="account-form-hint">
             Solo puedes solicitar reembolso de pedidos <strong>pagados</strong> que ya estén en preparación,
