@@ -41,6 +41,7 @@ function getBrowserConnectOrigins(): string[] {
   origins.add("https://3ds.culqi.com");
   origins.add("https://js.culqi.com");
   origins.add("https://static.culqi.com");
+  origins.add("https://cloudflareinsights.com");
 
   return [...origins];
 }
@@ -51,6 +52,8 @@ const CULQI_SCRIPT_SRC = [
   "https://3ds.culqi.com",
   "https://static.culqi.com",
 ];
+
+const ANALYTICS_SCRIPT_SRC = ["https://static.cloudflareinsights.com"];
 
 const CULQI_FRAME_SRC = [
   "https://checkout.culqi.com",
@@ -79,7 +82,7 @@ function buildContentSecurityPolicy(options: BuildSecurityHeadersOptions = {}): 
 
   const directives = [
     "default-src 'self'",
-    `script-src 'self' 'unsafe-inline' https://www.google.com https://www.gstatic.com ${CULQI_SCRIPT_SRC.join(" ")}`,
+    `script-src 'self' 'unsafe-inline' https://www.google.com https://www.gstatic.com ${CULQI_SCRIPT_SRC.join(" ")} ${ANALYTICS_SCRIPT_SRC.join(" ")}`,
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: blob: https:",
     "font-src 'self' data:",

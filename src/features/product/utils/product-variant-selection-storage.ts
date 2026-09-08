@@ -29,8 +29,27 @@ function writeAllSelections(selections: StoredSelections) {
     return;
   }
 
-  window.localStorage.setItem(PRODUCT_VARIANT_SELECTION_STORAGE_KEY, JSON.stringify(selections));
+  const serialized = JSON.stringify(selections);
+  const existing = window.localStorage.getItem(PRODUCT_VARIANT_SELECTION_STORAGE_KEY);
+  if (existing === serialized) {
+    return;
+  }
+
+  window.localStorage.setItem(PRODUCT_VARIANT_SELECTION_STORAGE_KEY, serialized);
   window.dispatchEvent(new Event(PRODUCT_VARIANT_SELECTION_CHANGE_EVENT));
+}
+
+function selectionSnapshot(productId: string): string {
+  const selection = readAllSelections()[productId];
+  if (!selection?.sizeId) {
+    return "";
+  }
+
+  return `${selection.sizeId}:${selection.colorId ?? ""}`;
+}
+
+export function readStoredVariantSnapshot(productId: string): string {
+  return selectionSnapshot(productId);
 }
 
 export function readProductVariantSelection(
@@ -52,16 +71,26 @@ export function writeProductVariantSelection(
   selection: ProductVariantInitialSelection,
 ) {
   const current = readAllSelections();
+  const existing = current[productId];
 
   if (!selection.sizeId) {
+    if (!existing) {
+      return;
+    }
+
     delete current[productId];
     writeAllSelections(current);
     return;
   }
 
+  const nextColorId = selection.colorId ?? null;
+  if (existing?.sizeId === selection.sizeId && (existing.colorId ?? null) === nextColorId) {
+    return;
+  }
+
   current[productId] = {
     sizeId: selection.sizeId,
-    colorId: selection.colorId ?? null,
+    colorId: nextColorId,
   };
   writeAllSelections(current);
 }

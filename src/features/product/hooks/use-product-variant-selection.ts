@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
+import { useMemo, useState, useSyncExternalStore } from "react";
 
 import { isUuid } from "@/features/cart/utils/cart-variant";
 import { PDP_COPY } from "@/features/product/constants/pdp-copy";
 import { PRODUCT_VARIANT_SELECTION_CHANGE_EVENT } from "@/features/product/constants/product-variant-selection-storage";
 import type { ProductCartVariation, ProductSize } from "@/features/product/types/product-variant.types";
 import {
-  readProductVariantSelection,
+  readStoredVariantSnapshot,
   writeProductVariantSelection,
 } from "@/features/product/utils/product-variant-selection-storage";
 
@@ -69,6 +69,25 @@ function resolveAutoSelection(sizes: ProductSize[]): VariantSelection {
   return { sizeId: onlySize.id, colorId: null };
 }
 
+function parseStoredSnapshot(snapshot: string): ProductVariantInitialSelection | null {
+  if (!snapshot) {
+    return null;
+  }
+
+  const separatorIndex = snapshot.indexOf(":");
+  if (separatorIndex === -1) {
+    return { sizeId: snapshot, colorId: null };
+  }
+
+  const sizeId = snapshot.slice(0, separatorIndex);
+  const colorId = snapshot.slice(separatorIndex + 1);
+
+  return {
+    sizeId,
+    colorId: colorId || null,
+  };
+}
+
 function resolveDefaultSelection(
   sizes: ProductSize[],
   initialSelection?: ProductVariantInitialSelection,
@@ -89,7 +108,7 @@ function resolveDefaultSelection(
   return resolveAutoSelection(sizes);
 }
 
-function useStoredVariantSelection(productId: string | undefined, enabled: boolean) {
+function useStoredVariantSnapshot(productId: string | undefined, enabled: boolean) {
   return useSyncExternalStore(
     (onStoreChange) => {
       if (!enabled || !productId) {
@@ -105,8 +124,8 @@ function useStoredVariantSelection(productId: string | undefined, enabled: boole
         window.removeEventListener("storage", handler);
       };
     },
-    () => (enabled && productId ? (readProductVariantSelection(productId) ?? null) : null),
-    () => null,
+    () => (enabled && productId ? readStoredVariantSnapshot(productId) : ""),
+    () => "",
   );
 }
 
@@ -124,7 +143,11 @@ export function useProductVariantSelection(
 ) {
   const { productId, persist = false } = options ?? {};
   const shouldPersist = persist && Boolean(productId);
-  const storedSelection = useStoredVariantSelection(productId, shouldPersist);
+  const storedSnapshot = useStoredVariantSnapshot(productId, shouldPersist);
+  const storedSelection = useMemo(
+    () => parseStoredSnapshot(storedSnapshot),
+    [storedSnapshot],
+  );
   const selectionScope = buildSelectionScope(productId, initialSelection);
 
   const defaultSelection = useMemo(
@@ -143,17 +166,6 @@ export function useProductVariantSelection(
   const selectedSizeId = activeOverride?.sizeId ?? defaultSelection.sizeId;
   const selectedColorId = activeOverride?.colorId ?? defaultSelection.colorId;
 
-  useEffect(() => {
-    if (!shouldPersist || !productId) {
-      return;
-    }
-
-    writeProductVariantSelection(productId, {
-      sizeId: selectedSizeId,
-      colorId: selectedColorId,
-    });
-  }, [productId, selectedColorId, selectedSizeId, shouldPersist]);
-
   const hasSizes = sizes.length > 0;
   const selectedSize = sizes.find((size) => size.id === selectedSizeId) ?? null;
   const availableColors = selectedSize?.colors ?? [];
@@ -170,19 +182,31 @@ export function useProductVariantSelection(
     };
   }, [selectedColor?.label, selectedSize?.label, selectedColorId, selectedSizeId]);
 
+  function persistSelection(selection: VariantSelection) {
+    if (!shouldPersist || !productId) {
+      return;
+    }
+
+    writeProductVariantSelection(productId, selection);
+  }
+
   function handleSizeSelect(id: string) {
+    const selection = { sizeId: id, colorId: null };
     setUserOverride({
       scope: selectionScope,
-      selection: { sizeId: id, colorId: null },
+      selection,
     });
+    persistSelection(selection);
     setValidationError(null);
   }
 
   function handleColorSelect(id: string) {
+    const selection = { sizeId: selectedSizeId, colorId: id };
     setUserOverride({
       scope: selectionScope,
-      selection: { sizeId: selectedSizeId, colorId: id },
+      selection,
     });
+    persistSelection(selection);
     setValidationError(null);
   }
 
