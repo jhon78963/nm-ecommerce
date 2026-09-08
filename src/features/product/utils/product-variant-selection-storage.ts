@@ -1,4 +1,7 @@
-import { PRODUCT_VARIANT_SELECTION_STORAGE_KEY } from "@/features/product/constants/product-variant-selection-storage";
+import {
+  PRODUCT_VARIANT_SELECTION_CHANGE_EVENT,
+  PRODUCT_VARIANT_SELECTION_STORAGE_KEY,
+} from "@/features/product/constants/product-variant-selection-storage";
 import type { ProductVariantInitialSelection } from "@/features/product/hooks/use-product-variant-selection";
 
 type StoredSelections = Record<string, ProductVariantInitialSelection>;
@@ -27,6 +30,7 @@ function writeAllSelections(selections: StoredSelections) {
   }
 
   window.localStorage.setItem(PRODUCT_VARIANT_SELECTION_STORAGE_KEY, JSON.stringify(selections));
+  window.dispatchEvent(new Event(PRODUCT_VARIANT_SELECTION_CHANGE_EVENT));
 }
 
 export function readProductVariantSelection(

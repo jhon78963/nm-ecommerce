@@ -10,19 +10,13 @@ interface PdpGalleryProps {
   product: ProductDetail;
 }
 
-export function PdpGallery({ product }: PdpGalleryProps) {
+function PdpGalleryContent({ product }: PdpGalleryProps) {
   const images = useMemo(() => {
     const gallery = product.galleryImageUrls?.filter(Boolean) ?? [];
     return gallery.length > 0 ? gallery : [product.imageUrl];
   }, [product.galleryImageUrls, product.imageUrl]);
 
   const [activeIndex, setActiveIndex] = useState(0);
-  const [trackedProductId, setTrackedProductId] = useState(product.id);
-
-  if (product.id !== trackedProductId) {
-    setTrackedProductId(product.id);
-    setActiveIndex(0);
-  }
 
   const activeImage = images[activeIndex] ?? product.imageUrl;
 
@@ -68,4 +62,8 @@ export function PdpGallery({ product }: PdpGalleryProps) {
       ) : null}
     </div>
   );
+}
+
+export function PdpGallery({ product }: PdpGalleryProps) {
+  return <PdpGalleryContent key={product.id} product={product} />;
 }

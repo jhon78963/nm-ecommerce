@@ -11,7 +11,7 @@ interface ProductQuickViewGalleryProps {
   product: ProductBoxItem;
 }
 
-export function ProductQuickViewGallery({ product }: ProductQuickViewGalleryProps) {
+function ProductQuickViewGalleryContent({ product }: ProductQuickViewGalleryProps) {
   const images = useMemo(() => {
     const gallery = product.galleryImageUrls?.filter(Boolean) ?? [];
 
@@ -23,12 +23,6 @@ export function ProductQuickViewGallery({ product }: ProductQuickViewGalleryProp
   }, [product.galleryImageUrls, product.imageUrl]);
 
   const [activeIndex, setActiveIndex] = useState(0);
-  const [trackedProductId, setTrackedProductId] = useState(product.id);
-
-  if (product.id !== trackedProductId) {
-    setTrackedProductId(product.id);
-    setActiveIndex(0);
-  }
 
   const activeImage = images[activeIndex] ?? product.imageUrl;
 
@@ -78,4 +72,8 @@ export function ProductQuickViewGallery({ product }: ProductQuickViewGalleryProp
       ) : null}
     </div>
   );
+}
+
+export function ProductQuickViewGallery({ product }: ProductQuickViewGalleryProps) {
+  return <ProductQuickViewGalleryContent key={product.id} product={product} />;
 }

@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 
 import { isUuid } from "@/features/cart/utils/cart-variant";
 import { PDP_COPY } from "@/features/product/constants/pdp-copy";
+import { PRODUCT_VARIANT_SELECTION_CHANGE_EVENT } from "@/features/product/constants/product-variant-selection-storage";
 import type { ProductCartVariation, ProductSize } from "@/features/product/types/product-variant.types";
 import {
   readProductVariantSelection,
@@ -20,10 +21,15 @@ export interface UseProductVariantSelectionOptions {
   persist?: boolean;
 }
 
+interface VariantSelection {
+  sizeId: string | null;
+  colorId: string | null;
+}
+
 function resolveInitialSelection(
   sizes: ProductSize[],
   initialSelection?: ProductVariantInitialSelection,
-): { sizeId: string | null; colorId: string | null } {
+): VariantSelection {
   if (!initialSelection?.sizeId) {
     return { sizeId: null, colorId: null };
   }
@@ -45,7 +51,7 @@ function resolveInitialSelection(
   return { sizeId: size.id, colorId: color.id };
 }
 
-function resolveAutoSelection(sizes: ProductSize[]): { sizeId: string | null; colorId: string | null } {
+function resolveAutoSelection(sizes: ProductSize[]): VariantSelection {
   if (sizes.length !== 1) {
     return { sizeId: null, colorId: null };
   }
@@ -68,7 +74,7 @@ function resolveDefaultSelection(
   initialSelection?: ProductVariantInitialSelection,
   storedSelection?: ProductVariantInitialSelection | null,
   shouldPersist = false,
-): { sizeId: string | null; colorId: string | null } {
+): VariantSelection {
   if (initialSelection?.sizeId) {
     return resolveInitialSelection(sizes, initialSelection);
   }
@@ -83,6 +89,34 @@ function resolveDefaultSelection(
   return resolveAutoSelection(sizes);
 }
 
+function useStoredVariantSelection(productId: string | undefined, enabled: boolean) {
+  return useSyncExternalStore(
+    (onStoreChange) => {
+      if (!enabled || !productId) {
+        return () => {};
+      }
+
+      const handler = () => onStoreChange();
+      window.addEventListener(PRODUCT_VARIANT_SELECTION_CHANGE_EVENT, handler);
+      window.addEventListener("storage", handler);
+
+      return () => {
+        window.removeEventListener(PRODUCT_VARIANT_SELECTION_CHANGE_EVENT, handler);
+        window.removeEventListener("storage", handler);
+      };
+    },
+    () => (enabled && productId ? (readProductVariantSelection(productId) ?? null) : null),
+    () => null,
+  );
+}
+
+function buildSelectionScope(
+  productId: string | undefined,
+  initialSelection?: ProductVariantInitialSelection,
+) {
+  return `${productId ?? ""}:${initialSelection?.sizeId ?? ""}:${initialSelection?.colorId ?? ""}`;
+}
+
 export function useProductVariantSelection(
   sizes: ProductSize[] = [],
   initialSelection?: ProductVariantInitialSelection,
@@ -90,32 +124,24 @@ export function useProductVariantSelection(
 ) {
   const { productId, persist = false } = options ?? {};
   const shouldPersist = persist && Boolean(productId);
-
-  const storedSelection =
-    shouldPersist && productId && typeof window !== "undefined"
-      ? readProductVariantSelection(productId)
-      : null;
+  const storedSelection = useStoredVariantSelection(productId, shouldPersist);
+  const selectionScope = buildSelectionScope(productId, initialSelection);
 
   const defaultSelection = useMemo(
     () => resolveDefaultSelection(sizes, initialSelection, storedSelection, shouldPersist),
     [initialSelection, shouldPersist, sizes, storedSelection],
   );
 
-  const [selectedSizeId, setSelectedSizeId] = useState<string | null>(defaultSelection.sizeId);
-  const [selectedColorId, setSelectedColorId] = useState<string | null>(defaultSelection.colorId);
+  const [userOverride, setUserOverride] = useState<{
+    scope: string;
+    selection: VariantSelection;
+  } | null>(null);
   const [validationError, setValidationError] = useState<string | null>(null);
-  const [appliedSelectionKey, setAppliedSelectionKey] = useState(
-    () => `${defaultSelection.sizeId ?? ""}:${defaultSelection.colorId ?? ""}`,
-  );
 
-  const defaultSelectionKey = `${defaultSelection.sizeId ?? ""}:${defaultSelection.colorId ?? ""}`;
-
-  if (defaultSelectionKey !== appliedSelectionKey) {
-    setAppliedSelectionKey(defaultSelectionKey);
-    setSelectedSizeId(defaultSelection.sizeId);
-    setSelectedColorId(defaultSelection.colorId);
-    setValidationError(null);
-  }
+  const activeOverride =
+    userOverride?.scope === selectionScope ? userOverride.selection : null;
+  const selectedSizeId = activeOverride?.sizeId ?? defaultSelection.sizeId;
+  const selectedColorId = activeOverride?.colorId ?? defaultSelection.colorId;
 
   useEffect(() => {
     if (!shouldPersist || !productId) {
@@ -145,13 +171,18 @@ export function useProductVariantSelection(
   }, [selectedColor?.label, selectedSize?.label, selectedColorId, selectedSizeId]);
 
   function handleSizeSelect(id: string) {
-    setSelectedSizeId(id);
-    setSelectedColorId(null);
+    setUserOverride({
+      scope: selectionScope,
+      selection: { sizeId: id, colorId: null },
+    });
     setValidationError(null);
   }
 
   function handleColorSelect(id: string) {
-    setSelectedColorId(id);
+    setUserOverride({
+      scope: selectionScope,
+      selection: { sizeId: selectedSizeId, colorId: id },
+    });
     setValidationError(null);
   }
 
