@@ -12,6 +12,22 @@ export function createLocalStorageStore<T>(
   write: (items: T[]) => void,
   eventName: string,
 ): LocalStorageStore<T> {
+  let cachedSerialized = "";
+  let cachedSnapshot: T[] = [];
+
+  function getSnapshot(): T[] {
+    const next = read();
+    const serialized = JSON.stringify(next);
+
+    if (serialized === cachedSerialized) {
+      return cachedSnapshot;
+    }
+
+    cachedSerialized = serialized;
+    cachedSnapshot = next;
+    return cachedSnapshot;
+  }
+
   function notifyChange() {
     if (typeof window === "undefined") {
       return;
@@ -35,12 +51,15 @@ export function createLocalStorageStore<T>(
         window.removeEventListener("storage", handler);
       };
     },
-    getSnapshot: read,
+    getSnapshot,
     getServerSnapshot: () => [],
     setItems(updater) {
-      const current = read();
+      const current = getSnapshot();
       const next = typeof updater === "function" ? updater(current) : updater;
       write(next);
+
+      cachedSerialized = JSON.stringify(next);
+      cachedSnapshot = next;
       notifyChange();
     },
   };

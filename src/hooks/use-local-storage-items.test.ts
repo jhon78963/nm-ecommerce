@@ -27,6 +27,20 @@ describe("createLocalStorageStore", () => {
     expect(store.getSnapshot()).toEqual(["a", "b", "c"]);
   });
 
+  it("returns the same snapshot reference when storage data is unchanged", () => {
+    const store = createLocalStorageStore<string>(
+      () => JSON.parse(window.localStorage.getItem("test-items") ?? "[]") as string[],
+      (items) => window.localStorage.setItem("test-items", JSON.stringify(items)),
+      "test-items-change",
+    );
+
+    store.setItems(["a"]);
+    const first = store.getSnapshot();
+    const second = store.getSnapshot();
+
+    expect(first).toBe(second);
+  });
+
   it("returns an empty snapshot on the server", () => {
     const store = createLocalStorageStore<string>(
       () => ["client"],
