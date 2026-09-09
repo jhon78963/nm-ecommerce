@@ -20,6 +20,7 @@ export const PDP_COPY = {
   remainingStock: (qty: number) => `Quedan ${qty} unidades`,
   addToWishlist: "Agregar a favoritos",
   removeFromWishlist: "En favoritos",
+  whatsappPurchase: "Comprar por WhatsApp",
   whatsappInquiry: "Consultar por WhatsApp",
 
   selectSizeFirst: "Selecciona una talla",

@@ -7,6 +7,7 @@ export const QUICK_VIEW_COPY = {
   buyNow: "Comprar ahora",
   outOfStock: "Agotado",
   addToWishlist: "Agregar a favoritos",
+  whatsappPurchase: "Comprar por WhatsApp",
   whatsappInquiry: "Consultar por WhatsApp",
   deliveryDetails: "Detalles de envío",
   estimatedDelivery: "Entrega estimada en 1-2 días hábiles",

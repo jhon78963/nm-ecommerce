@@ -5,10 +5,11 @@ import { ArrowLeftRight, Heart, Minus, Plus, ShoppingCart, Star, Truck } from "l
 import { useMemo, useState } from "react";
 
 import { useCart } from "@/features/cart/context/CartProvider";
+import { formatPrice } from "@/features/cart/utils/format-price";
 import { cartLineHasValidVariant } from "@/features/cart/utils/cart-variant";
 import { PRODUCT_COPY } from "@/features/product/constants/product-copy";
 import { QUICK_VIEW_COPY } from "@/features/product/constants/quick-view-copy";
-import { ProductWhatsAppInquiryLink } from "@/features/product/components/ProductWhatsAppInquiryLink";
+import { ProductWhatsAppPurchaseButton } from "@/features/product/components/ProductWhatsAppPurchaseButton";
 import { ProductVariantSelectors } from "@/features/product/components/variants/ProductVariantSelectors";
 import {
   useProductVariantSelection,
@@ -222,16 +223,19 @@ export function ProductQuickViewDetails({
           <Heart className={cn("size-4", isWishlisted && "fill-theme text-theme")} />
           <span>{PRODUCT_COPY.addToWishlist}</span>
         </button>
-        <ProductWhatsAppInquiryLink
-          label={QUICK_VIEW_COPY.whatsappInquiry}
+        <ProductWhatsAppPurchaseButton
+          label={QUICK_VIEW_COPY.whatsappPurchase}
+          productId={String(product.id)}
           productName={product.name}
+          quantity={effectiveQuantity}
+          unitPriceLabel={formatPrice(product.salePrice)}
           sizeLabel={variantSelection.hasSizes ? variantSelection.selectedSize?.label ?? null : undefined}
           colorLabel={
             variantSelection.hasSizes && variantSelection.selectedSize
               ? variantSelection.selectedColor?.label ?? null
               : undefined
           }
-          barcode={product.sku}
+          sku={product.sku}
           productPath={href}
         />
       </div>

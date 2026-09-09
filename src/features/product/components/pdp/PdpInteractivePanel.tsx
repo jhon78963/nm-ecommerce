@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useMemo, useState } from "react";
 
 import { useCart } from "@/features/cart/context/CartProvider";
-import { ProductWhatsAppInquiryLink } from "@/features/product/components/ProductWhatsAppInquiryLink";
+import { ProductWhatsAppPurchaseButton } from "@/features/product/components/ProductWhatsAppPurchaseButton";
 import { ProductVariantSelectors } from "@/features/product/components/variants/ProductVariantSelectors";
 import { PDP_COPY } from "@/features/product/constants/pdp-copy";
 import { useProductStock } from "@/features/product/hooks/use-product-stock";
@@ -16,6 +16,7 @@ import { formatPdpStockLabel } from "@/features/product/utils/format-pdp-stock-l
 import { getProductBoxHref } from "@/features/product/utils/format-product-price";
 import { clampQuantity, getVariantStock } from "@/features/product/utils/get-variant-stock";
 import { buildProductHrefWithVariants, parseVariantSearchParams } from "@/features/product/utils/product-variant-url";
+import { formatPrice } from "@/features/cart/utils/format-price";
 import { useWishlist } from "@/features/wishlist/context/WishlistProvider";
 import { cn } from "@/lib/utils";
 
@@ -198,6 +199,24 @@ export function PdpInteractivePanel({ product }: PdpInteractivePanelProps) {
             {PDP_COPY.buyNow}
           </button>
         </div>
+
+        <ProductWhatsAppPurchaseButton
+          label={PDP_COPY.whatsappPurchase}
+          variant="button"
+          className="mt-3"
+          productId={String(product.id)}
+          productName={product.name}
+          quantity={effectiveQuantity}
+          unitPriceLabel={formatPrice(product.salePrice)}
+          sizeLabel={variantSelection.hasSizes ? variantSelection.selectedSize?.label ?? null : undefined}
+          colorLabel={
+            variantSelection.hasSizes && variantSelection.selectedSize
+              ? variantSelection.selectedColor?.label ?? null
+              : undefined
+          }
+          sku={product.sku}
+          productPath={productPath}
+        />
       </div>
 
       <div className="compare-box buy-box">
@@ -213,16 +232,19 @@ export function PdpInteractivePanel({ product }: PdpInteractivePanelProps) {
           <span>{isWishlisted ? PDP_COPY.removeFromWishlist : PDP_COPY.addToWishlist}</span>
         </button>
 
-        <ProductWhatsAppInquiryLink
+        <ProductWhatsAppPurchaseButton
           label={PDP_COPY.whatsappInquiry}
+          productId={String(product.id)}
           productName={product.name}
+          quantity={effectiveQuantity}
+          unitPriceLabel={formatPrice(product.salePrice)}
           sizeLabel={variantSelection.hasSizes ? variantSelection.selectedSize?.label ?? null : undefined}
           colorLabel={
             variantSelection.hasSizes && variantSelection.selectedSize
               ? variantSelection.selectedColor?.label ?? null
               : undefined
           }
-          barcode={product.sku}
+          sku={product.sku}
           productPath={productPath}
         />
       </div>
