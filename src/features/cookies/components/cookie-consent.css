@@ -1,0 +1,114 @@
+.nm-cookie-banner {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 120;
+  border-top: 1px solid #e5e7eb;
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 -8px 30px rgba(17, 24, 39, 0.08);
+  backdrop-filter: blur(8px);
+}
+
+.nm-cookie-banner__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 1rem 0 1.25rem;
+}
+
+.nm-cookie-banner__copy {
+  min-width: 0;
+}
+
+.nm-cookie-banner__title {
+  margin: 0 0 0.35rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.nm-cookie-banner__text {
+  margin: 0;
+  max-width: 52rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: #4b5563;
+}
+
+.nm-cookie-banner__link {
+  color: #ea580c;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.nm-cookie-banner__actions {
+  display: flex;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.nm-cookie-banner__btn {
+  border-radius: 9999px;
+  padding: 0.65rem 1.1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.nm-cookie-banner__btn--ghost {
+  border: 1px solid #d1d5db;
+  background: #fff;
+  color: #374151;
+}
+
+.nm-cookie-banner__btn--ghost:hover {
+  border-color: #9ca3af;
+  background: #f9fafb;
+}
+
+.nm-cookie-banner__btn--primary {
+  border: 1px solid #ea580c;
+  background: #ea580c;
+  color: #fff;
+}
+
+.nm-cookie-banner__btn--primary:hover {
+  background: #c2410c;
+  border-color: #c2410c;
+}
+
+.nm-cookie-preferences-trigger {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  color: inherit;
+  font: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.footer-cookie-preferences {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+@media (max-width: 767px) {
+  .nm-cookie-banner__inner {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .nm-cookie-banner__actions {
+    width: 100%;
+  }
+
+  .nm-cookie-banner__btn {
+    flex: 1 1 auto;
+  }
+}

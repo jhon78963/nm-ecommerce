@@ -8,6 +8,7 @@ import { FooterLogo } from "@/features/footer/components/widgets/FooterLogo";
 import { FooterNewsletter } from "@/features/footer/components/widgets/FooterNewsletter";
 import { FooterPaymentOptions } from "@/features/footer/components/widgets/FooterPaymentOptions";
 import { FooterSocialLinks } from "@/features/footer/components/widgets/FooterSocialLinks";
+import { FooterCookiePreferences } from "@/features/cookies/components/FooterCookiePreferences";
 import { getStoreFooterConfig } from "@/features/footer/services/footer.service";
 import {
   HARDCODED_FOOTER_CENTRO_AYUDA_LINKS,
@@ -71,6 +72,7 @@ export async function Footer() {
             {config.copyrightEnabled ? (
               <div className="sub-footer-col sub-footer-col--copyright">
                 <FooterCopyright content={config.copyrightContent} />
+                <FooterCookiePreferences />
               </div>
             ) : null}
             {config.paymentImageUrl ? (

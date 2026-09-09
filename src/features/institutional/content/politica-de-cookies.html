@@ -79,34 +79,40 @@
 					</thead>
 					<tbody>
 						<tr>
-							<td><code>woocommerce_cart_hash</code></td>
+							<td><code>nm-ecommerce-cart</code></td>
 							<td>Necesaria</td>
-							<td>Identificar el carrito de compras del usuario.</td>
-							<td>Sesión</td>
+							<td>Guardar los productos del carrito de compras.</td>
+							<td>Persistente</td>
 						</tr>
 						<tr>
-							<td><code>woocommerce_items_in_cart</code></td>
+							<td><code>nm_customer_access_token</code></td>
 							<td>Necesaria</td>
-							<td>Indicar si hay productos en el carrito.</td>
-							<td>Sesión</td>
+							<td>Mantener la sesión del cliente autenticado.</td>
+							<td>1 hora</td>
 						</tr>
 						<tr>
-							<td><code>wp_woocommerce_session_*</code></td>
+							<td><code>nm_customer_refresh_token</code></td>
 							<td>Necesaria</td>
-							<td>Mantener la sesión de compra activa.</td>
-							<td>48 horas</td>
+							<td>Renovar la sesión del cliente sin volver a iniciar sesión.</td>
+							<td>7 días</td>
 						</tr>
 						<tr>
-							<td><code>wordpress_logged_in_*</code></td>
-							<td>Necesaria</td>
-							<td>Identificar al usuario registrado e iniciado sesión.</td>
-							<td>Sesión / 14 días</td>
-						</tr>
-						<tr>
-							<td><code>localStorage (wishlist)</code></td>
+							<td><code>nm_wishlist</code></td>
 							<td>Funcional</td>
 							<td>Guardar la lista de deseos en el navegador del usuario.</td>
 							<td>Persistente</td>
+						</tr>
+						<tr>
+							<td><code>nm_cookie_consent</code></td>
+							<td>Necesaria</td>
+							<td>Recordar tu elección sobre cookies no esenciales.</td>
+							<td>Persistente</td>
+						</tr>
+						<tr>
+							<td><code>_ga / _gid</code> (Google Analytics / GTM)</td>
+							<td>Análisis</td>
+							<td>Medir visitas y comportamiento agregado del sitio.</td>
+							<td>Hasta 24 meses</td>
 						</tr>
 					</tbody>
 				</table>
@@ -126,6 +132,8 @@
 			</ul>
 			<p>
 				Si desactivas las cookies técnicas necesarias, es posible que no puedas añadir productos al carrito, iniciar sesión o completar una compra. Las cookies de análisis pueden desactivarse sin afectar la funcionalidad principal de la tienda.			</p>
+			<p>
+				Al visitar la tienda por primera vez verás un aviso para aceptar todas las cookies o continuar solo con las necesarias. También puedes cambiar tu elección en cualquier momento desde el enlace <strong>Gestionar cookies</strong> del pie de página.			</p>
 
 			<h2 id="cookies-6">6. Conservación</h2>
 			<p>
