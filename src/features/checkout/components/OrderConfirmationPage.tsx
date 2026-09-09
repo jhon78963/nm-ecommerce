@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { CheckCircle2, ChevronRight, Loader2 } from "lucide-react";
+import { useEffect, useRef } from "react";
 
+import { trackPurchase } from "@/features/analytics";
 import { CHECKOUT_COPY } from "@/features/checkout/constants/checkout-copy";
 import { BacsPaymentInstructions } from "@/features/checkout/components/BacsPaymentInstructions";
 import { PaymentStatusBadge } from "@/features/checkout/components/PaymentStatusBadge";
@@ -15,12 +17,22 @@ import "./order.css";
 export function OrderConfirmationContent() {
   const { orderNumber, email, emailOrPhone } = useOrderLookupParams();
   const contact = email || emailOrPhone;
+  const trackedOrderRef = useRef<string | null>(null);
   const { order, isLoading, isAwaitingPayment, paymentError } = useLiveOrderSync({
     orderNumber,
     contact,
     enabled: Boolean(orderNumber && contact),
     processPendingCharge: true,
   });
+
+  useEffect(() => {
+    if (!order || trackedOrderRef.current === order.orderNumber) {
+      return;
+    }
+
+    trackedOrderRef.current = order.orderNumber;
+    trackPurchase(order);
+  }, [order]);
 
   if (isLoading && !order) {
     return (

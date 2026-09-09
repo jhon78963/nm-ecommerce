@@ -16,7 +16,10 @@ import {
   SITE_META,
 } from "@/features/seo/constants/site-meta";
 import {
+  AnalyticsPageTracker,
   AnalyticsScripts,
+} from "@/features/analytics";
+import {
   CookieConsentBanner,
 } from "@/features/cookies/components/CookieConsentBanner";
 import { CookieConsentProvider } from "@/features/cookies/context/CookieConsentProvider";
@@ -66,6 +69,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             </WishlistProvider>
           </AuthProvider>
           <AnalyticsScripts />
+          <Suspense fallback={null}>
+            <AnalyticsPageTracker />
+          </Suspense>
           <CookieConsentBanner />
         </CookieConsentProvider>
       </body>

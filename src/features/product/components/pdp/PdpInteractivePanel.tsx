@@ -2,8 +2,9 @@
 
 import { Heart, Minus, Plus, ShoppingCart } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
+import { trackBeginCheckout, trackViewItem } from "@/features/analytics";
 import { useCart } from "@/features/cart/context/CartProvider";
 import { ProductWhatsAppPurchaseButton } from "@/features/product/components/ProductWhatsAppPurchaseButton";
 import { ProductVariantSelectors } from "@/features/product/components/variants/ProductVariantSelectors";
@@ -55,6 +56,39 @@ export function PdpInteractivePanel({ product }: PdpInteractivePanelProps) {
   const maxQuantity = availableStock !== null && availableStock > 0 ? availableStock : 1;
   const effectiveQuantity = clampQuantity(quantity, maxQuantity);
   const canIncreaseQuantity = effectiveQuantity < maxQuantity;
+  const lastViewItemKeyRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!variantSelection.selectedSizeId && variantSelection.hasSizes) {
+      return;
+    }
+
+    const viewKey = [
+      product.id,
+      variantSelection.selectedSizeId ?? "default",
+      variantSelection.selectedColorId ?? "default",
+    ].join(":");
+
+    if (lastViewItemKeyRef.current === viewKey) {
+      return;
+    }
+
+    lastViewItemKeyRef.current = viewKey;
+    trackViewItem({
+      productId: String(product.id),
+      name: product.name,
+      price: product.salePrice,
+      variation: variantSelection.cartVariation.variation,
+    });
+  }, [
+    product.id,
+    product.name,
+    product.salePrice,
+    variantSelection.cartVariation.variation,
+    variantSelection.hasSizes,
+    variantSelection.selectedColorId,
+    variantSelection.selectedSizeId,
+  ]);
 
   function updateQuantity(delta: number) {
     setQuantity((current) => clampQuantity(current + delta, maxQuantity));
@@ -82,6 +116,23 @@ export function PdpInteractivePanel({ product }: PdpInteractivePanelProps) {
     });
 
     if (buyNow) {
+      trackBeginCheckout(
+        [
+          {
+            id: `${product.id}-buy-now`,
+            productId: String(product.id),
+            productSizeId: variantSelection.cartVariation.productSizeId,
+            colorId: variantSelection.cartVariation.colorId,
+            name: product.name,
+            imageUrl: product.imageUrl,
+            quantity: effectiveQuantity,
+            price: product.salePrice,
+            variation: variantSelection.cartVariation.variation,
+            variationId: variantSelection.cartVariation.variationId,
+          },
+        ],
+        product.salePrice * effectiveQuantity,
+      );
       router.push("/checkout");
       return;
     }

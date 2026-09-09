@@ -17,6 +17,7 @@ import {
 import type { CartContextValue, CartLineItem } from "@/features/cart/types/cart.types";
 import { readCartFromStorage, writeCartToStorage } from "@/features/cart/utils/cart-storage";
 import { resolveCartLineVariantIds } from "@/features/cart/utils/cart-variant";
+import { trackAddToCart } from "@/features/analytics";
 import { useAuth } from "@/features/auth/context/AuthProvider";
 import { createLocalStorageStore, useLocalStorageItems } from "@/hooks/use-local-storage-items";
 
@@ -79,6 +80,14 @@ export function CartProvider({
       });
 
       if (existing) {
+        trackAddToCart({
+          productId: item.productId,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+          variation: item.variation,
+        });
+
         return current.map((line) =>
           line.id === existing.id
             ? { ...line, quantity: line.quantity + item.quantity }
@@ -90,6 +99,14 @@ export function CartProvider({
         incomingVariant.productSizeId
         ?? item.variationId
         ?? "default";
+
+      trackAddToCart({
+        productId: item.productId,
+        name: item.name,
+        price: item.price,
+        quantity: item.quantity,
+        variation: item.variation,
+      });
 
       return [
         ...current,

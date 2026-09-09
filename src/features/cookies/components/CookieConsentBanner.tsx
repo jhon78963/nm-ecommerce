@@ -1,61 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import Script from "next/script";
 
 import { useCookieConsent } from "@/features/cookies/context/CookieConsentProvider";
 import { ROUTES } from "@/lib/routes";
-
-function getGtmId(): string | undefined {
-  return process.env.NEXT_PUBLIC_GTM_ID?.trim() || undefined;
-}
-
-function getCloudflareBeaconToken(): string | undefined {
-  return process.env.NEXT_PUBLIC_CF_BEACON_TOKEN?.trim() || undefined;
-}
-
-export function AnalyticsScripts() {
-  const { isReady, hasAnalyticsConsent } = useCookieConsent();
-  const gtmId = getGtmId();
-  const cfToken = getCloudflareBeaconToken();
-
-  if (!isReady || !hasAnalyticsConsent) {
-    return null;
-  }
-
-  return (
-    <>
-      {gtmId ? (
-        <>
-          <Script id="nm-gtm-loader" strategy="afterInteractive">
-            {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','${gtmId}');`}
-          </Script>
-          <noscript>
-            <iframe
-              title="Google Tag Manager"
-              src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`}
-              height="0"
-              width="0"
-              style={{ display: "none", visibility: "hidden" }}
-            />
-          </noscript>
-        </>
-      ) : null}
-      {cfToken ? (
-        <Script
-          id="nm-cf-beacon"
-          src="https://static.cloudflareinsights.com/beacon.min.js"
-          strategy="afterInteractive"
-          data-cf-beacon={JSON.stringify({ token: cfToken })}
-        />
-      ) : null}
-    </>
-  );
-}
 
 export function CookieConsentBanner() {
   const { showBanner, acceptAll, rejectNonEssential } = useCookieConsent();

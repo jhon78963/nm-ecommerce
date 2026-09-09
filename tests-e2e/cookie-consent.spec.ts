@@ -33,6 +33,14 @@ test.describe("Cookie consent banner", () => {
     await page.getByRole("button", { name: "Solo necesarias" }).click();
 
     await expect(page.locator('script[id="nm-gtm-loader"]')).toHaveCount(0);
+    await expect(page.locator('script[id="nm-ga-loader"]')).toHaveCount(0);
     await expect(page.locator('script[id="nm-cf-beacon"]')).toHaveCount(0);
+  });
+
+  test("loads consent bootstrap after accepting analytics", async ({ page }) => {
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+    await page.getByRole("button", { name: "Aceptar todas" }).click();
+
+    await expect(page.locator('script[id="nm-analytics-consent"]')).toHaveCount(1);
   });
 });

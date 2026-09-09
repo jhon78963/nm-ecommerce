@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState, useCallback, useSyncExternalStore
 import { useRouter } from "next/navigation";
 
 import { useCart } from "@/features/cart/context/CartProvider";
+import { trackBeginCheckout } from "@/features/analytics";
 import { fetchCustomerAddresses } from "@/features/account/services/account-addresses.service";
 import { useAuth } from "@/features/auth/context/AuthProvider";
 import { cartLineHasValidVariant } from "@/features/cart/utils/cart-variant";
@@ -129,6 +130,7 @@ function CheckoutFormClient() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [prefilledFromAccount, setPrefilledFromAccount] = useState(false);
   const isCompletingOrderRef = useRef(false);
+  const beginCheckoutTrackedRef = useRef(false);
   const customerPrefillAppliedRef = useRef(false);
   const [pendingCouponCode, setPendingCouponCode] = useState<string | null>(null);
 
@@ -244,8 +246,15 @@ function CheckoutFormClient() {
     if (!isHydrated || isCompletingOrderRef.current) return;
     if (items.length === 0) {
       router.replace(ROUTES.cart);
+      return;
     }
-  }, [isHydrated, items.length, router]);
+
+    if (!beginCheckoutTrackedRef.current) {
+      beginCheckoutTrackedRef.current = true;
+      const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+      trackBeginCheckout(items, subtotal);
+    }
+  }, [isHydrated, items, router]);
 
   const handleBillingChange = (field: keyof CheckoutAddress, value: string) => {
     setBilling((current) => {
