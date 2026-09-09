@@ -22,6 +22,7 @@ async function submitJson(path: string, payload: unknown) {
     message?: string;
     error?: string;
     receiptNumber?: string;
+    quoteNumber?: string;
   };
   if (!response.ok) {
     throw new Error(body.error ?? "No pudimos procesar tu solicitud.");
