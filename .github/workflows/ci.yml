@@ -42,7 +42,7 @@ jobs:
         run: npm run build
 
   e2e:
-    name: Playwright checkout E2E
+    name: Playwright storefront E2E
     runs-on: ubuntu-latest
     needs: quality
     timeout-minutes: 25
@@ -80,7 +80,7 @@ jobs:
           ECOMMERCE_SERVICE_URL: http://127.0.0.1:3012
           API_BASE_URL: http://127.0.0.1:3000/api/v1
 
-      - name: Run checkout E2E
+      - name: Run storefront E2E
         run: npm run test:e2e
 
   deploy:
