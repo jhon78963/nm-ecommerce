@@ -7,6 +7,23 @@ interface InstitutionalHtmlContentProps {
   slug: string;
 }
 
+async function submitJson(path: string, payload: unknown) {
+  const response = await fetch(path, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  const body = (await response.json().catch(() => ({}))) as {
+    message?: string;
+    error?: string;
+    receiptNumber?: string;
+  };
+  if (!response.ok) {
+    throw new Error(body.error ?? "No pudimos procesar tu solicitud.");
+  }
+  return body;
+}
+
 function bindInstitutionalForms(root: HTMLElement) {
   const contactForm = root.querySelector<HTMLFormElement>("#nm-contact-form");
   if (contactForm && !contactForm.dataset.bound) {
@@ -14,13 +31,31 @@ function bindInstitutionalForms(root: HTMLElement) {
     contactForm.addEventListener("submit", (event) => {
       event.preventDefault();
       const message = root.querySelector<HTMLElement>("#nm-contact-msg");
-      if (message) {
-        message.hidden = false;
-        message.textContent =
-          "Gracias por escribirnos. Te responderemos a la brevedad en el correo indicado.";
-        message.classList.add("nm-inst-contact-form__msg--success");
-      }
-      contactForm.reset();
+      const formData = new FormData(contactForm);
+
+      void submitJson("/api/institutional/contact", {
+        name: String(formData.get("nm_contact_name") ?? ""),
+        email: String(formData.get("nm_contact_email") ?? ""),
+        phone: String(formData.get("nm_contact_phone") ?? "") || undefined,
+        subject: String(formData.get("nm_contact_subject") ?? ""),
+        message: String(formData.get("nm_contact_message") ?? ""),
+      })
+        .then((result) => {
+          if (message) {
+            message.hidden = false;
+            message.textContent = result.message ?? "Mensaje enviado.";
+            message.classList.add("nm-inst-contact-form__msg--success");
+          }
+          contactForm.reset();
+        })
+        .catch((error: unknown) => {
+          if (message) {
+            message.hidden = false;
+            message.textContent =
+              error instanceof Error ? error.message : "No pudimos enviar tu mensaje.";
+            message.classList.remove("nm-inst-contact-form__msg--success");
+          }
+        });
     });
   }
 
@@ -30,12 +65,46 @@ function bindInstitutionalForms(root: HTMLElement) {
     libroForm.addEventListener("submit", (event) => {
       event.preventDefault();
       const message = root.querySelector<HTMLElement>("#nm-libro-msg");
-      if (message) {
-        message.hidden = false;
-        message.textContent =
-          "Tu reclamo o queja fue registrado. Conserva este comprobante y te responderemos en un plazo máximo de 15 días hábiles.";
-        message.classList.add("nm-libro-form__msg--success");
-      }
+      const receipt = root.querySelector<HTMLElement>("#nm-libro-receipt");
+      const receiptContent = root.querySelector<HTMLElement>("#nm-libro-receipt-content");
+      const formData = new FormData(libroForm);
+      const tipo = String(formData.get("nm_libro_tipo") ?? "");
+
+      void submitJson("/api/institutional/libro-reclamaciones", {
+        tipo,
+        nombre: String(formData.get("nm_libro_nombre") ?? ""),
+        documento: String(formData.get("nm_libro_documento") ?? ""),
+        domicilio: String(formData.get("nm_libro_domicilio") ?? ""),
+        telefono: String(formData.get("nm_libro_telefono") ?? ""),
+        email: String(formData.get("nm_libro_email") ?? ""),
+        producto: String(formData.get("nm_libro_producto") ?? ""),
+        monto: String(formData.get("nm_libro_monto") ?? "") || undefined,
+        detalle: String(formData.get("nm_libro_detalle") ?? ""),
+        pedido: String(formData.get("nm_libro_pedido") ?? ""),
+        conforme: formData.get("nm_libro_conforme") === "on",
+      })
+        .then((result) => {
+          if (message) {
+            message.hidden = false;
+            message.textContent = result.message ?? "Registro completado.";
+            message.classList.add("nm-libro-form__msg--success");
+          }
+          if (receipt && receiptContent && result.receiptNumber) {
+            receiptContent.innerHTML = `
+              <p><strong>N° de registro:</strong> ${result.receiptNumber}</p>
+              <p>Conserva este número como comprobante de tu ${tipo === "queja" ? "queja" : "reclamo"}.</p>
+            `;
+            receipt.hidden = false;
+          }
+        })
+        .catch((error: unknown) => {
+          if (message) {
+            message.hidden = false;
+            message.textContent =
+              error instanceof Error ? error.message : "No pudimos registrar tu reclamo.";
+            message.classList.remove("nm-libro-form__msg--success");
+          }
+        });
     });
   }
 }
