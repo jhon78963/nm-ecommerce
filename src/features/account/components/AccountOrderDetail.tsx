@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Download } from "lucide-react";
 
 import { AccountEmptyState } from "@/features/account/components/AccountEmptyState";
 import { ACCOUNT_ROUTES } from "@/features/account/constants/account-nav";
@@ -81,6 +81,29 @@ export function AccountOrderDetail({ orderNumber }: AccountOrderDetailProps) {
 
       <OrderStatusSummary order={order} />
       <OrderStatusTracker order={order} />
+
+      {order.invoice?.available ? (
+        <div className="account-card" style={{ marginTop: 24 }}>
+          <div className="account-card__body flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h3 className="text-lg font-bold">Comprobante electrónico</h3>
+              <p className="text-sm text-[#666]">
+                {order.invoice.fullInvoiceNumber
+                  ? `${order.invoice.documentType ?? "Boleta"} ${order.invoice.fullInvoiceNumber}`
+                  : "Tu boleta estará disponible en breve."}
+              </p>
+            </div>
+            <a
+              href={`/api/account/orders/${encodeURIComponent(order.orderNumber)}/invoice`}
+              className="btn btn-solid inline-flex items-center gap-2"
+              download
+            >
+              <Download className="size-4" />
+              Descargar PDF
+            </a>
+          </div>
+        </div>
+      ) : null}
 
       <div className="dashboard-table" style={{ marginTop: 24 }}>
         <div className="account-card__body">

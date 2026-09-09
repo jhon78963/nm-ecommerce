@@ -36,6 +36,12 @@ interface ApiOrder {
   couponCode?: string | null;
   couponDiscount: number;
   total: number;
+  invoice?: {
+    available: boolean;
+    documentType: string | null;
+    fullInvoiceNumber: string | null;
+    sunatStatus: string | null;
+  };
   items: ApiOrderItem[];
 }
 
@@ -72,6 +78,7 @@ function mapApiOrder(order: ApiOrder): StoredOrder {
     couponCode: order.couponCode ?? undefined,
     couponDiscount: order.couponDiscount,
     total: order.total,
+    invoice: order.invoice,
   };
 }
 

@@ -39,4 +39,10 @@ export interface StoredOrder {
   couponCode?: string;
   couponDiscount: number;
   total: number;
+  invoice?: {
+    available: boolean;
+    documentType: string | null;
+    fullInvoiceNumber: string | null;
+    sunatStatus: string | null;
+  };
 }
