@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import { PDP_COPY } from "@/features/product/constants/pdp-copy";
+import { useProductStock } from "@/features/product/hooks/use-product-stock";
 import { PdpReviews } from "@/features/product/components/pdp/PdpReviews";
 import type { ProductDetail } from "@/features/product/types/product-detail.types";
+import { enrichProductWithVariants } from "@/features/product/utils/enrich-product-variants";
 import { cn } from "@/lib/utils";
 
 interface PdpProductTabsProps {
@@ -33,10 +35,14 @@ function DescriptionTab({ description }: { description?: string }) {
 }
 
 function AdditionalInfoTab({ product }: { product: ProductDetail }) {
+  const enrichedProduct = useMemo(() => enrichProductWithVariants(product), [product]);
+  const { stockStatus } = useProductStock(String(product.id), enrichedProduct.sizes);
+  const isInStock = stockStatus === "in_stock";
+
   const rows = [
     product.sku && { label: "SKU", value: product.sku },
     product.genderLabel && { label: "Género", value: product.genderLabel },
-    { label: "Estado", value: product.stockStatus === "in_stock" ? "En stock" : "Sin stock" },
+    { label: "Estado", value: isInStock ? PDP_COPY.inStock : PDP_COPY.outOfStock },
   ].filter(Boolean) as Array<{ label: string; value: string }>;
 
   return (

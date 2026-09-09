@@ -17,6 +17,7 @@ export const PDP_COPY = {
   addToCart: "Agregar al carrito",
   buyNow: "Comprar ahora",
   outOfStock: "Agotado",
+  remainingStock: (qty: number) => `Quedan ${qty} unidades`,
   addToWishlist: "Agregar a favoritos",
   removeFromWishlist: "En favoritos",
   whatsappInquiry: "Consultar por WhatsApp",

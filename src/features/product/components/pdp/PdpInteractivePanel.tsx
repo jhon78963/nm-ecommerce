@@ -8,9 +8,11 @@ import { useCart } from "@/features/cart/context/CartProvider";
 import { ProductWhatsAppInquiryLink } from "@/features/product/components/ProductWhatsAppInquiryLink";
 import { ProductVariantSelectors } from "@/features/product/components/variants/ProductVariantSelectors";
 import { PDP_COPY } from "@/features/product/constants/pdp-copy";
+import { useProductStock } from "@/features/product/hooks/use-product-stock";
 import { useProductVariantSelection } from "@/features/product/hooks/use-product-variant-selection";
 import type { ProductDetail } from "@/features/product/types/product-detail.types";
 import { enrichProductWithVariants } from "@/features/product/utils/enrich-product-variants";
+import { formatPdpStockLabel } from "@/features/product/utils/format-pdp-stock-label";
 import { getProductBoxHref } from "@/features/product/utils/format-product-price";
 import { clampQuantity, getVariantStock } from "@/features/product/utils/get-variant-stock";
 import { buildProductHrefWithVariants, parseVariantSearchParams } from "@/features/product/utils/product-variant-url";
@@ -29,19 +31,25 @@ export function PdpInteractivePanel({ product }: PdpInteractivePanelProps) {
   const searchParams = useSearchParams();
 
   const enrichedProduct = useMemo(() => enrichProductWithVariants(product), [product]);
+  const { sizes: liveSizes, stockStatus: liveStockStatus } = useProductStock(
+    String(product.id),
+    enrichedProduct.sizes,
+  );
   const initialSelection = useMemo(() => parseVariantSearchParams(searchParams), [searchParams]);
-  const variantSelection = useProductVariantSelection(enrichedProduct.sizes, initialSelection, {
+  const variantSelection = useProductVariantSelection(liveSizes, initialSelection, {
     productId: String(product.id),
     persist: true,
   });
-
-  const isInStock = product.stockStatus === "in_stock";
-  const isWishlisted = isInWishlist(String(product.id));
 
   const availableStock = useMemo(
     () => getVariantStock(variantSelection.selectedSize, variantSelection.selectedColor),
     [variantSelection.selectedColor, variantSelection.selectedSize],
   );
+
+  const variantInStock =
+    availableStock !== null ? availableStock > 0 : liveStockStatus === "in_stock";
+  const isWishlisted = isInWishlist(String(product.id));
+  const stockLabel = formatPdpStockLabel(availableStock);
 
   const maxQuantity = availableStock !== null && availableStock > 0 ? availableStock : 1;
   const effectiveQuantity = clampQuantity(quantity, maxQuantity);
@@ -100,6 +108,18 @@ export function PdpInteractivePanel({ product }: PdpInteractivePanelProps) {
           onSizeSelect={variantSelection.handleSizeSelect}
           onColorSelect={variantSelection.handleColorSelect}
         />
+      ) : null}
+
+      {stockLabel ? (
+        <p
+          className={cn(
+            "pdp-stock-status mt-4 font-medium",
+            availableStock === 0 ? "text-red-500" : "text-green-700",
+          )}
+          aria-live="polite"
+        >
+          {stockLabel}
+        </p>
       ) : null}
 
       {showStockAlert ? (
@@ -162,17 +182,17 @@ export function PdpInteractivePanel({ product }: PdpInteractivePanelProps) {
           <button
             type="button"
             className="btn btn-solid buy-button"
-            disabled={!isInStock}
+            disabled={!variantInStock}
             onClick={() => validateAndAddToCart(false)}
           >
             <ShoppingCart className="me-1 inline size-4" aria-hidden="true" />
-            {isInStock ? PDP_COPY.addToCart : PDP_COPY.outOfStock}
+            {variantInStock ? PDP_COPY.addToCart : PDP_COPY.outOfStock}
           </button>
 
           <button
             type="button"
             className="pdp-btn-outline buy-button"
-            disabled={!isInStock}
+            disabled={!variantInStock}
             onClick={() => validateAndAddToCart(true)}
           >
             {PDP_COPY.buyNow}
