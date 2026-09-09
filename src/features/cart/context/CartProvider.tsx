@@ -10,9 +10,14 @@ import {
   type ReactNode,
 } from "react";
 
+import {
+  clearRemoteCartIfAuthenticated,
+  useCartServerSync,
+} from "@/features/cart/hooks/use-cart-server-sync";
 import type { CartContextValue, CartLineItem } from "@/features/cart/types/cart.types";
 import { readCartFromStorage, writeCartToStorage } from "@/features/cart/utils/cart-storage";
 import { resolveCartLineVariantIds } from "@/features/cart/utils/cart-variant";
+import { useAuth } from "@/features/auth/context/AuthProvider";
 import { createLocalStorageStore, useLocalStorageItems } from "@/hooks/use-local-storage-items";
 
 const cartStorage = createLocalStorageStore(
@@ -32,8 +37,17 @@ export function CartProvider({
   children,
   freeShippingThreshold = 200,
 }: CartProviderProps) {
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   const { items, isHydrated, setItems } = useLocalStorageItems(cartStorage);
   const [isOpen, setIsOpen] = useState(false);
+
+  useCartServerSync({
+    isAuthenticated,
+    authReady: !authLoading,
+    isHydrated,
+    items,
+    setItems,
+  });
 
   const subtotal = useMemo(
     () => items.reduce((sum, item) => sum + item.price * item.quantity, 0),
@@ -44,7 +58,10 @@ export function CartProvider({
   const closeCart = useCallback(() => setIsOpen(false), []);
   const toggleCart = useCallback((open: boolean) => setIsOpen(open), []);
 
-  const clearCart = useCallback(() => setItems([]), [setItems]);
+  const clearCart = useCallback(() => {
+    setItems([]);
+    void clearRemoteCartIfAuthenticated(isAuthenticated);
+  }, [isAuthenticated, setItems]);
 
   const addItem = useCallback((item: Omit<CartLineItem, "id"> & { id?: string }) => {
     setItems((current) => {
