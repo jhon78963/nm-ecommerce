@@ -16,6 +16,7 @@ import {
 } from "@/features/shop/services/shop.service";
 import { parseSearchParams } from "@/features/shop/utils/shop-url.utils";
 import { getSiteUrl } from "@/features/seo/constants/site-meta";
+import { buildSearchPath } from "@/lib/routes";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -81,21 +82,7 @@ export default async function SlugRoute({ params, searchParams }: PageProps) {
 
   if (slug === SEARCH_COLLECTION_SLUG) {
     const rawParams = await searchParams;
-    const query = new URLSearchParams();
-
-    for (const [key, value] of Object.entries(rawParams)) {
-      if (Array.isArray(value)) {
-        value.forEach((item) => query.append(key, item));
-        continue;
-      }
-
-      if (value) {
-        query.set(key, value);
-      }
-    }
-
-    const suffix = query.toString();
-    redirect(suffix ? `/search?${suffix}` : "/search");
+    redirect(buildSearchPath(rawParams));
   }
 
   if (isInstitutionalSlug(slug)) {

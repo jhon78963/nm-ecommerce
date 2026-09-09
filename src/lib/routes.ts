@@ -18,7 +18,7 @@ export const ROUTES = {
     refunds: "/micuenta/reembolsos",
     favorites: "/micuenta/favoritos",
   },
-  search: "/search",
+  search: "/buscar",
   product: (slugOrId: string | number) => `/producto/${slugOrId}`,
   institutional: {
     nuestraEmpresa: "/nuestra-empresa",
@@ -34,6 +34,26 @@ export const ROUTES = {
     ventasMayor: "/ventas-al-por-mayor",
   },
 } as const;
+
+export function buildSearchPath(
+  params: Record<string, string | string[] | undefined> = {},
+): string {
+  const query = new URLSearchParams();
+
+  for (const [key, value] of Object.entries(params)) {
+    if (Array.isArray(value)) {
+      value.forEach((item) => query.append(key, item));
+      continue;
+    }
+
+    if (value) {
+      query.set(key, value);
+    }
+  }
+
+  const suffix = query.toString();
+  return suffix ? `${ROUTES.search}?${suffix}` : ROUTES.search;
+}
 
 export function getProductHref(slugOrId: string | number): string {
   return ROUTES.product(slugOrId);

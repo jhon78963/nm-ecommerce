@@ -1,5 +1,6 @@
 import { JsonLd } from "@/features/seo/components/JsonLd";
 import { getSiteUrl, SITE_META } from "@/features/seo/constants/site-meta";
+import { ROUTES } from "@/lib/routes";
 
 export function HomeJsonLd() {
   const siteUrl = getSiteUrl();
@@ -21,7 +22,7 @@ export function HomeJsonLd() {
           url: siteUrl,
           potentialAction: {
             "@type": "SearchAction",
-            target: `${siteUrl}/buscar?q={search_term_string}`,
+            target: `${siteUrl}${ROUTES.search}?q={search_term_string}`,
             "query-input": "required name=search_term_string",
           },
         },

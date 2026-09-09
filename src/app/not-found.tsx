@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import { ROUTES } from "@/lib/routes";
+
 export default function NotFound() {
   return (
     <div className="flex flex-1 flex-col items-center justify-center bg-white px-4 py-20 text-center">
@@ -16,7 +18,7 @@ export default function NotFound() {
           Ir al inicio
         </Link>
         <Link
-          href="/search"
+          href={ROUTES.search}
           className="rounded border border-[#ddd] px-6 py-3 text-sm font-semibold text-[#222] transition hover:border-theme hover:text-theme"
         >
           Buscar productos
