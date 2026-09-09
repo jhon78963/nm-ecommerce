@@ -2,6 +2,11 @@
 
 import { useEffect } from "react";
 
+import {
+  buildWholesaleQuoteWhatsAppUrl,
+  type WholesaleQuoteWhatsAppInput,
+} from "@/features/institutional/utils/build-whatsapp-wholesale-quote";
+
 interface InstitutionalHtmlContentProps {
   html: string;
   slug: string;
@@ -22,6 +27,36 @@ async function submitJson(path: string, payload: unknown) {
     throw new Error(body.error ?? "No pudimos procesar tu solicitud.");
   }
   return body;
+}
+
+function readWholesaleFormInput(form: HTMLFormElement): WholesaleQuoteWhatsAppInput {
+  const formData = new FormData(form);
+
+  return {
+    businessName: String(formData.get("nm_wholesale_business") ?? ""),
+    contactName: String(formData.get("nm_wholesale_contact") ?? ""),
+    phone: String(formData.get("nm_wholesale_phone") ?? ""),
+    city: String(formData.get("nm_wholesale_city") ?? ""),
+    businessType: String(formData.get("nm_wholesale_business_type") ?? ""),
+    productLines: String(formData.get("nm_wholesale_lines") ?? "") || undefined,
+    estimatedUnits: String(formData.get("nm_wholesale_units") ?? "") || undefined,
+    message: String(formData.get("nm_wholesale_message") ?? ""),
+  };
+}
+
+function syncWholesaleWhatsAppLinks(root: HTMLElement, input: WholesaleQuoteWhatsAppInput) {
+  const href = buildWholesaleQuoteWhatsAppUrl(input);
+
+  for (const selector of [
+    "#nm-wholesale-whatsapp-link",
+    "#nm-wholesale-whatsapp-form-link",
+    "#nm-wholesale-whatsapp-cta",
+  ]) {
+    const link = root.querySelector<HTMLAnchorElement>(selector);
+    if (link) {
+      link.href = href;
+    }
+  }
 }
 
 function bindInstitutionalForms(root: HTMLElement) {
@@ -57,6 +92,64 @@ function bindInstitutionalForms(root: HTMLElement) {
           }
         });
     });
+  }
+
+  const wholesaleForm = root.querySelector<HTMLFormElement>("#nm-wholesale-quote-form");
+  if (wholesaleForm && !wholesaleForm.dataset.bound) {
+    wholesaleForm.dataset.bound = "true";
+
+    const refreshWhatsappLinks = () => {
+      syncWholesaleWhatsAppLinks(root, readWholesaleFormInput(wholesaleForm));
+    };
+
+    refreshWhatsappLinks();
+    wholesaleForm.addEventListener("input", refreshWhatsappLinks);
+
+    wholesaleForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const message = root.querySelector<HTMLElement>("#nm-wholesale-msg");
+      const formData = new FormData(wholesaleForm);
+      const whatsappInput = readWholesaleFormInput(wholesaleForm);
+
+      void submitJson("/api/institutional/wholesale-quote", {
+        businessName: String(formData.get("nm_wholesale_business") ?? ""),
+        contactName: String(formData.get("nm_wholesale_contact") ?? ""),
+        email: String(formData.get("nm_wholesale_email") ?? ""),
+        phone: String(formData.get("nm_wholesale_phone") ?? ""),
+        city: String(formData.get("nm_wholesale_city") ?? ""),
+        businessType: String(formData.get("nm_wholesale_business_type") ?? ""),
+        productLines: String(formData.get("nm_wholesale_lines") ?? "") || undefined,
+        estimatedUnits: String(formData.get("nm_wholesale_units") ?? "") || undefined,
+        message: String(formData.get("nm_wholesale_message") ?? ""),
+      })
+        .then((result) => {
+          const quoteNumber =
+            typeof result.quoteNumber === "string" ? result.quoteNumber : undefined;
+
+          if (message) {
+            message.hidden = false;
+            message.textContent = quoteNumber
+              ? `${result.message ?? "Solicitud registrada."} Referencia: ${quoteNumber}.`
+              : (result.message ?? "Solicitud registrada.");
+            message.classList.add("nm-inst-contact-form__msg--success");
+          }
+
+          syncWholesaleWhatsAppLinks(root, {
+            ...whatsappInput,
+            quoteNumber,
+          });
+        })
+        .catch((error: unknown) => {
+          if (message) {
+            message.hidden = false;
+            message.textContent =
+              error instanceof Error ? error.message : "No pudimos registrar tu solicitud.";
+            message.classList.remove("nm-inst-contact-form__msg--success");
+          }
+        });
+    });
+  } else if (root.querySelector("#nm-wholesale-whatsapp-link")) {
+    syncWholesaleWhatsAppLinks(root, {});
   }
 
   const libroForm = root.querySelector<HTMLFormElement>("#nm-libro-form");

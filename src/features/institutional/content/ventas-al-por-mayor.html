@@ -157,8 +157,9 @@
 	</div>
 </section>
 
-<section class="nm-inst-section" aria-labelledby="nm-inst-wholesale-contact-title">
-	<div class="nm-container">
+<section class="nm-inst-section nm-inst-section--muted" id="nm-wholesale-quote-form" aria-labelledby="nm-inst-wholesale-contact-title">
+	<div class="nm-container nm-inst-contact-grid">
+		<div class="nm-inst-contact-info">
 		<p class="nm-section-eyebrow">Cotiza ahora</p>
 		<h2 id="nm-inst-wholesale-contact-title" class="nm-inst-section__title">
 			Canales de atención mayorista		</h2>
@@ -170,7 +171,7 @@
 				</span>
 				<div>
 					<strong>WhatsApp</strong>
-					<a href="https://wa.me/51901259663" target="_blank" rel="noopener noreferrer">
+					<a id="nm-wholesale-whatsapp-link" href="#" target="_blank" rel="noopener noreferrer">
 						Cotiza tu pedido por chat					</a>
 					<small>Respuesta rápida</small>
 				</div>
@@ -208,6 +209,78 @@
 				</div>
 			</li>
 		</ul>
+		</div>
+
+		<div class="nm-inst-contact-form-wrap">
+			<h3 class="nm-inst-contact-form__title">Solicitar cotización mayorista</h3>
+			<p class="nm-inst-contact-intro">Completa el formulario y un asesor te enviará precios mayoristas según tu pedido.</p>
+			<form id="nm-wholesale-quote-form" class="nm-inst-contact-form" method="post" novalidate>
+				<div class="nm-inst-contact-form__row">
+					<label class="nm-inst-contact-form__field">
+						<span>Nombre del negocio <em>*</em></span>
+						<input type="text" name="nm_wholesale_business" required autocomplete="organization">
+					</label>
+					<label class="nm-inst-contact-form__field">
+						<span>Persona de contacto <em>*</em></span>
+						<input type="text" name="nm_wholesale_contact" required autocomplete="name">
+					</label>
+				</div>
+
+				<div class="nm-inst-contact-form__row">
+					<label class="nm-inst-contact-form__field">
+						<span>Correo electrónico <em>*</em></span>
+						<input type="email" name="nm_wholesale_email" required autocomplete="email">
+					</label>
+					<label class="nm-inst-contact-form__field">
+						<span>Teléfono / WhatsApp <em>*</em></span>
+						<input type="tel" name="nm_wholesale_phone" required autocomplete="tel">
+					</label>
+				</div>
+
+				<div class="nm-inst-contact-form__row">
+					<label class="nm-inst-contact-form__field">
+						<span>Ciudad <em>*</em></span>
+						<input type="text" name="nm_wholesale_city" required>
+					</label>
+					<label class="nm-inst-contact-form__field">
+						<span>Tipo de negocio <em>*</em></span>
+						<select name="nm_wholesale_business_type" required>
+							<option value="">Selecciona una opción</option>
+							<option value="tienda">Tienda / bazar</option>
+							<option value="feria">Feria / mercado</option>
+							<option value="ecommerce">Ecommerce / redes</option>
+							<option value="otro">Otro</option>
+						</select>
+					</label>
+				</div>
+
+				<label class="nm-inst-contact-form__field">
+					<span>Líneas de interés</span>
+					<input type="text" name="nm_wholesale_lines" placeholder="Ej. damas, caballeros, niños">
+				</label>
+
+				<label class="nm-inst-contact-form__field">
+					<span>Cantidad estimada</span>
+					<input type="text" name="nm_wholesale_units" placeholder="Ej. 100 prendas, 2 docenas por modelo">
+				</label>
+
+				<label class="nm-inst-contact-form__field">
+					<span>Detalle de tu pedido <em>*</em></span>
+					<textarea name="nm_wholesale_message" rows="5" required placeholder="Cuéntanos qué buscas abastecer, fechas y cualquier detalle útil."></textarea>
+				</label>
+
+				<div class="nm-inst-contact-form__row">
+					<button type="submit" class="nm-btn nm-btn-primary nm-inst-contact-form__submit">
+						Enviar solicitud
+					</button>
+					<a id="nm-wholesale-whatsapp-form-link" href="#" class="nm-btn nm-btn-outline" target="_blank" rel="noopener noreferrer">
+						Cotizar por WhatsApp
+					</a>
+				</div>
+
+				<div id="nm-wholesale-msg" class="nm-inst-contact-form__msg" hidden aria-live="polite"></div>
+			</form>
+		</div>
 	</div>
 </section>
 
@@ -218,9 +291,9 @@
 		<p class="nm-inst-cta__text">
 			Solicita una cotización mayorista y te ayudamos a armar el pedido ideal para tu tienda.		</p>
 		<div class="nm-inst-cta__actions">
-			<a href="https://novedadesmaritex.net.pe/contactanos/" class="nm-btn nm-btn-primary">
+			<a href="#nm-wholesale-quote-form" class="nm-btn nm-btn-primary">
 				Solicitar cotización			</a>
-						<a href="https://wa.me/51901259663" class="nm-btn nm-btn-outline" target="_blank" rel="noopener noreferrer">
+						<a id="nm-wholesale-whatsapp-cta" href="#" class="nm-btn nm-btn-outline" target="_blank" rel="noopener noreferrer">
 				WhatsApp			</a>
 						<a href="https://novedadesmaritex.net.pe/tiendas/" class="nm-btn nm-btn-outline">
 				Visitar tiendas			</a>
