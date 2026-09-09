@@ -1,6 +1,6 @@
 import type { PaymentMethodOption } from "@/features/checkout/types/checkout.types";
 
-/** Orden y textos alineados con WooCommerce (deploy/woocommerce-payment-gateways.php). */
+/** Orden y textos de métodos de pago en checkout. */
 export const PAYMENT_METHODS: PaymentMethodOption[] = [
   {
     id: "bacs",

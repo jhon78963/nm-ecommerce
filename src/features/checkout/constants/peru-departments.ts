@@ -35,7 +35,7 @@ export function getDepartmentName(code: string): string {
   return PERU_DEPARTMENTS.find((dept) => dept.code === code)?.name ?? code;
 }
 
-/** Códigos postales de Trujillo y distritos (13001, 13002, etc.) — igual que WooCommerce zona 130*. */
+/** Códigos postales de Trujillo y distritos (13001, 13002, etc.). */
 export function isTrujilloPostcode(postcode: string): boolean {
   return postcode.trim().startsWith("130");
 }
