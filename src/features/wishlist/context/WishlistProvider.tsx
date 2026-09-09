@@ -8,7 +8,9 @@ import {
   type ReactNode,
 } from "react";
 
+import { useAuth } from "@/features/auth/context/AuthProvider";
 import type { ProductCartVariation } from "@/features/product/types/product-variant.types";
+import { useWishlistServerSync } from "@/features/wishlist/hooks/use-wishlist-server-sync";
 import type {
   WishlistContextValue,
   WishlistProductInput,
@@ -56,7 +58,16 @@ function upsertWishlistItem(
 }
 
 export function WishlistProvider({ children }: WishlistProviderProps) {
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   const { items, isHydrated, setItems } = useLocalStorageItems(wishlistStorage);
+
+  useWishlistServerSync({
+    isAuthenticated,
+    authReady: !authLoading,
+    isHydrated,
+    items,
+    setItems,
+  });
 
   const isInWishlist = useCallback(
     (productId: string) => items.some((item) => item.productId === productId),
