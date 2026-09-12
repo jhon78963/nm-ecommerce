@@ -7,6 +7,8 @@ import {
   buildWhatsAppProductPurchaseUrl,
   type WhatsAppProductPurchaseInput,
 } from "@/features/product/utils/build-whatsapp-product-purchase";
+import { mergeWhatsAppPendingLine } from "@/features/cart/whatsapp-pending/whatsapp-pending-cart.storage";
+import type { WhatsAppPendingCartLine } from "@/features/cart/whatsapp-pending/types";
 import { buildAbsolutePublicUrl } from "@/lib/public-site-url";
 import { cn } from "@/lib/utils";
 
@@ -56,12 +58,27 @@ export function ProductWhatsAppPurchaseButton({
     ],
   );
 
+  const queuePendingLine = () => {
+    const line: WhatsAppPendingCartLine = {
+      productId,
+      productName,
+      quantity,
+      unitPriceLabel,
+      sizeLabel,
+      colorLabel,
+      sku,
+      productUrl: productUrl ?? (productPath ? buildAbsolutePublicUrl(productPath) : null),
+    };
+    mergeWhatsAppPendingLine(line);
+  };
+
   if (variant === "button") {
     return (
       <a
         href={href}
         target="_blank"
         rel="noopener noreferrer"
+        onClick={queuePendingLine}
         className={cn("btn btn-outline w-full inline-flex items-center justify-center gap-2", className)}
       >
         <WhatsAppIcon className="size-4 text-[#25D366]" />
@@ -75,6 +92,7 @@ export function ProductWhatsAppPurchaseButton({
       href={href}
       target="_blank"
       rel="noopener noreferrer"
+      onClick={queuePendingLine}
       className={cn("quick-view-action-link", className)}
     >
       <WhatsAppIcon className="size-4 text-[#25D366]" />
