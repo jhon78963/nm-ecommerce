@@ -11,7 +11,7 @@ export const FALLBACK_FOOTER_CONFIG: StoreFooterConfig = {
   aboutText:
     "Descubre las últimas tendencias y disfruta de una experiencia de compra única con nuestras colecciones exclusivas.",
   address: "Puesto C-74, Mercado Mayorista, Trujillo, Perú",
-  supportNumber: "+51 921619616",
+  supportNumber: "+51 915213408",
   supportEmail: SUPPORT_EMAIL,
   socialMediaEnabled: true,
   facebookUrl: "https://facebook.com/",
