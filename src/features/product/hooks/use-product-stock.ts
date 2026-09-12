@@ -30,6 +30,8 @@ export function useProductStock(productId: string, initialSizes: ProductSize[]) 
   );
 
   useEffect(() => {
+    // Reset live stock when the server-provided size list changes (e.g. navigation).
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- sync props to client state
     setSizes(initialSizes);
     setStockStatus(resolveInitialStockStatus(initialSizes));
   }, [initialSizes]);

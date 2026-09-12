@@ -31,6 +31,8 @@ export function CookieConsentProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const stored = readCookieConsentFromStorage();
+    // Hydrate consent from localStorage once on mount (client-only).
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional SSR/client split
     setPreferences(stored);
     setShowBanner(stored === null);
     setIsReady(true);

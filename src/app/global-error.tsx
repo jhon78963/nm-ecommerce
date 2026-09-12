@@ -1,6 +1,7 @@
 "use client";
 
 import * as Sentry from "@sentry/nextjs";
+import Link from "next/link";
 import { useEffect } from "react";
 
 type GlobalErrorProps = {
@@ -29,9 +30,9 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
             >
               Reintentar
             </button>
-            <a href="/" className="rounded border border-[#222] px-4 py-2 text-sm">
+            <Link href="/" className="rounded border border-[#222] px-4 py-2 text-sm">
               Ir al inicio
-            </a>
+            </Link>
           </div>
         </div>
       </body>
