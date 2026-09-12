@@ -1,18 +1,22 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
+import { useState } from "react";
 import { Minus, Pencil, Plus, ShoppingCart, Trash2, Truck, X } from "lucide-react";
 
+import { CartVariationEditModal } from "@/features/cart/components/CartVariationEditModal";
+import { CART_COPY } from "@/features/cart/constants/cart-copy";
 import { useCart } from "@/features/cart/context/CartProvider";
+import type { CartLineItem } from "@/features/cart/types/cart.types";
+import { cartLineIsEditable } from "@/features/cart/utils/cart-variant";
 import { formatPrice } from "@/features/cart/utils/format-price";
 import { buildWhatsAppPendingCartBatchUrl } from "@/features/cart/whatsapp-pending/build-whatsapp-cart-batch";
 import { cartLineItemToWhatsAppPending } from "@/features/cart/whatsapp-pending/whatsapp-pending-cart.storage";
-import { WhatsAppIcon } from "@/components/ui/WhatsAppIcon";
-import { ROUTES } from "@/lib/routes";
+import { CartFooterActions } from "@/features/cart/components/CartFooterActions";
 import { cn } from "@/lib/utils";
 
 export function CartOffcanvas() {
+  const [editingLine, setEditingLine] = useState<CartLineItem | null>(null);
   const {
     items,
     isOpen,
@@ -189,11 +193,12 @@ export function CartOffcanvas() {
                       </div>
 
                       <div className="close-circle absolute right-0 top-0 flex gap-1">
-                        {item.variationId ? (
+                        {cartLineIsEditable(item) ? (
                           <button
                             type="button"
-                            className="flex size-7 items-center justify-center border border-[#eee] bg-[#f8f8f8] text-[#222]"
-                            aria-label="Editar variación"
+                            onClick={() => setEditingLine(item)}
+                            className="flex size-7 items-center justify-center border border-[#eee] bg-[#f8f8f8] text-[#222] hover:text-theme"
+                            aria-label={CART_COPY.editVariation}
                           >
                             <Pencil className="size-3.5" />
                           </button>
@@ -227,39 +232,24 @@ export function CartOffcanvas() {
                 </div>
               </li>
               <li>
-                <div className="buttons flex flex-col gap-3.5">
-                  <a
-                    href={whatsappBatchUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex w-full items-center justify-center gap-2 border border-[#25D366] bg-[#25D366] px-4 py-3 text-center text-sm font-semibold capitalize text-white transition-colors hover:bg-white hover:text-[#25D366]"
-                  >
-                    <WhatsAppIcon className="size-4" />
-                    Comprar carrito por WhatsApp
-                  </a>
-                  <div className="flex gap-3.5">
-                  <Link
-                    href={ROUTES.cart}
-                    onClick={closeCart}
-                    className="view-cart w-full border border-theme bg-theme px-4 py-3 text-center text-sm font-semibold capitalize text-white transition-colors hover:bg-white hover:text-theme"
-                  >
-                    Ver carrito
-                  </Link>
-                  <Link
-                    href={ROUTES.checkout}
-                    onClick={closeCart}
-                    className="checkout w-full border border-theme bg-theme px-4 py-3 text-center text-sm font-semibold capitalize text-white transition-colors hover:bg-white hover:text-theme"
-                  >
-                    Finalizar compra
-                  </Link>
-                  </div>
-                </div>
+                <CartFooterActions
+                  whatsappHref={whatsappBatchUrl}
+                  variant="offcanvas"
+                  onNavigate={closeCart}
+                />
               </li>
             </ul>
           </div>
         ) : null}
         </div>
       </aside>
+
+      {editingLine ? (
+        <CartVariationEditModal
+          cartLine={editingLine}
+          onClose={() => setEditingLine(null)}
+        />
+      ) : null}
     </>
   );
 }

@@ -65,3 +65,7 @@ export function cartLineHasValidVariant(
 ): boolean {
   return Boolean(resolveCartLineVariantIds(item as CartLineItem).productSizeId);
 }
+
+export function cartLineIsEditable(item: CartLineItem): boolean {
+  return Boolean(item.variation) || cartLineHasValidVariant(item);
+}

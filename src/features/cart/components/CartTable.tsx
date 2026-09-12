@@ -1,18 +1,28 @@
 "use client";
 
-import Link from "next/link";
+import { useMemo, useState } from "react";
 
 import { CART_COPY } from "@/features/cart/constants/cart-copy";
 import { CartEmptyState } from "@/features/cart/components/CartEmptyState";
+import { CartFooterActions } from "@/features/cart/components/CartFooterActions";
 import { CartRow } from "@/features/cart/components/CartRow";
+import { CartVariationEditModal } from "@/features/cart/components/CartVariationEditModal";
 import { useCart } from "@/features/cart/context/CartProvider";
+import type { CartLineItem } from "@/features/cart/types/cart.types";
 import { formatPrice } from "@/features/cart/utils/format-price";
-import { ROUTES } from "@/lib/routes";
+import { buildWhatsAppPendingCartBatchUrl } from "@/features/cart/whatsapp-pending/build-whatsapp-cart-batch";
+import { cartLineItemToWhatsAppPending } from "@/features/cart/whatsapp-pending/whatsapp-pending-cart.storage";
 
 import "./cart.css";
 
 export function CartTable() {
+  const [editingLine, setEditingLine] = useState<CartLineItem | null>(null);
   const { items, subtotal, isHydrated, removeItem, updateQuantity } = useCart();
+  const whatsappBatchUrl = useMemo(
+    () =>
+      buildWhatsAppPendingCartBatchUrl(items.map((line) => cartLineItemToWhatsAppPending(line))),
+    [items],
+  );
 
   if (!isHydrated) {
     return null;
@@ -44,6 +54,7 @@ export function CartTable() {
                 onDecrease={() => updateQuantity(item.id, item.quantity - 1)}
                 onIncrease={() => updateQuantity(item.id, item.quantity + 1)}
                 onRemove={() => removeItem(item.id)}
+                onEditVariation={() => setEditingLine(item)}
               />
             ))}
           </tbody>
@@ -64,13 +75,15 @@ export function CartTable() {
       </div>
 
       <div className="cart-buttons">
-        <Link href="/" className="cart-buttons__link">
-          {CART_COPY.continueShopping}
-        </Link>
-        <Link href={ROUTES.checkout} className="cart-buttons__link">
-          {CART_COPY.checkout}
-        </Link>
+        <CartFooterActions whatsappHref={whatsappBatchUrl} variant="page" />
       </div>
+
+      {editingLine ? (
+        <CartVariationEditModal
+          cartLine={editingLine}
+          onClose={() => setEditingLine(null)}
+        />
+      ) : null}
     </>
   );
 }

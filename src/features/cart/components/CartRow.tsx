@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { X } from "lucide-react";
+import { Pencil, X } from "lucide-react";
 
 import { StoreImage } from "@/components/ui/StoreImage";
 import { CART_COPY } from "@/features/cart/constants/cart-copy";
 import { CartQuantityStepper } from "@/features/cart/components/CartQuantityStepper";
 import type { CartLineItem } from "@/features/cart/types/cart.types";
+import { cartLineIsEditable } from "@/features/cart/utils/cart-variant";
 import { formatPrice } from "@/features/cart/utils/format-price";
 import { getCartItemHref, getCartItemLineTotal } from "@/features/cart/utils/cart-item";
 
@@ -15,11 +16,52 @@ interface CartRowProps {
   onDecrease: () => void;
   onIncrease: () => void;
   onRemove: () => void;
+  onEditVariation?: () => void;
 }
 
-export function CartRow({ item, onDecrease, onIncrease, onRemove }: CartRowProps) {
+function CartRowActionButtons({
+  showEdit,
+  onEditVariation,
+  onRemove,
+}: {
+  showEdit: boolean;
+  onEditVariation?: () => void;
+  onRemove: () => void;
+}) {
+  return (
+    <div className="cart-row-actions">
+      {showEdit ? (
+        <button
+          type="button"
+          onClick={onEditVariation}
+          className="edit-btn"
+          aria-label={CART_COPY.editVariation}
+        >
+          <Pencil className="size-4" />
+        </button>
+      ) : null}
+      <button
+        type="button"
+        onClick={onRemove}
+        className="remove-btn"
+        aria-label={CART_COPY.removeItem}
+      >
+        <X className="size-4" />
+      </button>
+    </div>
+  );
+}
+
+export function CartRow({
+  item,
+  onDecrease,
+  onIncrease,
+  onRemove,
+  onEditVariation,
+}: CartRowProps) {
   const href = getCartItemHref(item);
   const lineTotal = getCartItemLineTotal(item);
+  const canEditVariation = cartLineIsEditable(item) && Boolean(onEditVariation);
 
   return (
     <tr>
@@ -55,14 +97,11 @@ export function CartRow({ item, onDecrease, onIncrease, onRemove }: CartRowProps
           </div>
           <div className="col">
             <h2 className="td-color">
-              <button
-                type="button"
-                onClick={onRemove}
-                className="remove-btn"
-                aria-label={CART_COPY.removeItem}
-              >
-                <X className="size-4" />
-              </button>
+              <CartRowActionButtons
+                showEdit={canEditVariation}
+                onEditVariation={onEditVariation}
+                onRemove={onRemove}
+              />
             </h2>
           </div>
         </div>
@@ -85,14 +124,11 @@ export function CartRow({ item, onDecrease, onIncrease, onRemove }: CartRowProps
       </td>
 
       <td>
-        <button
-          type="button"
-          onClick={onRemove}
-          className="remove-btn"
-          aria-label={CART_COPY.removeItem}
-        >
-          <X className="size-4" />
-        </button>
+        <CartRowActionButtons
+          showEdit={canEditVariation}
+          onEditVariation={onEditVariation}
+          onRemove={onRemove}
+        />
       </td>
     </tr>
   );

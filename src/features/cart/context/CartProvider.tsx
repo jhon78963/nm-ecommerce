@@ -139,6 +139,44 @@ export function CartProvider({
     );
   }, [setItems]);
 
+  const replaceItem = useCallback((lineId: string, next: Omit<CartLineItem, "id">) => {
+    setItems((current) => {
+      const lineIndex = current.findIndex((line) => line.id === lineId);
+      if (lineIndex === -1) {
+        return current;
+      }
+
+      const incomingVariant = resolveCartLineVariantIds(next as CartLineItem);
+      const duplicate = current.find((line) => {
+        if (line.id === lineId || line.productId !== next.productId) {
+          return false;
+        }
+
+        const lineVariant = resolveCartLineVariantIds(line);
+        return (
+          lineVariant.productSizeId === incomingVariant.productSizeId
+          && lineVariant.colorId === incomingVariant.colorId
+        );
+      });
+
+      if (!duplicate) {
+        const updatedLine: CartLineItem = { ...next, id: lineId };
+        syncWhatsAppPendingFromCartLine(updatedLine);
+        return current.map((line) => (line.id === lineId ? updatedLine : line));
+      }
+
+      const mergedDuplicate: CartLineItem = {
+        ...duplicate,
+        quantity: duplicate.quantity + next.quantity,
+      };
+      syncWhatsAppPendingFromCartLine(mergedDuplicate);
+
+      return current
+        .filter((line) => line.id !== lineId)
+        .map((line) => (line.id === duplicate.id ? mergedDuplicate : line));
+    });
+  }, [setItems]);
+
   useEffect(() => {
     document.body.style.overflow = isOpen ? "hidden" : "";
     return () => {
@@ -161,6 +199,7 @@ export function CartProvider({
       addItem,
       removeItem,
       updateQuantity,
+      replaceItem,
     }),
     [
       items,
@@ -175,6 +214,7 @@ export function CartProvider({
       addItem,
       removeItem,
       updateQuantity,
+      replaceItem,
     ],
   );
 

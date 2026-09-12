@@ -1,0 +1,103 @@
+.cart-footer-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  width: 100%;
+}
+
+.cart-footer-actions__btn {
+  display: flex;
+  min-height: 52px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px 6px;
+  border: 1px solid transparent;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.25;
+  text-align: center;
+  text-decoration: none;
+  text-transform: capitalize;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.15s ease;
+}
+
+.cart-footer-actions__btn svg {
+  flex-shrink: 0;
+}
+
+.cart-footer-actions__btn--whatsapp {
+  border-color: #1a9d5c;
+  background-color: #1fa463;
+  color: #fff;
+}
+
+.cart-footer-actions__btn--whatsapp:hover {
+  background-color: #178c52;
+  border-color: #178c52;
+  color: #fff;
+  box-shadow: none;
+}
+
+.cart-footer-actions__btn--theme-outline {
+  border-color: color-mix(in srgb, var(--theme-color) 70%, #e8e8e8);
+  background-color: #fff;
+  color: var(--theme-color);
+}
+
+.cart-footer-actions__btn--theme-outline:hover {
+  border-color: var(--theme-color);
+  background-color: color-mix(in srgb, var(--theme-color) 10%, #fff);
+  color: var(--theme-color);
+}
+
+.cart-footer-actions__btn--theme-cta {
+  border-color: var(--theme-color);
+  background-color: var(--theme-color);
+  color: #fff;
+  box-shadow: 0 3px 10px color-mix(in srgb, var(--theme-color) 28%, transparent);
+}
+
+.cart-footer-actions__btn--theme-cta:hover {
+  background-color: color-mix(in srgb, var(--theme-color) 90%, #3d2a20);
+  border-color: color-mix(in srgb, var(--theme-color) 90%, #3d2a20);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.cart-footer-actions--page .cart-footer-actions__btn {
+  min-height: 48px;
+  padding: 12px 10px;
+  font-size: clamp(12px, calc(12px + 2 * (100vw - 320px) / 1600), 15px);
+}
+
+@media (min-width: 480px) {
+  .cart-footer-actions--offcanvas .cart-footer-actions__btn {
+    min-height: 54px;
+    font-size: 12px;
+    padding-inline: 8px;
+  }
+}
+
+@media (max-width: 359px) {
+  .cart-footer-actions {
+    gap: 6px;
+  }
+
+  .cart-footer-actions__btn {
+    min-height: 48px;
+    font-size: 10px;
+    padding-inline: 4px;
+  }
+
+  .cart-footer-actions__btn svg {
+    width: 14px;
+    height: 14px;
+  }
+}
