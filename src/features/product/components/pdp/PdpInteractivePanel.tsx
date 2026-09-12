@@ -250,24 +250,6 @@ export function PdpInteractivePanel({ product }: PdpInteractivePanelProps) {
             {PDP_COPY.buyNow}
           </button>
         </div>
-
-        <ProductWhatsAppPurchaseButton
-          label={PDP_COPY.whatsappPurchase}
-          variant="button"
-          className="mt-3"
-          productId={String(product.id)}
-          productName={product.name}
-          quantity={effectiveQuantity}
-          unitPriceLabel={formatPrice(product.salePrice)}
-          sizeLabel={variantSelection.hasSizes ? variantSelection.selectedSize?.label ?? null : undefined}
-          colorLabel={
-            variantSelection.hasSizes && variantSelection.selectedSize
-              ? variantSelection.selectedColor?.label ?? null
-              : undefined
-          }
-          sku={product.sku}
-          productPath={productPath}
-        />
       </div>
 
       <div className="compare-box buy-box">
