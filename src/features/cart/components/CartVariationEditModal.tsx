@@ -138,10 +138,6 @@ export function CartVariationEditModal({
   }, []);
 
   useEffect(() => {
-    setQuantity((current) => clampQuantity(current, maxQuantity));
-  }, [maxQuantity]);
-
-  useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         handleClose();
