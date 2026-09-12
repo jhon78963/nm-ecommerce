@@ -3,11 +3,11 @@
 import { useMemo } from "react";
 
 import { WhatsAppIcon } from "@/components/ui/WhatsAppIcon";
-import { env } from "@/config/env";
 import {
   buildWhatsAppProductPurchaseUrl,
   type WhatsAppProductPurchaseInput,
 } from "@/features/product/utils/build-whatsapp-product-purchase";
+import { buildAbsolutePublicUrl } from "@/lib/public-site-url";
 import { cn } from "@/lib/utils";
 
 interface ProductWhatsAppPurchaseButtonProps extends WhatsAppProductPurchaseInput {
@@ -41,7 +41,7 @@ export function ProductWhatsAppPurchaseButton({
         sizeLabel,
         colorLabel,
         sku,
-        productUrl: productUrl ?? (productPath ? `${env.appUrl}${productPath}` : null),
+        productUrl: productUrl ?? (productPath ? buildAbsolutePublicUrl(productPath) : null),
       }),
     [
       colorLabel,
