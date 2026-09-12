@@ -26,7 +26,10 @@ export const CART_COPY = {
   decreaseQuantity: "Disminuir cantidad",
   increaseQuantity: "Aumentar cantidad",
   editVariation: "Editar variación",
+  editVariationTitle: "Editar variación",
+  editVariationCurrent: "En tu carrito",
   updateItem: "Actualizar producto",
+  updateItemShort: "Guardar cambios",
   loadingProduct: "Cargando producto…",
   productLoadError: "No se pudo cargar el producto. Intenta de nuevo.",
 } as const;

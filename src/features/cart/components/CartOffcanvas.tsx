@@ -247,6 +247,7 @@ export function CartOffcanvas() {
       {editingLine ? (
         <CartVariationEditModal
           cartLine={editingLine}
+          presentation="offcanvas"
           onClose={() => setEditingLine(null)}
         />
       ) : null}

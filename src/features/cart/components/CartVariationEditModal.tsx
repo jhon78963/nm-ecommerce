@@ -1,9 +1,10 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
-import { Minus, Plus, ShoppingCart, X } from "lucide-react";
+import { ArrowLeft, Minus, Plus, ShoppingCart, X } from "lucide-react";
 
 import { useCart } from "@/features/cart/context/CartProvider";
 import { CART_COPY } from "@/features/cart/constants/cart-copy";
@@ -16,6 +17,7 @@ import {
 import { ProductVariantSelectors } from "@/features/product/components/variants/ProductVariantSelectors";
 import { useProductStock } from "@/features/product/hooks/use-product-stock";
 import { useProductVariantSelection } from "@/features/product/hooks/use-product-variant-selection";
+import { PDP_COPY } from "@/features/product/constants/pdp-copy";
 import type { ProductBoxItem } from "@/features/product/types/product-box.types";
 import { fetchProductBoxItem } from "@/features/product/services/product-catalog.client";
 import { enrichProductWithVariants } from "@/features/product/utils/enrich-product-variants";
@@ -29,12 +31,20 @@ import "./cart-variation-edit-modal.css";
 
 const MODAL_ANIMATION_MS = 360;
 
+type CartVariationEditPresentation = "default" | "offcanvas";
+
 interface CartVariationEditModalProps {
   cartLine: CartLineItem;
   onClose: () => void;
+  presentation?: CartVariationEditPresentation;
 }
 
-export function CartVariationEditModal({ cartLine, onClose }: CartVariationEditModalProps) {
+export function CartVariationEditModal({
+  cartLine,
+  onClose,
+  presentation = "default",
+}: CartVariationEditModalProps) {
+  const isOffcanvas = presentation === "offcanvas";
   const { replaceItem } = useCart();
   const isMounted = useSyncExternalStore(() => () => {}, () => true, () => false);
   const [isVisible, setIsVisible] = useState(false);
@@ -77,6 +87,7 @@ export function CartVariationEditModal({ cartLine, onClose }: CartVariationEditM
   const canIncreaseQuantity = effectiveQuantity < maxQuantity;
 
   const displayPrice = variantSelection.selectedSize?.salePrice ?? product?.salePrice ?? cartLine.price;
+  const previewImageUrl = product?.imageUrl ?? cartLine.imageUrl;
 
   const canUpdate =
     Boolean(product)
@@ -85,6 +96,21 @@ export function CartVariationEditModal({ cartLine, onClose }: CartVariationEditM
       productBoxItemToCartLineItem(product!, effectiveQuantity, variantSelection.cartVariation),
     )
     && (availableStock === null || (availableStock > 0 && effectiveQuantity <= availableStock));
+
+  const updateLabel = isOffcanvas ? CART_COPY.updateItemShort : CART_COPY.updateItem;
+
+  const stockHint = useMemo(() => {
+    if (availableStock === null) {
+      return null;
+    }
+    if (availableStock <= 0) {
+      return PDP_COPY.outOfStock;
+    }
+    if (availableStock <= 4) {
+      return PDP_COPY.remainingStock(availableStock);
+    }
+    return null;
+  }, [availableStock]);
 
   const handleClose = useCallback(() => {
     setIsVisible(false);
@@ -110,6 +136,10 @@ export function CartVariationEditModal({ cartLine, onClose }: CartVariationEditM
       document.body.style.overflow = "";
     };
   }, []);
+
+  useEffect(() => {
+    setQuantity((current) => clampQuantity(current, maxQuantity));
+  }, [maxQuantity]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -189,6 +219,7 @@ export function CartVariationEditModal({ cartLine, onClose }: CartVariationEditM
     <div
       className={cn(
         "quick-view-modal-root cart-variation-edit-modal-root theme-modal-2 variation-modal",
+        isOffcanvas && "cart-variation-edit-modal-root--offcanvas",
         isVisible && "quick-view-modal-root--show",
       )}
       role="presentation"
@@ -206,36 +237,90 @@ export function CartVariationEditModal({ cartLine, onClose }: CartVariationEditM
         aria-labelledby="cart-variation-edit-title"
         className="quick-view-modal-root__dialog cart-variation-edit-modal__dialog"
       >
-        <div className="modal-content cart-variation-edit-modal">
-          <div className="modal-header p-0">
-            <button
-              type="button"
-              className="btn btn-close"
-              onClick={handleClose}
-              aria-label="Cerrar"
-            >
-              <X aria-hidden="true" />
-            </button>
-          </div>
+        <div
+          className={cn(
+            "modal-content cart-variation-edit-modal",
+            isOffcanvas && "cart-variation-edit-modal--offcanvas",
+          )}
+        >
+          {isOffcanvas ? (
+            <div className="cart-variation-edit-modal__topbar">
+              <button
+                type="button"
+                className="cart-variation-edit-modal__back"
+                onClick={handleClose}
+                aria-label="Volver al carrito"
+              >
+                <ArrowLeft className="size-4" aria-hidden />
+                {CART_COPY.editVariationTitle}
+              </button>
+              <button
+                type="button"
+                className="cart-variation-edit-modal__topbar-close"
+                onClick={handleClose}
+                aria-label="Cerrar"
+              >
+                <X className="size-5" aria-hidden />
+              </button>
+            </div>
+          ) : (
+            <div className="modal-header p-0">
+              <button
+                type="button"
+                className="btn btn-close"
+                onClick={handleClose}
+                aria-label="Cerrar"
+              >
+                <X aria-hidden="true" />
+              </button>
+            </div>
+          )}
 
-          <div className="modal-body">
+          <div className="cart-variation-edit-modal__body modal-body">
             {isLoading ? (
               <p className="cart-variation-edit-modal__status">{CART_COPY.loadingProduct}</p>
             ) : loadError ? (
               <p className="cart-variation-edit-modal__status">{loadError}</p>
             ) : product ? (
               <>
-                <div className="product-right product-page-details variation-title">
-                  <h2 className="main-title" id="cart-variation-edit-title">
-                    <Link href={productHref} onClick={handleClose}>
-                      {product.name}
-                    </Link>
-                  </h2>
-                  <h3 className="price-detail">{formatPrice(displayPrice)}</h3>
+                <div
+                  className={cn(
+                    "cart-variation-edit-modal__product",
+                    isOffcanvas && "cart-variation-edit-modal__product--offcanvas",
+                  )}
+                >
+                  <div className="cart-variation-edit-modal__thumb">
+                    {previewImageUrl ? (
+                      <Image
+                        src={previewImageUrl}
+                        alt={product.name}
+                        fill
+                        className="object-contain p-1"
+                        sizes="96px"
+                      />
+                    ) : (
+                      <ShoppingCart className="size-6 text-[#ccc]" aria-hidden />
+                    )}
+                  </div>
+
+                  <div className="cart-variation-edit-modal__product-copy">
+                    <p className="cart-variation-edit-modal__eyebrow">
+                      {isOffcanvas ? CART_COPY.editVariationCurrent : CART_COPY.editVariation}
+                    </p>
+                    <h2 className="main-title" id="cart-variation-edit-title">
+                      <Link href={productHref} onClick={handleClose}>
+                        {product.name}
+                      </Link>
+                    </h2>
+                    <p className="price-detail">{formatPrice(displayPrice)}</p>
+                    {cartLine.variation ? (
+                      <p className="cart-variation-edit-modal__current-line">{cartLine.variation}</p>
+                    ) : null}
+                  </div>
                 </div>
 
                 {variantSelection.hasSizes ? (
-                  <>
+                  <div className="cart-variation-edit-modal__selectors">
                     <ProductVariantSelectors
                       sizes={variantSelection.sizes}
                       selectedSizeId={variantSelection.selectedSizeId}
@@ -245,64 +330,79 @@ export function CartVariationEditModal({ cartLine, onClose }: CartVariationEditM
                       availableColors={variantSelection.availableColors}
                       onSizeSelect={variantSelection.handleSizeSelect}
                       onColorSelect={variantSelection.handleColorSelect}
+                      compact
                     />
+
+                    {stockHint ? (
+                      <p
+                        className={cn(
+                          "cart-variation-edit-modal__stock",
+                          availableStock !== null && availableStock <= 0 && "cart-variation-edit-modal__stock--out",
+                        )}
+                      >
+                        {stockHint}
+                      </p>
+                    ) : null}
 
                     {variantSelection.validationError ? (
                       <p className="product-variant-selectors__error">
                         {variantSelection.validationError}
                       </p>
                     ) : null}
-                  </>
+                  </div>
                 ) : null}
-
-                <div className="variation-qty-button">
-                  <div className="qty-section">
-                    <div className="qty-box">
-                      <div className="input-group">
-                        <button
-                          type="button"
-                          className="btn quantity-left-minus"
-                          onClick={() => updateQuantity(-1)}
-                          aria-label={CART_COPY.decreaseQuantity}
-                        >
-                          <Minus className="size-4" />
-                        </button>
-                        <input
-                          type="text"
-                          name="quantity"
-                          className="form-control input-number"
-                          value={effectiveQuantity}
-                          readOnly
-                          aria-label={CART_COPY.quantity}
-                        />
-                        <button
-                          type="button"
-                          className="btn quantity-left-plus"
-                          onClick={() => updateQuantity(1)}
-                          disabled={!canIncreaseQuantity}
-                          aria-label={CART_COPY.increaseQuantity}
-                        >
-                          <Plus className="size-4" />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="product-buttons">
-                    <button
-                      type="button"
-                      className="btn btn-solid hover-solid btn-animation scroll-button"
-                      disabled={!canUpdate}
-                      onClick={handleUpdate}
-                    >
-                      <ShoppingCart className="size-4" aria-hidden="true" />
-                      {CART_COPY.updateItem}
-                    </button>
-                  </div>
-                </div>
               </>
             ) : null}
           </div>
+
+          {product && !isLoading && !loadError ? (
+            <div className="cart-variation-edit-modal__footer variation-qty-button">
+              <div className="qty-section">
+                <span className="cart-variation-edit-modal__qty-label">{CART_COPY.quantity}</span>
+                <div className="qty-box">
+                  <div className="input-group">
+                    <button
+                      type="button"
+                      className="btn quantity-left-minus"
+                      onClick={() => updateQuantity(-1)}
+                      aria-label={CART_COPY.decreaseQuantity}
+                    >
+                      <Minus className="size-4" />
+                    </button>
+                    <input
+                      type="text"
+                      name="quantity"
+                      className="form-control input-number"
+                      value={effectiveQuantity}
+                      readOnly
+                      aria-label={CART_COPY.quantity}
+                    />
+                    <button
+                      type="button"
+                      className="btn quantity-left-plus"
+                      onClick={() => updateQuantity(1)}
+                      disabled={!canIncreaseQuantity}
+                      aria-label={CART_COPY.increaseQuantity}
+                    >
+                      <Plus className="size-4" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="product-buttons">
+                <button
+                  type="button"
+                  className="btn btn-solid hover-solid btn-animation scroll-button"
+                  disabled={!canUpdate}
+                  onClick={handleUpdate}
+                >
+                  <ShoppingCart className="size-4" aria-hidden="true" />
+                  {updateLabel}
+                </button>
+              </div>
+            </div>
+          ) : null}
         </div>
       </div>
     </div>,
