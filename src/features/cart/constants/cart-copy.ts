@@ -32,4 +32,6 @@ export const CART_COPY = {
   updateItemShort: "Guardar cambios",
   loadingProduct: "Cargando producto…",
   productLoadError: "No se pudo cargar el producto. Intenta de nuevo.",
+  viewProduct: "Ver ficha del producto",
+  chooseVariation: "Elige talla y color",
 } as const;

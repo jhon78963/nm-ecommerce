@@ -21,7 +21,7 @@ export async function GET(_request: Request, context: RouteContext) {
       { product },
       {
         headers: {
-          "Cache-Control": "no-store",
+          "Cache-Control": "private, max-age=300, stale-while-revalidate=60",
         },
       },
     );

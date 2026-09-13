@@ -19,7 +19,7 @@ import { useProductStock } from "@/features/product/hooks/use-product-stock";
 import { useProductVariantSelection } from "@/features/product/hooks/use-product-variant-selection";
 import { PDP_COPY } from "@/features/product/constants/pdp-copy";
 import type { ProductBoxItem } from "@/features/product/types/product-box.types";
-import { fetchProductBoxItem } from "@/features/product/services/product-catalog.client";
+import { fetchProductBoxItem, peekProductBoxItem } from "@/features/product/services/product-catalog.client";
 import { enrichProductWithVariants } from "@/features/product/utils/enrich-product-variants";
 import { clampQuantity, getVariantStock } from "@/features/product/utils/get-variant-stock";
 import { getProductBoxHref } from "@/features/product/utils/format-product-price";
@@ -48,9 +48,11 @@ export function CartVariationEditModal({
   const { replaceItem } = useCart();
   const isMounted = useSyncExternalStore(() => () => {}, () => true, () => false);
   const [isVisible, setIsVisible] = useState(false);
-  const [product, setProduct] = useState<ProductBoxItem | null>(null);
+  const [product, setProduct] = useState<ProductBoxItem | null>(() =>
+    peekProductBoxItem(cartLine.productId),
+  );
   const [loadError, setLoadError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(() => !peekProductBoxItem(cartLine.productId));
   const [quantity, setQuantity] = useState(cartLine.quantity);
 
   const lineVariant = resolveCartLineVariantIds(cartLine);
@@ -86,8 +88,11 @@ export function CartVariationEditModal({
   const effectiveQuantity = clampQuantity(quantity, maxQuantity);
   const canIncreaseQuantity = effectiveQuantity < maxQuantity;
 
-  const displayPrice = variantSelection.selectedSize?.salePrice ?? product?.salePrice ?? cartLine.price;
+  const displayPrice =
+    variantSelection.selectedSize?.salePrice ?? product?.salePrice ?? cartLine.price;
   const previewImageUrl = product?.imageUrl ?? cartLine.imageUrl;
+  const displayName = product?.name ?? cartLine.name;
+  const showFooter = isOffcanvas ? !loadError : Boolean(product) && !isLoading && !loadError;
 
   const canUpdate =
     Boolean(product)
@@ -152,7 +157,6 @@ export function CartVariationEditModal({
     let cancelled = false;
 
     void (async () => {
-      setIsLoading(true);
       setLoadError(null);
 
       try {
@@ -273,11 +277,9 @@ export function CartVariationEditModal({
           )}
 
           <div className="cart-variation-edit-modal__body modal-body">
-            {isLoading ? (
-              <p className="cart-variation-edit-modal__status">{CART_COPY.loadingProduct}</p>
-            ) : loadError ? (
+            {loadError ? (
               <p className="cart-variation-edit-modal__status">{loadError}</p>
-            ) : product ? (
+            ) : (
               <>
                 <div
                   className={cn(
@@ -285,14 +287,19 @@ export function CartVariationEditModal({
                     isOffcanvas && "cart-variation-edit-modal__product--offcanvas",
                   )}
                 >
-                  <div className="cart-variation-edit-modal__thumb">
+                  <div
+                    className={cn(
+                      "cart-variation-edit-modal__thumb",
+                      isOffcanvas && "cart-variation-edit-modal__thumb--offcanvas",
+                    )}
+                  >
                     {previewImageUrl ? (
                       <Image
                         src={previewImageUrl}
-                        alt={product.name}
+                        alt={displayName}
                         fill
                         className="object-contain p-1"
-                        sizes="96px"
+                        sizes={isOffcanvas ? "140px" : "96px"}
                       />
                     ) : (
                       <ShoppingCart className="size-6 text-[#ccc]" aria-hidden />
@@ -304,9 +311,13 @@ export function CartVariationEditModal({
                       {isOffcanvas ? CART_COPY.editVariationCurrent : CART_COPY.editVariation}
                     </p>
                     <h2 className="main-title" id="cart-variation-edit-title">
-                      <Link href={productHref} onClick={handleClose}>
-                        {product.name}
-                      </Link>
+                      {product ? (
+                        <Link href={productHref} onClick={handleClose}>
+                          {displayName}
+                        </Link>
+                      ) : (
+                        displayName
+                      )}
                     </h2>
                     <p className="price-detail">{formatPrice(displayPrice)}</p>
                     {cartLine.variation ? (
@@ -315,43 +326,84 @@ export function CartVariationEditModal({
                   </div>
                 </div>
 
-                {variantSelection.hasSizes ? (
-                  <div className="cart-variation-edit-modal__selectors">
-                    <ProductVariantSelectors
-                      sizes={variantSelection.sizes}
-                      selectedSizeId={variantSelection.selectedSizeId}
-                      selectedColorId={variantSelection.selectedColorId}
-                      selectedSize={variantSelection.selectedSize}
-                      selectedColor={variantSelection.selectedColor}
-                      availableColors={variantSelection.availableColors}
-                      onSizeSelect={variantSelection.handleSizeSelect}
-                      onColorSelect={variantSelection.handleColorSelect}
-                      compact
-                    />
+                <div
+                  className={cn(
+                    "cart-variation-edit-modal__variant-panel",
+                    isOffcanvas && "cart-variation-edit-modal__variant-panel--offcanvas",
+                  )}
+                >
+                  <p className="cart-variation-edit-modal__panel-title">{CART_COPY.chooseVariation}</p>
 
-                    {stockHint ? (
-                      <p
-                        className={cn(
-                          "cart-variation-edit-modal__stock",
-                          availableStock !== null && availableStock <= 0 && "cart-variation-edit-modal__stock--out",
-                        )}
-                      >
-                        {stockHint}
-                      </p>
-                    ) : null}
+                  {isLoading ? (
+                    <div className="cart-variation-edit-modal__skeleton" aria-hidden>
+                      <div className="cart-variation-edit-modal__skeleton-row" />
+                      <div className="cart-variation-edit-modal__skeleton-chips" />
+                      <div className="cart-variation-edit-modal__skeleton-row cart-variation-edit-modal__skeleton-row--short" />
+                      <div className="cart-variation-edit-modal__skeleton-swatches" />
+                    </div>
+                  ) : product && variantSelection.hasSizes ? (
+                    <>
+                      <ProductVariantSelectors
+                        sizes={variantSelection.sizes}
+                        selectedSizeId={variantSelection.selectedSizeId}
+                        selectedColorId={variantSelection.selectedColorId}
+                        selectedSize={variantSelection.selectedSize}
+                        selectedColor={variantSelection.selectedColor}
+                        availableColors={variantSelection.availableColors}
+                        onSizeSelect={variantSelection.handleSizeSelect}
+                        onColorSelect={variantSelection.handleColorSelect}
+                        compact
+                      />
 
-                    {variantSelection.validationError ? (
-                      <p className="product-variant-selectors__error">
-                        {variantSelection.validationError}
-                      </p>
-                    ) : null}
-                  </div>
-                ) : null}
+                      {(variantSelection.selectedSize || variantSelection.selectedColor) ? (
+                        <div className="cart-variation-edit-modal__summary">
+                          {variantSelection.selectedSize ? (
+                            <span className="cart-variation-edit-modal__pill">
+                              Talla {variantSelection.selectedSize.label}
+                            </span>
+                          ) : null}
+                          {variantSelection.selectedColor ? (
+                            <span className="cart-variation-edit-modal__pill">
+                              {variantSelection.selectedColor.label}
+                            </span>
+                          ) : null}
+                        </div>
+                      ) : null}
+
+                      {stockHint ? (
+                        <p
+                          className={cn(
+                            "cart-variation-edit-modal__stock-badge",
+                            availableStock !== null && availableStock <= 0 && "cart-variation-edit-modal__stock-badge--out",
+                          )}
+                        >
+                          {stockHint}
+                        </p>
+                      ) : null}
+
+                      {variantSelection.validationError ? (
+                        <p className="product-variant-selectors__error">
+                          {variantSelection.validationError}
+                        </p>
+                      ) : null}
+                    </>
+                  ) : null}
+
+                  {product ? (
+                    <Link
+                      href={productHref}
+                      className="cart-variation-edit-modal__product-link"
+                      onClick={handleClose}
+                    >
+                      {CART_COPY.viewProduct}
+                    </Link>
+                  ) : null}
+                </div>
               </>
-            ) : null}
+            )}
           </div>
 
-          {product && !isLoading && !loadError ? (
+          {showFooter ? (
             <div className="cart-variation-edit-modal__footer variation-qty-button">
               <div className="qty-section">
                 <span className="cart-variation-edit-modal__qty-label">{CART_COPY.quantity}</span>

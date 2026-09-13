@@ -13,6 +13,7 @@ import { formatPrice } from "@/features/cart/utils/format-price";
 import { buildWhatsAppPendingCartBatchUrl } from "@/features/cart/whatsapp-pending/build-whatsapp-cart-batch";
 import { cartLineItemToWhatsAppPending } from "@/features/cart/whatsapp-pending/whatsapp-pending-cart.storage";
 import { CartFooterActions } from "@/features/cart/components/CartFooterActions";
+import { prefetchProductBoxItem } from "@/features/product/services/product-catalog.client";
 import { cn } from "@/lib/utils";
 
 export function CartOffcanvas() {
@@ -196,6 +197,8 @@ export function CartOffcanvas() {
                         {cartLineIsEditable(item) ? (
                           <button
                             type="button"
+                            onMouseEnter={() => prefetchProductBoxItem(item.productId)}
+                            onFocus={() => prefetchProductBoxItem(item.productId)}
                             onClick={() => setEditingLine(item)}
                             className="flex size-7 items-center justify-center border border-[#eee] bg-[#f8f8f8] text-[#222] hover:text-theme"
                             aria-label={CART_COPY.editVariation}
@@ -246,6 +249,7 @@ export function CartOffcanvas() {
 
       {editingLine ? (
         <CartVariationEditModal
+          key={editingLine.id}
           cartLine={editingLine}
           presentation="offcanvas"
           onClose={() => setEditingLine(null)}
